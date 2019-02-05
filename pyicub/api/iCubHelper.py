@@ -1,6 +1,8 @@
 import yarp
 from pyicub.api.yarp_classes.GazeController import GazeController
 from pyicub.api.yarp_classes.PositionController import PositionController
+from pyicub.api.yarp_modules.emotions import emotionsPyCtrl
+from pyicub.api.yarp_modules.speech import speechPyCtrl
 
 class iCubPart:
     def __init__(self, name, joints_n):
@@ -23,9 +25,16 @@ class iCub:
     def __init__(self, robot):
         self.__robot__ = robot
         self.__gaze_controller__ = None
+        self.__emotions_mod__ = None
+        self.__speech_mod__ = None
         self.__position_controllers__ = {}
         self.__drivers__ = {}
         self.__encoders__ = {}
+
+    def getEmotionsModule(self):
+        if self.__emotions_mod__ is None:
+            self.__emotions_mod__ = emotionsPyCtrl()
+        return self.__emotions_mod__
 
     def getIGazeControl(self):
         if self.__gaze_controller__ is None:
@@ -58,3 +67,8 @@ class iCub:
             driver = self.getDriver(robot_part)
             self.__encoders__[robot_part.name] = driver.viewIEncoders()
         return self.__encoders__[robot_part.name]
+
+    def say(self, message):
+        if self.__speech_mod__ is None:
+            self.__speech_mod__ = speechPyCtrl()
+        self.__speech_mod__.say(message)
