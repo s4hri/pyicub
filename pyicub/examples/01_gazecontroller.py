@@ -1,10 +1,23 @@
+#   Copyright (C) 2019  Davide De Tommaso
+#
+#   This program is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>
+
 import yarp
-import sys
-sys.path.append('../../')
+
 from pyicub.api.iCubHelper import iCub, ROBOT_TYPE
 
 yarp.Network.init()
-#yarp.Network.setLocalMode(True)
 
 icub = iCub(ROBOT_TYPE.ICUB)
 ctrl = icub.getIGazeControl()
@@ -15,20 +28,3 @@ p.set(1, 0.2)
 p.set(2, -0.4)
 
 ctrl.lookAtFixationPoint(p)
-
-"""
-options = yarp.Property()
-driver = yarp.PolyDriver()
-
-# set the poly driver options
-options.put("device", "gazecontrollerclient")
-options.put("local", "/gaze_client")
-options.put("remote", "/iKinGazeCtrl")
-
-# opening the drivers
-print 'Opening the motor driver...'
-driver.open(options)
-if not driver.isValid():
-    print 'Cannot open the driver!'
-    sys.exit()
-"""
