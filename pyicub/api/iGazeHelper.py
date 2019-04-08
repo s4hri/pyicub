@@ -43,6 +43,10 @@ class iGazeHelper:
         p.set(2, z)
         self.__gaze_controller__.lookAtFixationPoint(p)
 
+    def lookAt3DPointSync(self, x, y, z, timeout=0.0):
+        self.lookAt3DPoint(x, y, z)
+        self.__gaze_controller__.waitMotionDone(timeout)
+
     def reset(self):
         self.clearEyes()
         self.clearNeck()
