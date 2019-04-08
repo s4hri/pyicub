@@ -18,9 +18,11 @@ import time as tt
 
 class PositionController:
 
-    def __init__(self, yarp_driver, joints_list):
+    def __init__(self, yarp_driver, joints_list, iencoders):
         self.__IControlMode__ = yarp_driver.viewIControlMode()
-        for joint in joints_list:
+        self.__IEncoders__ = iencoders
+        self.__joints_list__ = joints_list
+        for joint in self.__joints_list__:
             self.__IControlMode__.setControlMode(joint, yarp.VOCAB_CM_POSITION)
         self.__IPositionControl__ = yarp_driver.viewIPositionControl()
 
@@ -29,3 +31,28 @@ class PositionController:
 
     def getIEncoders(self):
         return self.__IEncoders__
+
+    def move(self, target_joints, req_time, joints_list=None, waitMotionDone=False):
+        if joints_list is None:
+            joints_list = self.__joints_list__
+        disp = [0]*len(joints_list)
+        speed_head = [0]*len(joints_list)
+        tmp = yarp.Vector(len(joints_list))
+        encs=yarp.Vector(16)
+        while not self.__IEncoders__.getEncoders(encs.data()):
+            tt.sleep(0.1)
+        i = 0
+        for j in joints_list:
+            tmp.set(i, target_joints[i])
+            disp[i] = target_joints[i] - encs[j]
+            if disp[i]<0.0:
+                disp[i]=-disp[i]
+            speed_head[i] = disp[i]/req_time
+            self.__IPositionControl__.setRefSpeed(j, speed_head[i])
+            self.__IPositionControl__.positionMove(j, tmp[i])
+            i+=1
+        if waitMotionDone is True:
+            self.waitMotionDone(req_time)
+
+    def waitMotionDone(self, req_time):
+        tt.sleep(req_time)

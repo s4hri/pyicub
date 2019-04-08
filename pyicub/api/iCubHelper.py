@@ -25,6 +25,7 @@ class iCubPart:
     def __init__(self, name, joints_n):
         self.name = name
         self.joints_n = joints_n
+        self.joints_list = range(0, joints_n)
 
 class ROBOT_TYPE:
     ICUB = "icub"
@@ -40,26 +41,34 @@ class ICUB_PARTS:
 
 class iCub:
 
-    def __init__(self, robot, gaze_controller=False, facial_expressions=False, speech=False):
+    def __init__(self, robot):
         self.__robot__ = robot
         self.__position_controllers__ = {}
         self.__drivers__ = {}
         self.__encoders__ = {}
         self.__gaze_controller__ = None
-        self.gaze = None
-        self.emo = None
-        self.speech = None
-        if gaze_controller is True:
-            self.getIGazeControl()
-        if facial_expressions is True:
-            self.emo = self.getEmotionsModule()
-        if speech is True:
-            self.speech = self.getSpeechModule()
+        self.__gaze__ = None
+        self.__emo__ = None
+        self.__speech__ = None
 
-    def getEmotionsModule(self):
-        if self.emo is None:
-            self.emo = emotionsPyCtrl()
-        return self.emo
+    @property
+    def gaze(self):
+        if self.__gaze__ is None:
+            ctrl = self.getIGazeControl()
+            self.__gaze__ = iGazeHelper.iGazeHelper(ctrl)
+        return self.__gaze__
+
+    @property
+    def emo(self):
+        if self.__emo__ is None:
+            self.__emo__ = emotionsPyCtrl()
+        return self.__emo__
+
+    @property
+    def speech(self):
+        if self.__speech__ is None:
+            self.__speech__ = speechPyCtrl()
+        return self.__speech__
 
     def getDriver(self, robot_part):
         if not robot_part.name in self.__drivers__.keys():
@@ -67,7 +76,7 @@ class iCub:
             self.__drivers__[robot_part.name] = yarp.PolyDriver(props)
         return self.__drivers__[robot_part.name]
 
-    def getIEncoders(self, robot_part, driver=None):
+    def getIEncoders(self, robot_part):
         if not robot_part.name in self.__encoders__.keys():
             driver = self.getDriver(robot_part)
             self.__encoders__[robot_part.name] = driver.viewIEncoders()
@@ -76,15 +85,15 @@ class iCub:
     def getIGazeControl(self):
         if self.__gaze_controller__ is None:
             self.__gaze_controller__ = GazeController()
-            self.gaze = iGazeHelper.iGazeHelper(self.__gaze_controller__)
         return self.__gaze_controller__.getIGazeControl()
 
-    def getIPositionControl(self, robot_part, joints_list=None):
+    def getIPositionControl(self, robot_part, joints_list):
         if not robot_part.name in self.__position_controllers__.keys():
             driver = self.getDriver(robot_part)
             if joints_list is None:
-                joints_list = range(0, robot_part.joints_n)
-            self.__position_controllers__[robot_part.name] = PositionController(driver, joints_list)
+                joints_list = robot_part.joints_list
+            iencoders = self.getIEncoders(robot_part)
+            self.__position_controllers__[robot_part.name] = PositionController(driver, joints_list, iencoders)
         return self.__position_controllers__[robot_part.name].getIPositionControl()
 
     def getRobotPartProperties(self, robot_part):
@@ -94,35 +103,7 @@ class iCub:
         props.put("remote","/" + self.__robot__ + "/" + robot_part.name)
         return props
 
-    def getSpeechModule(self):
-        if self.speech is None:
-            self.speech = speechPyCtrl()
-        return self.speech
-
-    def initController(self, robot_parts=[]):
-        for part in robot_parts:
-            self.getIPositionControl(part)
-            self.getIEncoders(part)
-
-    def move(self, robot_part, target_joints, req_time, joints_list):
-        disp = [0]*len(joints_list)
-        speed_head = [0]*len(joints_list)
-        tmp = yarp.Vector(len(joints_list))
-        encs=yarp.Vector(16)
-        while not self.getIEncoders(robot_part).getEncoders(encs.data()):
-            tt.sleep(0.1)
-        i = 0
-        for j in joints_list:
-            tmp.set(i, target_joints[i])
-            disp[i] = target_joints[i] - encs[j]
-            if disp[i]<0.0:
-                disp[i]=-disp[i]
-            speed_head[i] = disp[i]/req_time
-
-            self.getIPositionControl(robot_part, joints_list).setRefSpeed(j, speed_head[i])
-            self.getIPositionControl(robot_part, joints_list).positionMove(j, tmp[i])
-            i+=1
-
-    def moveSync(self, robot_part, target_joints, req_time, joints_list):
-        self.move(robot_part, target_joints, req_time, joints_list)
-        time.sleep(req_time)
+    def getPositionController(self, robot_part):
+        if not robot_part in self.__position_controllers__.keys():
+            self.getIPositionControl(robot_part, robot_part.joints_list)
+        return self.__position_controllers__[robot_part.name]

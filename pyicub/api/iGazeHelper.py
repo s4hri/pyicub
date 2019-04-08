@@ -18,7 +18,7 @@ import yarp
 class iGazeHelper:
 
     def __init__(self, gaze_controller):
-        self.__gaze_controller__ = gaze_controller.getIGazeControl()
+        self.__gaze_controller__ = gaze_controller
 
     def blockEyes(self, vergence):
         self.__gaze_controller__.blockEyes(vergence)
