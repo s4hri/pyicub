@@ -33,6 +33,7 @@ class ROBOT_TYPE:
 
 class ICUB_PARTS:
     HEAD = iCubPart("head", 6)
+    FACE = iCubPart("face", 1)
     LEFT_ARM = iCubPart("left_arm", 16)
     RIGHT_ARM = iCubPart("right_arm", 16)
     TORSO = iCubPart("torso", 3)

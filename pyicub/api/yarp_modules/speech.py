@@ -35,14 +35,14 @@ class speechPyCtrl:
         cmd.clear()
         map(cmd.addString, ["setPitch"])
         map(cmd.addInt, [pitch])
-        return self.__rpc__execute(cmd)
+        return self.__rpc__.execute(cmd)
 
     def setSpeed(self, speed):
         cmd = yarp.Bottle()
         cmd.clear()
         map(cmd.addString, ["setSpeed"])
         map(cmd.addInt, [speed])
-        return self.__rpc__execute(cmd)
+        return self.__rpc__.execute(cmd)
 
     def close(self):
         self.__rpc__.close()

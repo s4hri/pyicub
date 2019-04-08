@@ -30,12 +30,12 @@ class faceLandmarksPyCtrl:
         return self.__rpc__.execute(btl)
 
     def getLandmark(self, index, shouldWait=False):
-        L = self.__port_landmarks__.read(shouldWait)
+        L = self.getLandmarks(shouldWait)
         if L is None:
             return (None, None)
         return map(int, L[index].split())
 
-    def getLandmarks(self):
+    def getLandmarks(self, shouldWait=False):
         btl = self.__port_landmarks__.read(shouldWait)
         if btl is None:
             return None
