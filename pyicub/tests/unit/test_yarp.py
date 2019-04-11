@@ -21,8 +21,10 @@ sys.path.append('../../../')
 from pyicub.api.yarp_classes.BufferedPort import BufferedPort, BufferedReadPort, BufferedWritePort
 from pyicub.api.yarp_classes.Rpc import RpcClient
 
+if yarp.Network.checkNetwork(1.0) is False:
+    yarp.Network.setLocalMode(True)
 yarp.Network.init()
-#yarp.Network.setLocalMode(True)
+
 
 class TestYarpMethods(unittest.TestCase):
 
