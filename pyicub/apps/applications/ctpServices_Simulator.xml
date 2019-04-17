@@ -1,0 +1,33 @@
+<application>
+    <name>ctpServices_Simulator</name>
+
+    <description>A Yarp application for running basic modules in human-robot interaction scenarios.</description>
+    <version>1.0</version>
+
+    <authors>
+        <author email="davide.detommaso@iit.it">Davide De Tommaso</author>
+    </authors>
+
+    <module>
+        <name>ctpService</name>
+        <parameters>--robot icubSim --part head</parameters>
+        <node>icubs4hri</node>
+    </module>
+
+    <module>
+        <name>ctpService</name>
+        <parameters>--robot icubSim --part left_arm</parameters>
+        <node>icubs4hri</node>
+    </module>
+    <module>
+        <name>ctpService</name>
+        <parameters>--robot icubSim --part right_arm</parameters>
+        <node>icubs4hri</node>
+    </module>
+    <module>
+        <name>ctpService</name>
+        <parameters>--robot icubSim --part torso</parameters>
+        <node>icubs4hri</node>
+    </module>
+
+</application>

@@ -15,30 +15,21 @@
 
 import yarp
 import time
+import sys
+
+sys.path.append('../../')
 
 from pyicub.api.iCubHelper import iCub, ROBOT_TYPE, ICUB_PARTS
 
 yarp.Network.init()
 
-icub = iCub(ROBOT_TYPE.ICUB_SIMULATOR)
-gaze_ctrl = icub.getIGazeControl()
+icub = iCub(ROBOT_TYPE.ICUB_SIMULATOR, logtype="DEBUG")
+rightarm_ctrl = icub.getPositionController(ICUB_PARTS.RIGHT_ARM)
+torso_ctrl = icub.getPositionController(ICUB_PARTS.TORSO)
 
-rightarm_ctrl = icub.getPositionControl(ICUB_PARTS.RIGHT_ARM)
-
-p = yarp.Vector(3)
-p.set(0, -0.4)
-p.set(1, 0.0)
-p.set(2, 0.1)
-gaze_ctrl.setTrackingMode(True)
-gaze_ctrl.lookAtFixationPoint(p)
-
-
-t1 = time.time()
-rightarm_ctrl.move(target_joints=[10.06, 99.47, 5.31, 102.67, -13.50, -4.21], req_time=0.2, joints_list=[0, 1, 2, 3, 4, 5], waitMotionDone=True)
-print time.time() - t1
-
-raw_input()
-
-t1 = time.time()
-rightarm_ctrl.move(target_joints=[9.97, 99.63, 6.34, 97.23, -10.95, -3.11], req_time=0.2, joints_list=[0, 1, 2, 3, 4, 5], waitMotionDone=True)
-print time.time() - t1
+icub.gaze.setTrackingMode(True)
+icub.gaze.lookAt3DPoint(-0.2, 0.2, 1.0)
+torso_ctrl.move(target_joints=[5.0, -4.0, -2.0], req_time=1.0)
+rightarm_ctrl.move(target_joints=[10.06, 99.47, 5.31, 102.67, -13.50, -4.21], req_time=1.0, joints_list=[0, 1, 2, 3, 4, 5], waitMotionDone=True)
+rightarm_ctrl.move(target_joints=[9.97, 99.63, 6.34, 97.23, -10.95, -3.11], req_time=1.0, joints_list=[0, 1, 2, 3, 4, 5], waitMotionDone=True)
+rightarm_ctrl.move(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0], req_time=1.0, joints_list=[0, 1, 2, 3, 4, 5], waitMotionDone=True)

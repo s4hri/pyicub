@@ -16,15 +16,15 @@
 import unittest
 import sys
 import yarp
+import time
 
 sys.path.append('../../../')
-from pyicub.api.yarp_classes.BufferedPort import BufferedPort, BufferedReadPort, BufferedWritePort
-from pyicub.api.yarp_classes.Rpc import RpcClient
+from pyicub.api.classes.BufferedPort import BufferedPort, BufferedReadPort, BufferedWritePort
+from pyicub.api.classes.Rpc import RpcClient
 
 if yarp.Network.checkNetwork(1.0) is False:
     yarp.Network.setLocalMode(True)
 yarp.Network.init()
-
 
 class TestYarpMethods(unittest.TestCase):
 

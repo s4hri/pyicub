@@ -14,17 +14,23 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-import time as tt
+import time
+import threading
 
-class PositionController:
+from Generics import GenericController
 
-    def __init__(self, yarp_driver, joints_list, iencoders):
-        self.__IControlMode__ = yarp_driver.viewIControlMode()
+class PositionController(GenericController):
+
+    def __init__(self, logger, driver, joints_list, iencoders):
+        GenericController.__init__(self, logger)
+        self.__IControlMode__ = driver.viewIControlMode()
         self.__IEncoders__ = iencoders
         self.__joints_list__ = joints_list
-        for joint in self.__joints_list__:
-            self.__IControlMode__.setControlMode(joint, yarp.VOCAB_CM_POSITION)
-        self.__IPositionControl__ = yarp_driver.viewIPositionControl()
+        self.setPositionControlMode(self.__joints_list__)
+        self.__IPositionControl__ = driver.viewIPositionControl()
+
+    def __waitMotionDone__(self, timeout):
+        time.sleep(timeout)
 
     def getIPositionControl(self):
         return self.__IPositionControl__
@@ -32,6 +38,7 @@ class PositionController:
     def getIEncoders(self):
         return self.__IEncoders__
 
+    @GenericController.__atomicDecorator__
     def move(self, target_joints, req_time, joints_list=None, waitMotionDone=False):
         if joints_list is None:
             joints_list = self.__joints_list__
@@ -40,19 +47,22 @@ class PositionController:
         tmp = yarp.Vector(len(joints_list))
         encs=yarp.Vector(16)
         while not self.__IEncoders__.getEncoders(encs.data()):
-            tt.sleep(0.1)
+            self.__logger__.warning("Data from encoders not available!")
+            time.sleep(0.1)
         i = 0
         for j in joints_list:
             tmp.set(i, target_joints[i])
             disp[i] = target_joints[i] - encs[j]
-            if disp[i]<0.0:
-                disp[i]=-disp[i]
+            if disp[i] < 0.0:
+                disp[i] =- disp[i]
             speed_head[i] = disp[i]/req_time
             self.__IPositionControl__.setRefSpeed(j, speed_head[i])
             self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
         if waitMotionDone is True:
-            self.waitMotionDone(req_time)
+            self.__waitMotionDone__(timeout=req_time)
 
-    def waitMotionDone(self, req_time):
-        tt.sleep(req_time)
+    @GenericController.__atomicDecorator__
+    def setPositionControlMode(self, joints_list):
+        for joint in joints_list:
+            self.__IControlMode__.setControlMode(joint, yarp.VOCAB_CM_POSITION)

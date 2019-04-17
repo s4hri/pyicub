@@ -14,12 +14,12 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-import time
-from pyicub.api.yarp_classes.GazeController import GazeController
-from pyicub.api.yarp_classes.PositionController import PositionController
-from pyicub.api.yarp_modules.emotions import emotionsPyCtrl
-from pyicub.api.yarp_modules.speech import speechPyCtrl
-from pyicub.api import iGazeHelper
+
+from pyicub.api.classes.Logger import YarpLogger
+from pyicub.api.controllers.GazeController import GazeController
+from pyicub.api.controllers.PositionController import PositionController
+from pyicub.api.modules.emotions import emotionsPyCtrl
+from pyicub.api.modules.speech import speechPyCtrl
 
 class iCubPart:
     def __init__(self, name, joints_n):
@@ -41,8 +41,7 @@ class ICUB_PARTS:
     RIGHT_LEG = iCubPart("right_leg", 6)
 
 class iCub:
-
-    def __init__(self, robot):
+    def __init__(self, robot, logtype=YarpLogger.NONE):
         self.__robot__ = robot
         self.__position_controllers__ = {}
         self.__drivers__ = {}
@@ -51,12 +50,31 @@ class iCub:
         self.__gaze__ = None
         self.__emo__ = None
         self.__speech__ = None
+        self.__logger__ = YarpLogger(logtype=logtype)
+
+    def __getDriver__(self, robot_part):
+        if not robot_part.name in self.__drivers__.keys():
+            props = self.__getRobotPartProperties__(robot_part)
+            self.__drivers__[robot_part.name] = yarp.PolyDriver(props)
+        return self.__drivers__[robot_part.name]
+
+    def __getIEncoders__(self, robot_part):
+        if not robot_part.name in self.__encoders__.keys():
+            driver = self.__getDriver__(robot_part)
+            self.__encoders__[robot_part.name] = driver.viewIEncoders()
+        return self.__encoders__[robot_part.name]
+
+    def __getRobotPartProperties__(self, robot_part):
+        props = yarp.Property()
+        props.put("device","remote_controlboard")
+        props.put("local","/client/" + robot_part.name)
+        props.put("remote","/" + self.__robot__ + "/" + robot_part.name)
+        return props
 
     @property
     def gaze(self):
         if self.__gaze__ is None:
-            ctrl = self.getIGazeControl()
-            self.__gaze__ = iGazeHelper.iGazeHelper(ctrl)
+            self.__gaze__ = GazeController(self.__robot__, self.__logger__)
         return self.__gaze__
 
     @property
@@ -71,40 +89,11 @@ class iCub:
             self.__speech__ = speechPyCtrl()
         return self.__speech__
 
-    def getDriver(self, robot_part):
-        if not robot_part.name in self.__drivers__.keys():
-            props = self.getRobotPartProperties(robot_part)
-            self.__drivers__[robot_part.name] = yarp.PolyDriver(props)
-        return self.__drivers__[robot_part.name]
-
-    def getIEncoders(self, robot_part):
-        if not robot_part.name in self.__encoders__.keys():
-            driver = self.getDriver(robot_part)
-            self.__encoders__[robot_part.name] = driver.viewIEncoders()
-        return self.__encoders__[robot_part.name]
-
-    def getIGazeControl(self):
-        if self.__gaze_controller__ is None:
-            self.__gaze_controller__ = GazeController()
-        return self.__gaze_controller__.getIGazeControl()
-
-    def getIPositionControl(self, robot_part, joints_list):
-        if not robot_part.name in self.__position_controllers__.keys():
-            driver = self.getDriver(robot_part)
+    def getPositionController(self, robot_part, joints_list=None):
+        if not robot_part in self.__position_controllers__.keys():
+            driver = self.__getDriver__(robot_part)
+            iencoders = self.__getIEncoders__(robot_part)
             if joints_list is None:
                 joints_list = robot_part.joints_list
-            iencoders = self.getIEncoders(robot_part)
-            self.__position_controllers__[robot_part.name] = PositionController(driver, joints_list, iencoders)
-        return self.__position_controllers__[robot_part.name].getIPositionControl()
-
-    def getRobotPartProperties(self, robot_part):
-        props = yarp.Property()
-        props.put("device","remote_controlboard")
-        props.put("local","/client/" + robot_part.name)
-        props.put("remote","/" + self.__robot__ + "/" + robot_part.name)
-        return props
-
-    def getPositionController(self, robot_part):
-        if not robot_part in self.__position_controllers__.keys():
-            self.getIPositionControl(robot_part, robot_part.joints_list)
+            self.__position_controllers__[robot_part.name] = PositionController(self.__logger__, driver, joints_list, iencoders)
         return self.__position_controllers__[robot_part.name]

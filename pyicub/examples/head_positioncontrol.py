@@ -15,6 +15,9 @@
 
 import yarp
 import time
+import sys
+
+sys.path.append('../../')
 
 from pyicub.api.iCubHelper import iCub, ROBOT_TYPE, ICUB_PARTS
 

@@ -14,10 +14,14 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
+import sys
+sys.path.append('../../')
 
 from pyicub.api.iCubHelper import iCub, ROBOT_TYPE
 
 yarp.Network.init()
 
-icub = iCub(ROBOT_TYPE.ICUB)
-icub.gaze.lookAt3DPointSync(-1.0, 0.0, 0.0)
+icub = iCub(ROBOT_TYPE.ICUB, logtype="DEBUG")
+icub.gaze.lookAt3DPoint(-1.0, -0.5, 1.0, waitMotionDone=True)
+icub.gaze.lookAt3DPoint(-1.0, -0.2, 0.5, waitMotionDone=True)
+icub.gaze.lookAt3DPoint(-1.0, 0.2, 0.1, waitMotionDone=True)

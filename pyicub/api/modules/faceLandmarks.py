@@ -14,8 +14,8 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-from pyicub.api.yarp_classes.Rpc import RpcClient
-from pyicub.api.yarp_classes.BufferedPort import BufferedReadPort
+from pyicub.api.classes.Rpc import RpcClient
+from pyicub.api.classes.BufferedPort import BufferedReadPort
 
 class faceLandmarksPyCtrl:
 
