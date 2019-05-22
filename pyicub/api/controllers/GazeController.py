@@ -17,7 +17,7 @@ import yarp
 import sys
 import time
 
-from Generics import GenericController
+from pyicub.api.controllers.Generics import GenericController
 
 class GazeController(GenericController):
 

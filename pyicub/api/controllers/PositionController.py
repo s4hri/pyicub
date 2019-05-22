@@ -17,7 +17,7 @@ import yarp
 import time
 import threading
 
-from Generics import GenericController
+from pyicub.api.controllers.Generics import GenericController
 
 class PositionController(GenericController):
 

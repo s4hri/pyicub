@@ -16,6 +16,7 @@
 import yarp
 
 from pyicub.api.classes.Logger import YarpLogger
+from pyicub.api.controllers.Generics import GenericController
 from pyicub.api.controllers.GazeController import GazeController
 from pyicub.api.controllers.PositionController import PositionController
 from pyicub.api.modules.emotions import emotionsPyCtrl
