@@ -1,4 +1,5 @@
 from setuptools import setup
+import setuptools
 
 setup(name='pyicub',
       version='0.1',
@@ -7,6 +8,7 @@ setup(name='pyicub',
       author='Davide De Tommaso',
       author_email='davide.detommaso@iit.it',
       license='GPLv3',
-      packages=['pyicub'],
+#      packages=['pyicub'],
+      packages=setuptools.find_packages(),
       zip_safe=False)
 
