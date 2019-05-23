@@ -57,3 +57,44 @@ rightarm.move( target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0], \
 ```
 
 
+## Usage in Matlab
+
+Just after starting the Matlab be sure to choose the version of python that actually has yarp bindings,
+for example: (you can check the current one using py.sys.path)
+```matlab
+pyversion('/usr/bin/python3')
+```
+and an example showing how to move the head
+```matlab
+py.time.time() % just to be sure that the Python engine started...
+
+py.yarp.Network.init()
+icub = py.pyicub.iCub( 'icubSim' )
+
+head_ctrl = icub.getPositionController(py.pyicub.iCubPart("head",int32(6)))
+while(1)
+    head_ctrl.move(py.list({-15.0, 0.0, 0.0, 0.0, 0.0, 5.0}), 1.2)
+    pause(1)
+    head_ctrl.move(py.list({-1.0, 0.0, 0.0, 0.0, 0.0, 5.0}), 1.2)
+    pause(1)
+end
+```
+and moving the arm up and down
+```matlab
+py.time.time()
+py.yarp.Network.init()
+icub = py.pyicub.iCub( 'icubSim' )
+
+rightarm = icub.getPositionController( py.pyicub.iCubPart("right_arm", int32(16)) )
+
+while(1)
+    rightarm.move(py.list({0.1, 0.1, 0.1, 0.1, 0.1, 0.1,0,0,0,0,0,0,0,0,0,0}),1.1)
+    pause(1)
+    rightarm.move(py.list({10.06, 99.47, 5.31, 102.67, -13.50, -4.21,0,0,0,0,0,0,0,0,0,0}),1.1)
+    pause(1)
+end
+```
+
+General notes:
+- storing py.list() as a matlab variable sometimes breaks everything
+- int32() is required when values are expected to be int in python
