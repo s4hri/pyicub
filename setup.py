@@ -1,19 +1,12 @@
-#!/usr/bin/env python
+from setuptools import setup
 
-from distutils.core import setup
-
-kwargs = {
-	'name': 'pyicub',
-	'version': '0.1',
-        'packages': ['pyicub'],
-#        'package_dir': {'': 'pyicub'},
-	'description': 'Python iCub wrapper',
-        'author': 'Davide De Tommaso',
-        'author_email': 'davide.detommaso@iit.it',
-        'url': 'https://github.com/s4hri/pyicub',
-        'license': 'GPLv3'
-}
-
-
-setup(**kwargs)
+setup(name='pyicub',
+      version='0.1',
+      description='iCub Python Wrapper',
+      url='http://github.com/s4hri/pyicub',
+      author='Davide De Tommaso',
+      author_email='davide.detommaso@iit.it',
+      license='GPLv3',
+      packages=['pyicub'],
+      zip_safe=False)
 
