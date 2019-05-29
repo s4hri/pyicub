@@ -42,9 +42,10 @@ class GenericController(object):
             else:
                 args = str(args[0:])
             self.__Lock__.release()
-            self.__logger__.debug("%s:%s(%s) has been executed successful in %d ms" % (type(self).__name__, foo.__name__, args, (time.time() - t0)*1000))
+            elapsed_time_ms = (time.time() - t0)*1000
+            self.__logger__.debug("%s:%s(%s) has been executed successful in %d ms" % (type(self).__name__, foo.__name__, args, elapsed_time_ms))
             time.sleep(0.001)
-            return True
+            return elapsed_time_ms
         return f
 
     def __waitMotionDone__(self, timeout):
