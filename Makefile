@@ -1,4 +1,4 @@
-.PHONY: all setup clean_dist distro clean install testsetup test
+.PHONY: all setup clean_dist distro clean install uninstall testsetup test
 
 NAME='pyicub'
 VERSION=`python setup.py -V`
@@ -13,6 +13,8 @@ clean_dist:
 	-rm -f MANIFEST
 	-rm -rf dist
 	-rm -rf deb_dist
+	-rm -rf build
+	-rm -rf pyicub.egg-info
 
 distro: setup clean_dist
 	python setup.py sdist
@@ -21,7 +23,10 @@ clean: clean_dist
 	echo "clean"
 
 install: distro
-	sudo checkinstall python setup.py install
+	sudo checkinstall --default --backup=no --nodoc --deldoc=yes --deldesc=yes --delspec=yes --pakdir=/tmp python setup.py install
+
+uninstall:
+	dpkg -r pyicub
 
 testsetup:
 	echo "running pyicub tests"
