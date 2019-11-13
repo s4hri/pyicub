@@ -29,8 +29,10 @@ class BufferedPort:
     def lastRead(self):
         return self.__port__.lastRead()
 
-    def write(self, forceStrict=False):
-        self.__port__.write(forceStrict)
+    def write(self, msg, forceStrict=False):
+        btl = self.__port__.prepare()
+        btl.fromString(msg)
+        return self.__port__.write(forceStrict)
 
     def setStrict(self):
         self.__port__.setStrict()
@@ -63,7 +65,7 @@ class BufferedWritePort(BufferedPort):
         BufferedPort.__init__(self)
         self.__port_name__ = port_name
         self.__port_dst__ = port_dst
-        self.__port__.open(self.__port_dst__)
+        self.__port__.open(self.__port_name__)
         yarp.Network.connect(self.__port_name__, self.__port_dst__)
 
     def __del__(self):

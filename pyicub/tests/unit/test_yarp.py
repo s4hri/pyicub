@@ -34,9 +34,7 @@ class TestYarpMethods(unittest.TestCase):
 
     def test_02_bufferedWritePort(self):
         port = BufferedWritePort('/out', '/in')
-        btl = port.prepare()
-        btl.addString("test_02_bufferedWritePort")
-        port.write()
+        port.write("test_02_bufferedWritePort")
 
     def test_03_bufferedReadWrite(self):
         writeport = BufferedPort()
@@ -45,10 +43,8 @@ class TestYarpMethods(unittest.TestCase):
         readport.open('/in')
         readport.setStrict()
         yarp.Network.connect('/out', '/in')
-        btl = writeport.prepare()
         msg = "test_03_bufferedReadWrite"
-        btl.fromString(msg)
-        writeport.write(True)
+        writeport.write(msg, forceStrict=True)
         self.assertEqual(readport.read().toString(), msg)
 
     def test_04_rpc(self):
