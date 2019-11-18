@@ -7,6 +7,7 @@ from .api.controllers.PositionController import PositionController
 from .api.modules.emotions import emotionsPyCtrl
 from .api.modules.faceLandmarks import faceLandmarksPyCtrl
 from .api.modules.speech import speechPyCtrl
+from .api.modules.face import facePyCtrl
 from .api.iCubHelper import iCubPart, ROBOT_TYPE, ICUB_PARTS, iCub
 
 # #symbols for export:

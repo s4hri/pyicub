@@ -21,6 +21,7 @@ from pyicub.api.controllers.GazeController import GazeController
 from pyicub.api.controllers.PositionController import PositionController
 from pyicub.api.modules.emotions import emotionsPyCtrl
 from pyicub.api.modules.speech import speechPyCtrl
+from pyicub.api.modules.face import facePyCtrl
 
 class iCubPart:
     def __init__(self, name, joints_n):
@@ -51,6 +52,7 @@ class iCub:
         self.__gaze__ = None
         self.__emo__ = None
         self.__speech__ = None
+        self.__face__ = None
         self.__logger__ = YarpLogger(logtype=logtype)
 
     def __getDriver__(self, robot_part):
@@ -89,6 +91,12 @@ class iCub:
         if self.__speech__ is None:
             self.__speech__ = speechPyCtrl()
         return self.__speech__
+
+    @property
+    def face(self):
+        if self.__face__ is None:
+            self.__face__ = facePyCtrl()
+        return self.__face__
 
     def getPositionController(self, robot_part, joints_list=None):
         if not robot_part in self.__position_controllers__.keys():

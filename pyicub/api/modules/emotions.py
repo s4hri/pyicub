@@ -39,7 +39,6 @@ class emotionsPyCtrl:
         self.__emoCmd__("leb", "sur")
         self.__emoCmd__("reb", "sur")
 
-
     def surprised(self):
         self.__emoCmd__("mou", "sur")
         self.__emoCmd__("leb", "sur")
@@ -70,6 +69,9 @@ class emotionsPyCtrl:
 
     def evil(self):
         self.__emoCmd__("all", "evil")
+
+    def sendCmd(self, part, emo):
+        return self.__emoCmd__(part, emo)
 
     def close(self):
         self.__rpc__.close()
