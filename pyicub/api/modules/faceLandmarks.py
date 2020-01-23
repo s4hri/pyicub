@@ -35,6 +35,14 @@ class faceLandmarksPyCtrl:
             return (None, None)
         return map(int, L[index].split())
 
+    def getCenterFace(self, shouldWait=False):
+        res = self.getLandmark(0, shouldWait)
+        if type(res) == list:
+            (fx, fy, gx, gy) = res
+            return [fx + (gx - fx)/2., fy + (gy - fy)/2.]
+        else:
+            return (None, None)
+
     def getLandmarks(self, shouldWait=False):
         btl = self.__port_landmarks__.read(shouldWait)
         if btl is None:
