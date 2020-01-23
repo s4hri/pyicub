@@ -63,6 +63,22 @@ class PositionController(GenericController):
             self.__waitMotionDone__(timeout=req_time)
 
     @GenericController.__atomicDecorator__
+    def moveRefVel(self, req_time, target_joints, joints_list=None, vel_list=None, waitMotionDone=False):
+        if joints_list is None:
+            joints_list = self.__joints_list__
+        jl = yarp.Vector(len(joints_list))
+        vl = yarp.Vector(len(vel_list))
+        i = 0
+        for j in joints_list:
+            jl.set(i, target_joints[i])
+            vl.set(i, vel_list[i])
+            self.__IPositionControl__.setRefSpeed(j, vl[i])
+            self.__IPositionControl__.positionMove(j, jl[i])
+            i+=1
+        if waitMotionDone is True:
+            self.__waitMotionDone__(timeout=req_time)
+
+    @GenericController.__atomicDecorator__
     def setPositionControlMode(self, joints_list):
         for joint in joints_list:
             self.__IControlMode__.setControlMode(joint, yarp.VOCAB_CM_POSITION)
