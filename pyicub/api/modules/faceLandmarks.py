@@ -37,9 +37,9 @@ class faceLandmarksPyCtrl:
 
     def getCenterFace(self, shouldWait=False):
         res = self.getLandmark(0, shouldWait)
-        if type(res) == list:
-            (fx, fy, gx, gy) = res
-            return [fx + (gx - fx)/2., fy + (gy - fy)/2.]
+        if type(res) == map:
+            (fx, fy) = res
+            return [fx, fy]
         else:
             return (None, None)
 
