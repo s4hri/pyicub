@@ -36,7 +36,7 @@ class faceLandmarksPyCtrl:
         return map(int, L[index].split())
 
     def getCenterFace(self, shouldWait=False):
-        res = self.getLandmark(0, shouldWait)
+        res = self.getLandmark(27, shouldWait)
         if type(res) == map:
             (fx, fy) = res
             return [fx, fy]
