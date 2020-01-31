@@ -25,7 +25,7 @@ class emotionsPyCtrl:
     def __emoCmd__(self, part, emo):
         cmd = yarp.Bottle()
         cmd.clear()
-        cmd.addString("set)
+        cmd.addString("set")
         cmd.addString(part)
         cmd.addString(emo)
         return self.__rpc__.execute(cmd)
