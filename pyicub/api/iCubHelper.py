@@ -83,19 +83,19 @@ class iCub:
     @property
     def emo(self):
         if self.__emo__ is None:
-            self.__emo__ = emotionsPyCtrl()
+            self.__emo__ = emotionsPyCtrl(self.__robot__)
         return self.__emo__
 
     @property
     def speech(self):
         if self.__speech__ is None:
-            self.__speech__ = speechPyCtrl()
+            self.__speech__ = speechPyCtrl(self.__robot__)
         return self.__speech__
 
     @property
     def face(self):
         if self.__face__ is None:
-            self.__face__ = facePyCtrl()
+            self.__face__ = facePyCtrl(self.__robot__)
         return self.__face__
 
     def getPositionController(self, robot_part, joints_list=None):

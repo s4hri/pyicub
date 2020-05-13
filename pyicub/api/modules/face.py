@@ -18,8 +18,8 @@ from pyicub.api.classes.BufferedPort import BufferedWritePort
 
 class facePyCtrl:
 
-    def __init__(self):
-        self.__faceraw_port__ = BufferedWritePort('/face/raw/out', '/icub/face/raw/in')
+    def __init__(self, robot):
+        self.__faceraw_port__ = BufferedWritePort('/face/raw/out', '/%s/face/raw/in' % robot)
 
     def sendRaw(self, cmd):
         self.__faceraw_port__.write(cmd)

@@ -18,8 +18,8 @@ from pyicub.api.classes.Rpc import RpcClient
 
 class speechPyCtrl:
 
-    def __init__(self):
-        self.__rpc__ = RpcClient("/icub/speech:rpc")
+    def __init__(self, robot):
+        self.__rpc__ = RpcClient("/%s/speech:rpc" % robot)
 
     def __sayCmd__(self, something):
         cmd = yarp.Bottle()

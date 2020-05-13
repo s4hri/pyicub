@@ -19,8 +19,8 @@ from pyicub.api.classes.Rpc import RpcClient
 
 class emotionsPyCtrl:
 
-    def __init__(self):
-        self.__rpc__ = RpcClient("/icub/face/emotions/in")
+    def __init__(self, robot):
+        self.__rpc__ = RpcClient("/%s/face/emotions/in" %s robot)
 
     def __emoCmd__(self, part, emo):
         cmd = yarp.Bottle()
