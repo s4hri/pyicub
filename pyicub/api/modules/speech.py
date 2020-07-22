@@ -14,35 +14,21 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-from pyicub.api.classes.Rpc import RpcClient
+from pyicub.api.classes.BufferedPort import BufferedWritePort
 
 class speechPyCtrl:
 
     def __init__(self, robot):
-        self.__rpc__ = RpcClient("/%s/speech:rpc" % robot)
-
-    def __sayCmd__(self, something):
-        cmd = yarp.Bottle()
-        cmd.clear()
-        map(cmd.addString, ["say", something])
-        return self.__rpc__.execute(cmd)
+         self.__port__ = BufferedWritePort("/pyicub/speech:o", "/%s/speech:rpc" % robot)
 
     def say(self, something):
-        self.__sayCmd__(something)
+        self.__port__.write("say '%s'" % something)
 
     def setPitch(self, pitch):
-        cmd = yarp.Bottle()
-        cmd.clear()
-        map(cmd.addString, ["setPitch"])
-        map(cmd.addInt, [pitch])
-        return self.__rpc__.execute(cmd)
+        self.__port__.write("setPitch %d" % pitch)
 
     def setSpeed(self, speed):
-        cmd = yarp.Bottle()
-        cmd.clear()
-        map(cmd.addString, ["setSpeed"])
-        map(cmd.addInt, [speed])
-        return self.__rpc__.execute(cmd)
+        self.__port__.write("setSpeed %d" % speed)
 
     def close(self):
         self.__rpc__.close()

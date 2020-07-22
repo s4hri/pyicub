@@ -2,7 +2,7 @@ from setuptools import setup
 import setuptools
 
 setup(name='pyicub',
-      version='1.1',
+      version='1.2',
       description='iCub Python Wrapper',
       url='http://github.com/s4hri/pyicub',
       author='Davide De Tommaso',
