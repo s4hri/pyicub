@@ -22,7 +22,7 @@ class speechPyCtrl:
          self.__port__ = BufferedWritePort("/pyicub/speech:o", "/%s/speech:rpc" % robot)
 
     def say(self, something):
-        self.__port__.write("say '%s'" % something)
+        self.__port__.write("say \"%s\"" % something)
 
     def setPitch(self, pitch):
         self.__port__.write("setPitch %d" % pitch)
@@ -31,4 +31,4 @@ class speechPyCtrl:
         self.__port__.write("setSpeed %d" % speed)
 
     def close(self):
-        self.__rpc__.close()
+        self.__port__.close()
