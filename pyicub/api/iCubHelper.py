@@ -70,7 +70,7 @@ class iCub:
     def __getRobotPartProperties__(self, robot_part):
         props = yarp.Property()
         props.put("device","remote_controlboard")
-        props.put("local","/client/" + robot_part.name)
+        props.put("local","/client/" + self.__robot__ + "/" + robot_part.name)
         props.put("remote","/" + self.__robot__ + "/" + robot_part.name)
         return props
 
