@@ -23,6 +23,11 @@ from pyicub.api.modules.emotions import emotionsPyCtrl
 from pyicub.api.modules.speech import speechPyCtrl
 from pyicub.api.modules.face import facePyCtrl
 
+import threading
+import time
+from collections import deque
+from pyicub.api.classes.BufferedPort import BufferedReadPort
+
 class iCubPart:
     def __init__(self, name, joints_n):
         self.name = name
@@ -42,6 +47,43 @@ class ICUB_PARTS:
     LEFT_LEG = iCubPart("left_leg", 6)
     RIGHT_LEG = iCubPart("right_leg", 6)
 
+
+class iCubWatcher:
+    def __init__(self, yarp_src_port, activate_function, callback, period=0.01, autostart=False):
+        self._port = BufferedReadPort(yarp_src_port + "_reader_" + str(id(self)), yarp_src_port,)
+        self._activate = activate_function
+        self._callback = callback
+        self._period = period
+        self._values = deque( int(1000/(period*1000))*[None], maxlen=int(1000/(period*1000))) #Values of the last second
+        self._stop_thread = False
+        if autostart:
+            self.start()
+
+    def start(self):
+        if self._stop_thread:
+           self.stop()
+        self._worker_thread = threading.Thread(target=self.worker)
+        self._worker_thread.start()
+
+    def stop(self):
+        if not self._stop_thread:
+            self._stop_thread = True
+        self._worker_thread.join()
+        self._stop_thread = False
+
+    def worker(self):
+        while not self._stop_thread:
+            res = self._port.read(shouldWait=False)
+            if not res is None:
+                self._values.append(res.toString())
+                if self._activate(self._values):
+                    self._callback()
+            time.sleep(self._period)
+
+    def __del__(self):
+        self.stop()
+        del self._port
+
 class iCub:
     def __init__(self, robot, logtype=YarpLogger.NONE):
         self.__robot__ = robot
@@ -54,6 +96,7 @@ class iCub:
         self.__speech__ = None
         self.__face__ = None
         self.__logger__ = YarpLogger(logtype=logtype)
+        self.__watchdogs__ = []
 
     def __getDriver__(self, robot_part):
         if not robot_part.name in self.__drivers__.keys():
