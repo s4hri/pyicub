@@ -13,28 +13,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-import sys
 import yarp
+from pyicub.iCubHelper import iCub, ROBOT_TYPE
+from pyicub.classes.Logger import YarpLogger
 
-class YarpLogger:
+yarp.Network.init()
 
-    DEBUG = "DEBUG"
-    ERROR = "ERROR"
-    NONE = "NONE"
-
-    def __init__(self, logtype=NONE):
-        self.__logtype__ = logtype
-        if not self.__logtype__ is YarpLogger.NONE:
-            self.__yarp_logger__ = yarp.Log()
-
-    def error(self, msg):
-        if self.__logtype__ is YarpLogger.DEBUG or self.__logtype__ is YarpLogger.ERROR:
-            self.__yarp_logger__.info(msg)
-
-    def warning(self, msg):
-        if self.__logtype__ is YarpLogger.DEBUG:
-            self.__yarp_logger__.warning(msg)
-
-    def debug(self, msg):
-        if self.__logtype__ is YarpLogger.DEBUG:
-            self.__yarp_logger__.debug(msg)
+icub = iCub(ROBOT_TYPE.ICUB_SIMULATOR, logtype=YarpLogger.DEBUG)
+icub.gaze.lookAt3DPoint(-1.0, -0.5, 1.0, waitMotionDone=True)
+icub.gaze.lookAt3DPoint(-1.0, -0.2, 0.5, waitMotionDone=True)
+icub.gaze.lookAt3DPoint(-1.0, 0.2, 0.1, waitMotionDone=True)

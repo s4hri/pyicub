@@ -14,21 +14,10 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-from pyicub.api.classes.BufferedPort import BufferedWritePort
+from pyicub.iCubHelper import iCub, ROBOT_TYPE, ICUB_PARTS
 
-class speechPyCtrl:
+yarp.Network.init()
 
-    def __init__(self, robot):
-         self.__port__ = BufferedWritePort("/pyicub/speech:o", "/%s/speech:rpc" % robot)
-
-    def say(self, something):
-        self.__port__.write("say \"%s\"" % something)
-
-    def setPitch(self, pitch):
-        self.__port__.write("setPitch %d" % pitch)
-
-    def setSpeed(self, speed):
-        self.__port__.write("setSpeed %d" % speed)
-
-    def close(self):
-        self.__port__.close()
+icub = iCub(ROBOT_TYPE.ICUB)
+head_ctrl = icub.getPositionController(ICUB_PARTS.HEAD)
+head_ctrl.move(target_joints=[-15.0, 0.0, 0.0, 0.0, 0.0, 5.0], req_time=1.0)

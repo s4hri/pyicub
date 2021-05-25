@@ -1,4 +1,4 @@
-#   Copyright (C) 2019  Davide De Tommaso
+#   Copyright (C) 2021  Davide De Tommaso
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -18,9 +18,8 @@ import sys
 import yarp
 import time
 
-sys.path.append('../../../')
-from pyicub.api.classes.BufferedPort import BufferedPort, BufferedReadPort, BufferedWritePort
-from pyicub.api.classes.Rpc import RpcClient
+from pyicub.classes.BufferedPort import BufferedPort, BufferedReadPort, BufferedWritePort
+from pyicub.classes.Rpc import RpcClient
 
 if yarp.Network.checkNetwork(1.0) is False:
     yarp.Network.setLocalMode(True)

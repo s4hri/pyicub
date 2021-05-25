@@ -1,4 +1,4 @@
-#   Copyright (C) 2019  Davide De Tommaso
+#   Copyright (C) 2021  Davide De Tommaso
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -14,8 +14,8 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-from pyicub.api.classes.Rpc import RpcClient
-from pyicub.api.classes.BufferedPort import BufferedReadPort
+from pyicub.classes.Rpc import RpcClient
+from pyicub.classes.BufferedPort import BufferedReadPort
 
 class faceLandmarksPyCtrl:
 

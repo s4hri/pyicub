@@ -14,10 +14,7 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-import sys
-sys.path.append('../../')
-
-from pyicub.api.iCubHelper import iCub, iCubWatcher, ROBOT_TYPE
+from pyicub.iCubHelper import iCub, iCubWatcher, ROBOT_TYPE
 
 yarp.Network.init()
 

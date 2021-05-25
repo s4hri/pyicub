@@ -1,4 +1,4 @@
-#   Copyright (C) 2019  Davide De Tommaso
+#   Copyright (C) 2021  Davide De Tommaso
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -14,14 +14,12 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-import sys
-sys.path.append('../../')
+from pyicub.classes.BufferedPort import BufferedWritePort
 
-from pyicub.api.iCubHelper import iCub, ROBOT_TYPE
+class facePyCtrl:
 
-yarp.Network.init()
+    def __init__(self, robot):
+        self.__faceraw_port__ = BufferedWritePort('/face/raw/out', '/%s/face/raw/in' % robot)
 
-icub = iCub(ROBOT_TYPE.ICUB, logtype="DEBUG")
-icub.gaze.lookAt3DPoint(-1.0, -0.5, 1.0, waitMotionDone=True)
-icub.gaze.lookAt3DPoint(-1.0, -0.2, 0.5, waitMotionDone=True)
-icub.gaze.lookAt3DPoint(-1.0, 0.2, 0.1, waitMotionDone=True)
+    def sendRaw(self, cmd):
+        self.__faceraw_port__.write(cmd)

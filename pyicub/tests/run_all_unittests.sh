@@ -4,5 +4,5 @@
 
 export YARP_FORWARD_LOG_ENABLE=1
 cd unit
-python -m unittest discover . -v
+python3 -m unittest discover . -v
 cd ..

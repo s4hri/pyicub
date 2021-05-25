@@ -1,7 +1,7 @@
 .PHONY: all setup clean_dist distro clean install uninstall testsetup test
 
 NAME='pyicub'
-VERSION=`python setup.py -V`
+VERSION=`python3 setup.py -V`
 
 all:
 	echo "noop for debbuild"
@@ -17,13 +17,13 @@ clean_dist:
 	-rm -rf pyicub.egg-info
 
 distro: setup clean_dist
-	python setup.py sdist
+	python3 setup.py sdist
 
 clean: clean_dist
 	echo "clean"
 
 install: distro
-	sudo checkinstall --default --backup=no --nodoc --deldoc=yes --deldesc=yes --delspec=yes --pakdir=/tmp python setup.py install
+	sudo checkinstall --default --backup=no --nodoc --deldoc=yes --deldesc=yes --delspec=yes --pakdir=/tmp python3 setup.py install
 
 uninstall:
 	dpkg -r pyicub

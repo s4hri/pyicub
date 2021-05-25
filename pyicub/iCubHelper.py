@@ -1,4 +1,4 @@
-#   Copyright (C) 2019  Davide De Tommaso
+#   Copyright (C) 2021  Davide De Tommaso
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -15,18 +15,18 @@
 
 import yarp
 
-from pyicub.api.classes.Logger import YarpLogger
-from pyicub.api.controllers.Generics import GenericController
-from pyicub.api.controllers.GazeController import GazeController
-from pyicub.api.controllers.PositionController import PositionController
-from pyicub.api.modules.emotions import emotionsPyCtrl
-from pyicub.api.modules.speech import speechPyCtrl
-from pyicub.api.modules.face import facePyCtrl
+from pyicub.classes.Logger import YarpLogger
+from pyicub.controllers.Generics import GenericController
+from pyicub.controllers.GazeController import GazeController
+from pyicub.controllers.PositionController import PositionController
+from pyicub.modules.emotions import emotionsPyCtrl
+from pyicub.modules.speech import speechPyCtrl
+from pyicub.modules.face import facePyCtrl
 
 import threading
 import time
 from collections import deque
-from pyicub.api.classes.BufferedPort import BufferedReadPort
+from pyicub.classes.BufferedPort import BufferedReadPort
 
 class iCubPart:
     def __init__(self, name, joints_n):
@@ -85,7 +85,7 @@ class iCubWatcher:
         del self._port
 
 class iCub:
-    def __init__(self, robot, logtype=YarpLogger.NONE):
+    def __init__(self, robot, logtype=YarpLogger.DEBUG):
         self.__robot__ = robot
         self.__position_controllers__ = {}
         self.__drivers__ = {}

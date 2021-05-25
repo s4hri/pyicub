@@ -1,4 +1,4 @@
-#   Copyright (C) 2019  Davide De Tommaso
+#   Copyright (C) 2021  Davide De Tommaso
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ import yarp
 import threading
 import time
 
-from pyicub.api.classes.Logger import YarpLogger
+from pyicub.classes.Logger import YarpLogger
 
 class GenericController(object):
 
