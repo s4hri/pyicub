@@ -1,0 +1,98 @@
+<application>
+<name>iCub</name>
+
+        <authors>
+            <author email="davide.detommaso@iit.it">Davide De Tommaso</author>
+        </authors>
+
+        <module>
+                  <name>yarplogger</name>
+                  <parameters>--start --no_stop</parameters>
+                  <node>localhost</node>
+          </module>
+
+          <module>
+                  <name>yarprobotinterface</name>
+                  <node>pc104</node>
+          </module>
+
+          <module>
+                <name>yarpdev</name>
+                <parameters> --from camera/dragonfly2_config_right.ini</parameters>
+                  <node>pc104</node>
+          </module>
+
+          <module>
+            <name>camCalib</name>
+            <parameters>--context cameraCalibration --from icubEyes.ini --group CAMERA_CALIBRATION_RIGHT --name /icub/camcalib/right</parameters>
+            <node>localhost</node>
+          </module>
+          <module>
+
+           <name>frameGrabberGui2</name>
+           <parameters>--local /icub/fggui/right --remote /icub/cam/right --x 0 --y 350 --width 350 --height 500</parameters>
+           <node>localhost</node>
+           <dependencies>
+                <port timeout="10">/icub/cam/right</port>
+             </dependencies>
+          </module>
+
+          <module>
+            <name>yarpview</name>
+            <parameters>--name /face --x 0 --y 0 --p 50 --w 320 --h 240</parameters>
+            <node>localhost</node>
+          </module>
+
+          <module>
+            <name>faceLandmarks</name>
+            <node>localhost</node>
+          </module>
+
+          <module>
+            <name>yarpdev</name>
+            <parameters>--name /icub/face/raw --device serial --subdevice serialport --context faceExpressions --from serialport.ini</parameters>
+            <node>pc104</node>
+            <tag>face_device</tag>
+          </module>
+
+          <module>
+                <name>emotionInterface</name>
+                <parameters>--name /icub/face/emotions --context faceExpressions --from emotions.ini</parameters>
+                <node>pc104</node>
+            <tag>emotions_interface</tag>
+          </module>
+
+          <module>
+                  <name>iKinGazeCtrl</name>
+                  <parameters>--from config.ini --head_version 2.5 --saccades off --imu::mode off --eye_tilt::max 5 --eye_tilt::min -5</parameters>
+                  <node>localhost</node>
+                  <dependencies>
+                      <port timeout="60.0" request="is_ready" reply="[ok]">/icub/yarprobotinterface</port>
+                  </dependencies>
+          </module>
+
+          <connection>
+              <from>/icub/cam/right</from>
+              <to>/icub/camcalib/right/in</to>
+              <protocol>udp</protocol>
+            </connection>
+
+            <connection>
+              <from>/faceLandmarks/image:o</from>
+              <to>/face</to>
+              <protocol>udp</protocol>
+            </connection>
+
+            <connection>
+              <output>/icub/camcalib/right/out</output>
+              <input>/faceLandmarks/image:i</input>
+              <protocol>udp</protocol>
+            </connection>
+
+            <connection>
+              <from>/icub/face/emotions/out</from>
+              <to>/icub/face/raw/in</to>
+              <protocol>tcp</protocol>
+            </connection>
+
+</application>

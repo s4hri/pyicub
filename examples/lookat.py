@@ -14,10 +14,15 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
+import iCubHelper
 from pyicub.iCubHelper import iCub, ROBOT_TYPE
 from pyicub.classes.Logger import YarpLogger
 
-yarp.Network.init()
+import time
+
+import pyicub
+from pyicub.classes import iCub
+import yarp
 
 icub = iCub(ROBOT_TYPE.ICUB_SIMULATOR, logtype=YarpLogger.DEBUG)
 icub.gaze.lookAt3DPoint(-1.0, -0.5, 1.0, waitMotionDone=True)
