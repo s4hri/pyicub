@@ -15,22 +15,43 @@
 
 import yarp
 import time
-import threading
+import pyicub.utils as utils
 
-from pyicub.controllers.Generics import GenericController
+from pykron.core import Pykron
+from pykron.logging import PykronLogger
 
-class PositionController(GenericController):
+app = Pykron.getInstance()
+logger = PykronLogger.getInstance().log
 
-    def __init__(self, logger, driver, joints_list, iencoders):
-        GenericController.__init__(self, logger)
+class PositionController:
+
+    MIN_JOINTS_DIST = 1
+    WAITMOTIONDONE_PERIOD = 0.01
+    TIMEOUT_MOVE = 5.0
+
+    def __init__(self, driver, joints_list, iencoders):
         self.__IControlMode__ = driver.viewIControlMode()
         self.__IEncoders__ = iencoders
         self.__joints_list__ = joints_list
-        self.setPositionControlMode(self.__joints_list__)
+        self.__setPositionControlMode__(self.__joints_list__)
         self.__IPositionControl__ = driver.viewIPositionControl()
 
-    def __waitMotionDone__(self, timeout):
-        time.sleep(timeout)
+    def __setPositionControlMode__(self, joints_list):
+        for joint in joints_list:
+            self.__IControlMode__.setControlMode(joint, yarp.VOCAB_CM_POSITION)
+
+    def __waitMotionDone__(self, target_joints, joints_list):
+        encs=yarp.Vector(16)
+        while True:
+            while not self.__IEncoders__.getEncoders(encs.data()):
+                time.sleep(0.01)
+            v = []
+            for j in joints_list:
+                v.append(encs[j])
+            dist = utils.vector_distance(v, target_joints)
+            if dist < PositionController.MIN_JOINTS_DIST:
+                break
+            time.sleep(PositionController.WAITMOTIONDONE_PERIOD)
 
     def getIPositionControl(self):
         return self.__IPositionControl__
@@ -38,32 +59,30 @@ class PositionController(GenericController):
     def getIEncoders(self):
         return self.__IEncoders__
 
-    @GenericController.__atomicDecorator__
-    def move(self, target_joints, req_time, joints_list=None, waitMotionDone=False):
+    @app.AsyncRequest(timeout=TIMEOUT_MOVE)
+    def move(self, target_joints, req_time, joints_list=None):
         if joints_list is None:
             joints_list = self.__joints_list__
         disp = [0]*len(joints_list)
-        speed_head = [0]*len(joints_list)
+        speed = [0]*len(joints_list)
         tmp = yarp.Vector(len(joints_list))
         encs=yarp.Vector(16)
         while not self.__IEncoders__.getEncoders(encs.data()):
-            self.__logger__.warning("Data from encoders not available!")
-            time.sleep(0.1)
+            time.sleep(0.01)
         i = 0
         for j in joints_list:
             tmp.set(i, target_joints[i])
             disp[i] = target_joints[i] - encs[j]
             if disp[i] < 0.0:
                 disp[i] =- disp[i]
-            speed_head[i] = disp[i]/req_time
-            self.__IPositionControl__.setRefSpeed(j, speed_head[i])
+            speed[i] = disp[i]/req_time
+            self.__IPositionControl__.setRefSpeed(j, speed[i])
             self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
-        if waitMotionDone is True:
-            self.__waitMotionDone__(timeout=req_time)
+        self.__waitMotionDone__(target_joints, joints_list)
 
-    @GenericController.__atomicDecorator__
-    def moveRefVel(self, req_time, target_joints, joints_list=None, vel_list=None, waitMotionDone=False):
+    @app.AsyncRequest(timeout=TIMEOUT_MOVE)
+    def moveRefVel(self, req_time, target_joints, joints_list=None, vel_list=None):
         if joints_list is None:
             joints_list = self.__joints_list__
         jl = yarp.Vector(len(joints_list))
@@ -75,10 +94,4 @@ class PositionController(GenericController):
             self.__IPositionControl__.setRefSpeed(j, vl[i])
             self.__IPositionControl__.positionMove(j, jl[i])
             i+=1
-        if waitMotionDone is True:
-            self.__waitMotionDone__(timeout=req_time)
-
-    @GenericController.__atomicDecorator__
-    def setPositionControlMode(self, joints_list):
-        for joint in joints_list:
-            self.__IControlMode__.setControlMode(joint, yarp.VOCAB_CM_POSITION)
+        self.__waitMotionDone__(target_joints, joints_list)

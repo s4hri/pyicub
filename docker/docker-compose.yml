@@ -12,7 +12,7 @@ services:
 
     image: iitschri/pyicub:${PYICUB_TAG}-${BASE_TAG}
 
-    command: init.sh ${PYICUB_SIMULATION} ${ICUB_USER} ${ICUB_PSW} ${ICUB_HOSTNAME}
+    command: init.sh ${PYICUB_SIMULATION} ${ICUB_USER} ${ICUB_PSW} ${ICUB_HOSTNAME} ${APPS}
 
     environment:
       - "DISPLAY=${DISPLAY}"

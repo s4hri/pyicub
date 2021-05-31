@@ -13,18 +13,17 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-import yarp
-import iCubHelper
-from pyicub.iCubHelper import iCub, ROBOT_TYPE
-from pyicub.classes.Logger import YarpLogger
-
+from pyicub.iCubHelper import iCub
 import time
 
-import pyicub
-from pyicub.classes import iCub
-import yarp
+icub = iCub()
+t0 = time.time()
+req = icub.lookAtFixationPoint(-1.0, -0.5, 1.0, waitMotionDone=False)
+icub.gaze.waitMotionOnset()
 
-icub = iCub(ROBOT_TYPE.ICUB_SIMULATOR, logtype=YarpLogger.DEBUG)
-icub.gaze.lookAt3DPoint(-1.0, -0.5, 1.0, waitMotionDone=True)
-icub.gaze.lookAt3DPoint(-1.0, -0.2, 0.5, waitMotionDone=True)
-icub.gaze.lookAt3DPoint(-1.0, 0.2, 0.1, waitMotionDone=True)
+req.wait_for_completed()
+
+icub.lookAtFixationPoint(-1.0, -0.2, 0.5)
+icub.lookAtFixationPoint(-1.0, 0.2, 0.1)
+
+icub.close()

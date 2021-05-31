@@ -1,14 +1,14 @@
 #!/bin/bash
 export PATH=${PATH}:/home/docky/pyicub/apps/
 
-# $1: simulation $2: icub user, $3: icub psw, $4: icub host
+# $1: simulation $2: icub user, $3: icub psw, $4: icub host, $5: yarpmanager apps folder
 
 env_robot()
 {
-USER=$2
-PASS=$3
-HOST=$4
-
+USER=$1
+PASS=$2
+HOST=$3
+APPS=$4
 
 SSH_ASKPASS_SCRIPT=/home/docky/ssh-pass.sh
 cat > ${SSH_ASKPASS_SCRIPT} <<EOL
@@ -30,7 +30,7 @@ SSH_ASKPASS=${SSH_ASKPASS_SCRIPT} setsid ssh -oStrictHostKeyChecking=no ${USER}@
 
 yarprun --server /root --log &
 
-yarpmanager --apppath /home/docky/pyicub/apps/applications/ --from /home/docky/pyicub/apps/cluster-config.xml
+yarpmanager --apppath ${APPS}/applications/ --from ${APPS}/cluster-config.xml
 
 SSH_ASKPASS=${SSH_ASKPASS_SCRIPT} setsid ssh -oStrictHostKeyChecking=no ${USER}@${HOST} "kill -9 \$(ps -aux | grep yarprun | awk '{print \$2}')"
 SSH_ASKPASS=${SSH_ASKPASS_SCRIPT} setsid ssh -oStrictHostKeyChecking=no ${USER}@${HOST} "kill -9 \$(ps -aux | grep yarpdev | awk '{print \$2}')"
@@ -38,17 +38,20 @@ SSH_ASKPASS=${SSH_ASKPASS_SCRIPT} setsid ssh -oStrictHostKeyChecking=no ${USER}@
 
 env_sim()
 {
+APPS=$1
+
+export YARP_FORWARD_LOG_ENABLE=1
 yarpserver --write &
 sleep 2
 yarprun --server /root --log &
 
-yarpmanager --apppath /home/docky/pyicub/apps/applications/ --from /home/docky/pyicub/apps/cluster-config.xml
+yarpmanager --apppath ${APPS}/applications/ --from ${APPS}/cluster-config.xml
 }
 
 if [ "$1" = true ]
 then
-  env_sim
+  env_sim $5
 else
-  env_robot $2 $3 $4
+  env_robot $2 $3 $4 $5
 fi
 exit

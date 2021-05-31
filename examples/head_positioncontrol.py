@@ -13,11 +13,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-import yarp
-from pyicub.iCubHelper import iCub, ROBOT_TYPE, ICUB_PARTS
+from pyicub.iCubHelper import iCub, JointAction, ICUB_PARTS
 
-yarp.Network.init()
+icub = iCub()
 
-icub = iCub(ROBOT_TYPE.ICUB)
-head_ctrl = icub.getPositionController(ICUB_PARTS.HEAD)
-head_ctrl.move(target_joints=[-15.0, 0.0, 0.0, 0.0, 0.0, 5.0], req_time=1.0)
+a = JointAction(ICUB_PARTS.HEAD, req_time=1.0, target_position=[-15.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+b = JointAction(ICUB_PARTS.HEAD, req_time=1.0, target_position=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+icub.move(a)
+icub.move(b)
+
+icub.close()

@@ -14,14 +14,13 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-from pyicub.iCubHelper import iCub, iCubWatcher, ROBOT_TYPE
+from pyicub.iCubHelper import iCub
 
 yarp.Network.init()
 
 DOWN = [0.0, -30.0, 3.0]
 ZERO = [0.0, 0.0, 3.0]
 UP = [0.0, 30.0, 3.0]
-single_event_detected = False
 
 def af1(values):
     lastread = values[-1].split(' ')
@@ -30,30 +29,16 @@ def af1(values):
     return False
 
 def cb1():
-    global single_event_detected
-    if not single_event_detected:
-        print("Watching at ZERO detected!")
-        single_event_detected = True
+    print("Watching at ZERO detected!")
 
+icub = iCub()
 
-def lookat(icub, position):
-    p = yarp.Vector(3)
-    p.set(0, position[0]) # Azimuth
-    p.set(1, position[1]) # Elevation
-    p.set(2, position[2]) # Vergence
-    icub.gaze.getIGazeControl().lookAtAbsAnglesSync(p)
-    icub.gaze.getIGazeControl().waitMotionDone(timeout=5.0)
+icub.portmonitor("/iKinGazeCtrl/angles:o", activate_function=af1, callback=cb1)
 
-icub = iCub(ROBOT_TYPE.ICUB, logtype="DEBUG")
+icub.lookAtAbsAngles(UP[0], UP[1], UP[2])
 
-watch_zero = iCubWatcher("/iKinGazeCtrl/angles:o", activate_function=af1, callback=cb1)
-
-lookat(icub, UP)
-watch_zero.start()
 for _ in range(0,3):
-    single_event_detected = False
-    lookat(icub, DOWN)
-    single_event_detected = False
-    lookat(icub, UP)
+    icub.lookAtAbsAngles(DOWN[0], DOWN[1], DOWN[2])
+    icub.lookAtAbsAngles(UP[0], UP[1], UP[2])
 
-watch_zero.stop()
+icub.close()

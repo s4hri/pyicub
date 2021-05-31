@@ -14,17 +14,24 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-import sys
+import threading
 import time
+import math
+import pyicub.utils as utils
 
-from pyicub.controllers.Generics import GenericController
+from pykron.core import Pykron
+from pykron.logging import PykronLogger
 
-class GazeController(GenericController):
+app = Pykron.getInstance()
+logger = PykronLogger.getInstance().log
 
-    TIMEOUT_PERIOD = 0.1
+class GazeController:
 
-    def __init__(self, robot, logger):
-        GenericController.__init__(self, logger)
+    MIN_JOINTS_DIST = 5
+    WAITMOTIONDONE_PERIOD = 0.01
+    TIMEOUT_LOOKAT = 5.0
+
+    def __init__(self, robot):
         self.__props__ = yarp.Property()
         self.__driver__ = yarp.PolyDriver()
         self.__props__.put("robot", robot)
@@ -33,60 +40,102 @@ class GazeController(GenericController):
         self.__props__.put("remote","/iKinGazeCtrl")
         self.__driver__.open(self.__props__)
         if not self.__driver__.isValid():
-            self.__logger__.error('Cannot open GazeController driver!')
+            logger.error('Cannot open GazeController driver!')
+            pass
         else:
             self.__IGazeControl__ = self.__driver__.viewIGazeControl()
+            self.__IGazeControl__.setTrackingMode(False)
+            self.__IGazeControl__.stopControl()
+            self.clearNeck()
+            self.clearEyes()
 
-    def __waitMotionDone__(self, timeout):
-        res = self.__IGazeControl__.waitMotionDone(GazeController.TIMEOUT_PERIOD, timeout)
-        if res is False:
-            self.__logger__.error("Timeout occurred!")
 
-    @GenericController.__atomicDecorator__
-    def blockEyes(self, vergence):
-        self.__IGazeControl__.blockEyes(vergence)
-
-    @GenericController.__atomicDecorator__
-    def blockNeck(self):
-        self.__IGazeControl__.blockNeckYaw()
-        self.__IGazeControl__.blockNeckRoll()
-        self.__IGazeControl__.blockNeckPitch()
-
-    @GenericController.__atomicDecorator__
-    def clearEyes(self):
-        self.__IGazeControl__.clearEyes()
-
-    @GenericController.__atomicDecorator__
-    def clearNeck(self):
-        self.__IGazeControl__.clearNeckYaw()
-        self.__IGazeControl__.clearNeckRoll()
-        self.__IGazeControl__.clearNeckPitch()
-
-    def getIGazeControl(self):
+    @property
+    def IGazeControl(self):
         return self.__IGazeControl__
 
-    @GenericController.__atomicDecorator__
-    def lookAt3DPoint(self, x, y, z, waitMotionDone=False, timeout=0.0):
+    def __waitMotionDone2__(self, target_angles):
+        angles = yarp.Vector(6)
+        while True:
+            self.IGazeControl.getAngles(angles)
+            v = []
+            w = []
+            for i in range(0,6):
+                v.append(angles[i])
+                w.append(target_angles[i])
+            dist = utils.vector_distance(v, w)
+            if dist < GazeController.MIN_JOINTS_DIST:
+                break
+            time.sleep(GazeController.WAITMOTIONDONE_PERIOD)
+
+    def __waitMotionDone__(self):
+        res = self.IGazeControl.waitMotionDone(GazeController.WAITMOTIONDONE_PERIOD, GazeController.TIMEOUT_LOOKAT)
+        if res is False:
+            logger.error("Timeout occurred!")
+
+    def blockEyes(self, vergence):
+        self.IGazeControl.blockEyes(vergence)
+
+    def blockNeck(self):
+        self.IGazeControl.blockNeckYaw()
+        self.IGazeControl.blockNeckRoll()
+        self.IGazeControl.blockNeckPitch()
+
+    def clearEyes(self):
+        self.IGazeControl.clearEyes()
+
+    def clearNeck(self):
+        self.IGazeControl.clearNeckYaw()
+        self.IGazeControl.clearNeckRoll()
+        self.IGazeControl.clearNeckPitch()
+
+    def __lookAtAbsAngles__(self, angles):
+        self.IGazeControl.lookAtAbsAngles(angles)
+        #self.__waitMotionDone2__(angles)
+        self.__waitMotionDone__()
+
+    @app.AsyncRequest(timeout=TIMEOUT_LOOKAT)
+    def lookAtAbsAngles(self, azi, ele, ver):
+        angles = yarp.Vector(3)
+        angles.set(0, azi)
+        angles.set(1, ele)
+        angles.set(2, ver)
+        self.__lookAtAbsAngles__(angles)
+
+    @app.AsyncRequest(timeout=TIMEOUT_LOOKAT)
+    def lookAtFixationPoint(self, x, y, z):
         p = yarp.Vector(3)
         p.set(0, x)
         p.set(1, y)
         p.set(2, z)
-        self.__IGazeControl__.lookAtFixationPoint(p)
-        if waitMotionDone is True:
-            self.__waitMotionDone__(timeout)
+        angles = yarp.Vector(3)
+        self.IGazeControl.getAnglesFrom3DPoint(p, angles)
+        self.__lookAtAbsAngles__(angles)
 
     def reset(self):
         self.clearEyes()
         self.clearNeck()
 
-    @GenericController.__atomicDecorator__
     def setParams(self, neck_tt, eyes_tt):
-        self.__IGazeControl__.setNeckTrajTime(neck_tt)
-        self.__IGazeControl__.setEyesTrajTime(eyes_tt)
+        self.IGazeControl.setNeckTrajTime(neck_tt)
+        self.IGazeControl.setEyesTrajTime(eyes_tt)
 
-    @GenericController.__atomicDecorator__
     def setTrackingMode(self, mode):
-        self.__IGazeControl__.setTrackingMode(mode)
+        self.IGazeControl.setTrackingMode(mode)
+
+    def waitMotionOnset(self, speed_ref=0):
+        q = yarp.Vector(6)
+        while True:
+            self.IGazeControl.getJointsVelocities(q)
+            v = []
+            for i in range(0,6):
+                v.append(q[i])
+            speed = utils.norm(v)
+            if speed > speed_ref:
+                return
+            time.sleep(GazeController.WAITMOTIONDONE_PERIOD)
 
     def __del__(self):
+        self.__IGazeControl__.stopControl()
+        self.__IGazeControl__.setTrackingMode(False)
         self.__driver__.close()

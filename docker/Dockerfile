@@ -10,9 +10,8 @@ RUN cd ${HOME} && \
     git clone https://github.com/s4hri/pyicub && \
     cd pyicub && \
     git fetch --all --tags && \
-    git checkout ${PYICUB_TAG}
-
-ENV PYTHONPATH ${PYTHONPATH}:/home/docky/pyicub
+    git checkout ${PYICUB_TAG} && \
+    pip3 install --user .
 
 COPY init.sh ${HOME}
 

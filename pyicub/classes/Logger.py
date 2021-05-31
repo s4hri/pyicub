@@ -24,17 +24,16 @@ class YarpLogger:
 
     def __init__(self, logtype=NONE):
         self.__logtype__ = logtype
-        if not self.__logtype__ is YarpLogger.NONE:
-            self.__yarp_logger__ = yarp.Log()
+        self.__yarp_logger__ = yarp.Log()
 
     def error(self, msg):
-        if self.__logtype__ is YarpLogger.DEBUG or self.__logtype__ is YarpLogger.ERROR:
-            self.__yarp_logger__.info(msg)
+        self.__yarp_logger__.error(msg)
 
     def warning(self, msg):
-        if self.__logtype__ is YarpLogger.DEBUG:
-            self.__yarp_logger__.warning(msg)
+        self.__yarp_logger__.warning(msg)
 
     def debug(self, msg):
-        if self.__logtype__ is YarpLogger.DEBUG:
-            self.__yarp_logger__.debug(msg)
+        self.__yarp_logger__.debug(msg)
+
+    def info(self, msg):
+        self.__yarp_logger__.info(msg)
