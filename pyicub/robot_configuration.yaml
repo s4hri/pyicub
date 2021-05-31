@@ -1,0 +1,9 @@
+robot_name: icubSim
+
+gaze_controller: True
+
+position_controllers:
+  - head
+  - left_arm
+  - right_arm
+  - torso

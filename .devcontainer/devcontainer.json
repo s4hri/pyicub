@@ -1,0 +1,30 @@
+{
+	"name": "pyicub",
+
+	// Update the 'dockerComposeFile' list if you have more compose files or use different names.
+	"dockerComposeFile": "../docker/docker-compose.yml",
+
+	"runArgs": ["--env-file", "../.env"],
+
+	// The optional 'workspaceFolder' property is the path VS Code should open by default when
+	// connected. This is typically a volume mount in .devcontainer/docker-compose.yml
+	"workspaceFolder": "/home/docky/pyicub",
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"ms-python.python",
+		"ms-python.vscode-pylance",
+		"ms-toolsai.jupyter"
+	],
+
+	"service": "pyicub",
+
+	// Comment out connect as root instead. To add a non-root user, see: https://aka.ms/vscode-remote/containers/non-root.
+	"remoteUser": "docky",
+
+	"settings": {
+		"remote.autoForwardPorts": false,
+		"python.pythonPath": "/usr/bin/python3"
+	}
+
+}

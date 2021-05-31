@@ -1,0 +1,7 @@
+<cluster name="icub_cluster" user="icub">
+
+    <nameserver namespace="/root" node="localhost"></nameserver>
+    <node display=":0.0">localhost</node>
+    <node>pc104</node>
+
+</cluster>

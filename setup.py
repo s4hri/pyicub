@@ -1,12 +1,14 @@
 from setuptools import setup
 import setuptools
 
+import pyicub
+
 setup(name='pyicub',
-      version='1.4',
-      description='iCub Python Wrapper',
+      version=pyicub.__version__,
+      description=pyicub.__description__,
       url='http://github.com/s4hri/pyicub',
-      author='Davide De Tommaso',
-      author_email='davide.detommaso@iit.it',
-      license='GPLv3',
+      author=pyicub.__authors__,
+      author_email=pyicub.__emails__,
+      license=pyicub.__license__,
       packages=setuptools.find_packages(),
       zip_safe=False)

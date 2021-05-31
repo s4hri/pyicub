@@ -1,0 +1,34 @@
+version: '3.7'
+
+services:
+
+  pyicub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DOCKER_SRC: iitschri/icub:${BASE_TAG}
+        PYICUB_TAG: ${PYICUB_TAG}
+
+    image: iitschri/pyicub:${PYICUB_TAG}-${BASE_TAG}
+
+    command: init.sh ${PYICUB_SIMULATION} ${ICUB_USER} ${ICUB_PSW} ${ICUB_HOSTNAME} ${APPS}
+
+    environment:
+      - "DISPLAY=${DISPLAY}"
+      - "PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native"
+
+    privileged: true
+    stdin_open: true
+    tty: true
+
+    network_mode: "host"
+
+    volumes:
+      - type: bind
+        source: ../
+        target: /home/docky/pyicub
+
+      - type: bind
+        source: ${XDG_RUNTIME_DIR}/pulse
+        target: ${XDG_RUNTIME_DIR}/pulse
