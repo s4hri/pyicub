@@ -13,7 +13,8 @@ RUN cd ${HOME} && \
     git checkout ${PYICUB_TAG} && \
     pip3 install --user -r requirements.txt
 
-RUN export PYTHONPATH=${PYTHONPATH}:/home/docky/pyicub
+ENV PYTHONPATH ${PYTHONPATH}:/home/docky/pyicub
+
 COPY init.sh ${HOME}
 
 ENTRYPOINT ["bash"]

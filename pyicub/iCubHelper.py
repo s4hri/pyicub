@@ -17,7 +17,7 @@ import yarp
 
 from pykron.core import Pykron
 from pykron.logging import PykronLogger
-logger = PykronLogger(save_csv=True)
+logger = PykronLogger(save_csv=False)
 app = Pykron(pykron_logger=logger)
 
 from pyicub.controllers.GazeController import GazeController
