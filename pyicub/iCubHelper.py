@@ -117,11 +117,13 @@ class iCub:
 
         self.__robot__ = conf['robot_name']
 
-        if conf['gaze_controller'] is True:
-            self.__gazectrl__ = GazeController(self.__robot__)
+        if 'gaze_controller' in conf.keys():
+            if conf['gaze_controller'] is True:
+                self.__gazectrl__ = GazeController(self.__robot__)
 
-        for part_name in conf['position_controllers']:
-            self.__icub_controllers__[part_name] = self.getPositionController(self.__icub_parts__[part_name])
+        if 'position_controllers' in conf.keys():
+            for part_name in conf['position_controllers']:
+                self.__icub_controllers__[part_name] = self.getPositionController(self.__icub_parts__[part_name])
 
         yarp.Network.init()
 
@@ -182,18 +184,18 @@ class iCub:
     def lookAtAbsAngles(self, azi, ele, ver, waitMotionDone=True):
         req = self.gaze.lookAtAbsAngles(azi, ele, ver)
         if waitMotionDone is True:
-            return req.wait_for_completed()
+            req.wait_for_completed()
         return req
 
     def lookAtFixationPoint(self, x, y, z, waitMotionDone=True):
         req = self.gaze.lookAtFixationPoint(x, y, z)
         if waitMotionDone is True:
-            return req.wait_for_completed()
+            req.wait_for_completed()
         return req
 
     def move(self, action, waitMotionDone=True):
         ctrl = self.__icub_controllers__[action.part_name]
         req = ctrl.move(target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list)
         if waitMotionDone is True:
-            return req.wait_for_completed()
+            req.wait_for_completed()
         return req

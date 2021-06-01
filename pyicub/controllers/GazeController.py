@@ -54,7 +54,7 @@ class GazeController:
     def IGazeControl(self):
         return self.__IGazeControl__
 
-    def __waitMotionDone2__(self, target_angles):
+    def __waitMotionDone__(self, target_angles):
         angles = yarp.Vector(6)
         while True:
             self.IGazeControl.getAngles(angles)
@@ -67,11 +67,6 @@ class GazeController:
             if dist < GazeController.MIN_JOINTS_DIST:
                 break
             time.sleep(GazeController.WAITMOTIONDONE_PERIOD)
-
-    def __waitMotionDone__(self):
-        res = self.IGazeControl.waitMotionDone(GazeController.WAITMOTIONDONE_PERIOD, GazeController.TIMEOUT_LOOKAT)
-        if res is False:
-            logger.error("Timeout occurred!")
 
     def blockEyes(self, vergence):
         self.IGazeControl.blockEyes(vergence)
@@ -91,7 +86,6 @@ class GazeController:
 
     def __lookAtAbsAngles__(self, angles):
         self.IGazeControl.lookAtAbsAngles(angles)
-        #self.__waitMotionDone2__(angles)
         self.__waitMotionDone__()
 
     @app.AsyncRequest(timeout=TIMEOUT_LOOKAT)
