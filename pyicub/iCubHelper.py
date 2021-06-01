@@ -16,15 +16,14 @@
 import yarp
 
 from pykron.core import Pykron
-from pykron.logging import PykronLogger
-logger = PykronLogger(save_csv=False)
-app = Pykron(pykron_logger=logger)
+app = Pykron.getInstance()
 
 from pyicub.controllers.GazeController import GazeController
 from pyicub.controllers.PositionController import PositionController
 from pyicub.modules.emotions import emotionsPyCtrl
 from pyicub.modules.speech import speechPyCtrl
 from pyicub.modules.face import facePyCtrl
+from pyicub.modules.faceLandmarks import faceLandmarksPyCtrl
 
 import threading
 import time
@@ -102,6 +101,7 @@ class iCub:
         self.__emo__ = None
         self.__speech__ = None
         self.__face__ = None
+        self.__facelandmarks__ = None
         self.__monitors__ = []
 
         self.__icub_parts__ = {}
@@ -161,6 +161,12 @@ class iCub:
         return self.__face__
 
     @property
+    def facelandmarks(self):
+        if self.__facelandmarks__ is None:
+           self.__facelandmarks__ = faceLandmarksPyCtrl()
+        return self.__facelandmarks__
+
+    @property
     def gaze(self):
         return self.__gazectrl__
 
@@ -199,6 +205,15 @@ class iCub:
         if waitMotionDone is True:
             req.wait_for_completed()
         return req
+
+    def getFace(self):
+        req = self.facelandmarks.getCenterFace(shouldWait=True)
+        req.wait_for_completed()
+        if req.task.status == 'TIMEOUT':
+            retval = (None, None)
+        else:
+            retval = req.task.retval
+        return retval
 
     def move(self, action, waitMotionDone=True):
         ctrl = self.__icub_controllers__[action.part_name]

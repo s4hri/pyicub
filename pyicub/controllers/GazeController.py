@@ -63,6 +63,8 @@ class GazeController:
             for i in range(0,6):
                 v.append(angles[i])
                 w.append(target_angles[i])
+            if len(v) != len(w):
+                break
             dist = utils.vector_distance(v, w)
             if dist < GazeController.MIN_JOINTS_DIST:
                 break
