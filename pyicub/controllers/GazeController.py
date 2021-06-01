@@ -86,7 +86,7 @@ class GazeController:
 
     def __lookAtAbsAngles__(self, angles):
         self.IGazeControl.lookAtAbsAngles(angles)
-        self.__waitMotionDone__()
+        self.__waitMotionDone__(angles)
 
     @app.AsyncRequest(timeout=TIMEOUT_LOOKAT)
     def lookAtAbsAngles(self, azi, ele, ver):

@@ -24,6 +24,7 @@ from pyicub.controllers.GazeController import GazeController
 from pyicub.controllers.PositionController import PositionController
 from pyicub.modules.emotions import emotionsPyCtrl
 from pyicub.modules.speech import speechPyCtrl
+from pyicub.modules.face import facePyCtrl
 
 import threading
 import time
@@ -152,6 +153,12 @@ class iCub:
                 v.stop()
         app.close()
         yarp.Network.fini()
+
+    @property
+    def face(self):
+        if self.__face__ is None:
+            self.__face__ = facePyCtrl(self.__robot__)
+        return self.__face__
 
     @property
     def gaze(self):
