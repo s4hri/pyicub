@@ -1,5 +1,5 @@
 __authors__ = 'Davide De Tommaso'
 __emails__ = 'davide.detommaso@iit.it'
 __license__ = 'GPL version 3'
-__version__ = '2.3'
-__description__ = 'Developing iCub application using Python'
+__version__ = '3.0'
+__description__ = 'Developing iCub applications using Python'

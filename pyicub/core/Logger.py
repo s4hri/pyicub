@@ -18,13 +18,20 @@ import yarp
 
 class YarpLogger:
 
-    DEBUG = "DEBUG"
-    ERROR = "ERROR"
-    NONE = "NONE"
+    _instance = None
 
-    def __init__(self, logtype=NONE):
-        self.__logtype__ = logtype
-        self.__yarp_logger__ = yarp.Log()
+    @staticmethod
+    def getLogger():
+        if YarpLogger._instance == None:
+            YarpLogger()
+        return YarpLogger._instance
+
+    def __init__(self):
+        if YarpLogger._instance != None:
+            raise Exception("This class is a singleton!")
+        else:
+            YarpLogger._instance = self
+        self.__yarp_logger__ = yarp.Log("",0,"") #FIXME: without params I get segfault
 
     def error(self, msg):
         self.__yarp_logger__.error(msg)

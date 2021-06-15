@@ -1,2 +1,1 @@
 PyYAML==5.4.1
-git+https://github.com/s4hri/pykron@0.25

@@ -1,0 +1,11 @@
+<application>
+<name>PyiCub Applications</name>
+
+        <module>
+                <name>python3</name>
+                <parameters>/home/docky/pyicub/apps/examples/head_positioncontrol.py</parameters>
+                <node>localhost</node>
+                <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
+        </module>
+
+</application>

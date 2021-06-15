@@ -17,19 +17,15 @@ import yarp
 import time
 import pyicub.utils as utils
 
-from pykron.core import Pykron
-from pykron.logging import PykronLogger
-
-app = Pykron.getInstance()
-logger = PykronLogger.getInstance().log
+from pyicub.core.Logger import YarpLogger
 
 class PositionController:
 
     MIN_JOINTS_DIST = 1
     WAITMOTIONDONE_PERIOD = 0.01
-    TIMEOUT_MOVE = 5.0
 
     def __init__(self, driver, joints_list, iencoders):
+        self.__logger__ = YarpLogger.getLogger()
         self.__IControlMode__ = driver.viewIControlMode()
         self.__IEncoders__ = iencoders
         self.__joints_list__ = joints_list
@@ -44,14 +40,14 @@ class PositionController:
         encs=yarp.Vector(16)
         while True:
             while not self.__IEncoders__.getEncoders(encs.data()):
-                time.sleep(0.01)
+                yarp.delay(0.005)
             v = []
             for j in joints_list:
                 v.append(encs[j])
             dist = utils.vector_distance(v, target_joints)
             if dist < PositionController.MIN_JOINTS_DIST:
                 break
-            time.sleep(PositionController.WAITMOTIONDONE_PERIOD)
+            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
 
     def getIPositionControl(self):
         return self.__IPositionControl__
@@ -59,8 +55,16 @@ class PositionController:
     def getIEncoders(self):
         return self.__IEncoders__
 
-    @app.AsyncRequest(timeout=TIMEOUT_MOVE)
-    def move(self, target_joints, req_time, joints_list=None):
+    def move(self, target_joints, req_time, joints_list=None, waitMotionDone=True):
+        self.__logger__.debug("""Moving joints STARTED!
+                              target_joints:%s
+                              req_time:%.2f,
+                              joints_list=%s,
+                              waitMotionDone=%s""" %
+                              (str(target_joints),
+                              req_time,
+                              str(joints_list),
+                              str(waitMotionDone)) )
         if joints_list is None:
             joints_list = self.__joints_list__
         disp = [0]*len(joints_list)
@@ -68,7 +72,7 @@ class PositionController:
         tmp = yarp.Vector(len(joints_list))
         encs=yarp.Vector(16)
         while not self.__IEncoders__.getEncoders(encs.data()):
-            time.sleep(0.01)
+            yarp.delay(0.005)
         i = 0
         for j in joints_list:
             tmp.set(i, target_joints[i])
@@ -79,10 +83,29 @@ class PositionController:
             self.__IPositionControl__.setRefSpeed(j, speed[i])
             self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
-        self.__waitMotionDone__(target_joints, joints_list)
+        if waitMotionDone is True:
+            self.__waitMotionDone__(target_joints, joints_list)
+        self.__logger__.debug("""Moving joints COMPLETED!
+                              target_joints:%s
+                              req_time:%.2f,
+                              joints_list=%s,
+                              waitMotionDone=%s""" %
+                              (str(target_joints),
+                              req_time,
+                              str(joints_list),
+                              str(waitMotionDone)) )
 
-    @app.AsyncRequest(timeout=TIMEOUT_MOVE)
-    def moveRefVel(self, req_time, target_joints, joints_list=None, vel_list=None):
+    def moveRefVel(self, req_time, target_joints, joints_list=None, vel_list=None, waitMotionDone=True):
+        self.__logger__.debug("""Moving joints in position control STARTED!
+                              target_joints:%s
+                              req_time:%.2f,
+                              vel_list=%s,
+                              waitMotionDone=%s""" %
+                              str(target_joints),
+                              req_time,
+                              str(vel_list),
+                              str(waitMotionDone))
+
         if joints_list is None:
             joints_list = self.__joints_list__
         jl = yarp.Vector(len(joints_list))
@@ -94,4 +117,14 @@ class PositionController:
             self.__IPositionControl__.setRefSpeed(j, vl[i])
             self.__IPositionControl__.positionMove(j, jl[i])
             i+=1
-        self.__waitMotionDone__(target_joints, joints_list)
+        if waitMotionDone is True:
+            self.__waitMotionDone__(target_joints, joints_list)
+        self.__logger__.debug("""Moving joints COMPLETED!
+                              target_joints:%s
+                              req_time:%.2f,
+                              vel_list=%s,
+                              waitMotionDone=%s""" %
+                              str(target_joints),
+                              req_time,
+                              str(vel_list),
+                              str(waitMotionDone))

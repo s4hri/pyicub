@@ -14,14 +14,9 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-from pyicub.classes.Rpc import RpcClient
-from pyicub.classes.BufferedPort import BufferedReadPort
+from pyicub.core.Rpc import RpcClient
+from pyicub.core.BufferedPort import BufferedReadPort
 
-from pykron.core import Pykron
-from pykron.logging import PykronLogger
-
-app = Pykron.getInstance()
-logger = PykronLogger.getInstance().log
 
 class faceLandmarksPyCtrl:
 
@@ -41,7 +36,6 @@ class faceLandmarksPyCtrl:
             return (None, None)
         return map(int, L[index].split())
 
-    @app.AsyncRequest(timeout=0.5)
     def getCenterFace(self, shouldWait=False):
         res = self.getLandmark(27, shouldWait)
         if type(res) == map:

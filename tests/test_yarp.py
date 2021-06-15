@@ -18,8 +18,8 @@ import sys
 import yarp
 import time
 
-from pyicub.classes.BufferedPort import BufferedPort, BufferedReadPort, BufferedWritePort
-from pyicub.classes.Rpc import RpcClient
+from pyicub.core.BufferedPort import BufferedPort, BufferedReadPort, BufferedWritePort
+from pyicub.core.Rpc import RpcClient
 
 if yarp.Network.checkNetwork(1.0) is False:
     yarp.Network.setLocalMode(True)

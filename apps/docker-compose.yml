@@ -2,16 +2,15 @@ version: '3.9'
 
 services:
 
-  pyicub:
+  pyicub-app:
 
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        DOCKER_SRC: iitschri/icub:${ICUB_DISTRO}
-        PYICUB_TAG: ${PYICUB_TAG}
-
-    image: iitschri/pyicub:${PYICUB_TAG}-${ICUB_DISTRO}
+        SRC_IMAGE: iitschri/pyicub:${PYICUB_TAG}-${ICUB_DISTRO}
+        LOCAL_USER_ID: ${LOCAL_USER_ID}
+    container_name: pyicub-app
 
     command: init.sh ${SIMULATION} ${ICUB_USER} ${ICUB_PSW} ${ICUB_HOSTNAME} ${APPS}
 
@@ -26,9 +25,6 @@ services:
     network_mode: "host"
 
     volumes:
-      - type: bind
-        source: ../
-        target: /home/docky/pyicub
 
       - type: bind
         source: ${XAUTHORITY}
@@ -37,3 +33,7 @@ services:
       - type: bind
         source: /tmp/.X11-unix
         target: /tmp/.X11-unix
+
+      - type: bind
+        source: ./
+        target: /home/docky/pyicub/apps

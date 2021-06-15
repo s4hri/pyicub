@@ -15,22 +15,18 @@
 
 import yarp
 
-from pykron.core import Pykron
-app = Pykron.getInstance()
-
 from pyicub.controllers.GazeController import GazeController
 from pyicub.controllers.PositionController import PositionController
 from pyicub.modules.emotions import emotionsPyCtrl
 from pyicub.modules.speech import speechPyCtrl
 from pyicub.modules.face import facePyCtrl
 from pyicub.modules.faceLandmarks import faceLandmarksPyCtrl
+from pyicub.core.BufferedPort import BufferedReadPort
 
 import threading
-import time
 import yaml
 import os
 from collections import deque
-from pyicub.classes.BufferedPort import BufferedReadPort
 
 class ICUB_PARTS:
     HEAD       = 'head'
@@ -84,7 +80,7 @@ class PortMonitor:
                 self._values.append(res.toString())
                 if self._activate(self._values):
                     self._callback()
-            time.sleep(self._period)
+            yarp.delay(self._period)
 
     def __del__(self):
         self.stop()
@@ -114,16 +110,16 @@ class iCub:
         self.__icub_parts__[ICUB_PARTS.RIGHT_LEG] = iCubPart(ICUB_PARTS.RIGHT_LEG, 6)
 
         with open(configuration_file) as f:
-            conf = yaml.load(f, Loader=yaml.FullLoader)
+            self.__robot_conf__ = yaml.load(f, Loader=yaml.FullLoader)
 
-        self.__robot__ = conf['robot_name']
+        self.__robot__ = self.__robot_conf__['robot_name']
 
-        if 'gaze_controller' in conf.keys():
-            if conf['gaze_controller'] is True:
+        if 'gaze_controller' in self.__robot_conf__.keys():
+            if self.__robot_conf__['gaze_controller'] is True:
                 self.__gazectrl__ = GazeController(self.__robot__)
 
-        if 'position_controllers' in conf.keys():
-            for part_name in conf['position_controllers']:
+        if 'position_controllers' in self.__robot_conf__.keys():
+            for part_name in self.__robot_conf__['position_controllers']:
                 self.__icub_controllers__[part_name] = self.getPositionController(self.__icub_parts__[part_name])
 
         yarp.Network.init()
@@ -151,8 +147,9 @@ class iCub:
         if len(self.__monitors__) > 0:
             for v in self.__monitors__:
                 v.stop()
-        app.close()
-        yarp.Network.fini()
+        for driver in self.__drivers__.values():
+            driver.close()
+        #yarp.Network.fini() #FIXME: Due to an issue with YarpLogger a segfault occurs
 
     @property
     def face(self):
@@ -194,30 +191,6 @@ class iCub:
             self.__position_controllers__[robot_part.name] = PositionController(driver, joints_list, iencoders)
         return self.__position_controllers__[robot_part.name]
 
-    def lookAtAbsAngles(self, azi, ele, ver, waitMotionDone=True):
-        req = self.gaze.lookAtAbsAngles(azi, ele, ver)
-        if waitMotionDone is True:
-            req.wait_for_completed()
-        return req
-
-    def lookAtFixationPoint(self, x, y, z, waitMotionDone=True):
-        req = self.gaze.lookAtFixationPoint(x, y, z)
-        if waitMotionDone is True:
-            req.wait_for_completed()
-        return req
-
-    def getFace(self):
-        req = self.facelandmarks.getCenterFace(shouldWait=True)
-        req.wait_for_completed()
-        if req.task.status == 'TIMEOUT':
-            retval = (None, None)
-        else:
-            retval = req.task.retval
-        return retval
-
-    def move(self, action, waitMotionDone=True):
+    def move(self, action):
         ctrl = self.__icub_controllers__[action.part_name]
-        req = ctrl.move(target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list)
-        if waitMotionDone is True:
-            req.wait_for_completed()
-        return req
+        return ctrl.move(target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list)

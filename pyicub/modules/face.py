@@ -14,7 +14,7 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-from pyicub.classes.BufferedPort import BufferedWritePort
+from pyicub.core.BufferedPort import BufferedWritePort
 
 class facePyCtrl:
 

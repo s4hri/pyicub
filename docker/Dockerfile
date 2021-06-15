@@ -6,6 +6,8 @@ LABEL maintainer="Davide De Tommaso <davide.detommaso@iit.it>"
 
 ARG PYICUB_TAG
 
+USER docky
+
 RUN cd ${HOME} && \
     git clone https://github.com/s4hri/pyicub && \
     cd pyicub && \
@@ -14,7 +16,5 @@ RUN cd ${HOME} && \
     pip3 install --user -r requirements.txt
 
 ENV PYTHONPATH ${PYTHONPATH}:/home/docky/pyicub
-
-COPY init.sh ${HOME}
 
 ENTRYPOINT ["bash"]

@@ -1,13 +1,13 @@
-.PHONY: all setup clean_dist distro clean install uninstall testsetup test
+.PHONY: setup clean_dist distro clean install uninstall test
 
 NAME='pyicub'
 VERSION=`python3 setup.py -V`
 
-all:
-	echo "noop for debbuild"
+LOCAL_USER_ID := $(shell id -u)
+export LOCAL_USER_ID
 
 setup:
-	echo "building version ${VERSION}"
+	echo "Building PyiCub version ${VERSION}"
 
 clean_dist:
 	-rm -f MANIFEST
@@ -23,13 +23,21 @@ clean: clean_dist
 	echo "clean"
 
 install: distro
-	sudo checkinstall --default --backup=no --nodoc --deldoc=yes --deldesc=yes --delspec=yes --pakdir=/tmp python3 setup.py install
+	python3 -m pip install --user .
 
 uninstall:
-	dpkg -r pyicub
+	python3 -m pip uninstall pyicub
 
-testsetup:
-	echo "running pyicub tests"
+test:
+	python3 -m unittest discover -s tests
 
-test: testsetup
-	nosetests --with-coverage --cover-package=pyicub --with-xunit test
+
+docker_build:
+	docker-compose -f docker/docker-compose.yml build
+
+docker_run_dev: docker_build
+	docker-compose -f docker/docker-compose.yml up --remove-orphans
+
+docker_run:
+	docker-compose -f apps/docker-compose.yml build
+	docker-compose -f apps/docker-compose.yml up --remove-orphans

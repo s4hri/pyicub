@@ -1,5 +1,11 @@
 # pyicub
-Yarp interface for using the iCub robot with Python
+Python library using YARP wrappers for developing iCub applications
+
+
+# Requirements
+
+Python >3.5
+Yarp >3 (and Python wrappers availables in the PYTHONPATH)
 
 # installation
 
