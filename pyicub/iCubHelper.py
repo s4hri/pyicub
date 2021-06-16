@@ -27,6 +27,7 @@ import threading
 import yaml
 import os
 from collections import deque
+import concurrent.futures
 
 class ICUB_PARTS:
     HEAD       = 'head'
@@ -85,6 +86,42 @@ class PortMonitor:
     def __del__(self):
         self.stop()
         del self._port
+
+class iCubRequest:
+
+    def __init__(self, timeout, target, *args, **kwargs):
+        self.start_time = time.perf_counter()
+        self.timeout = timeout
+        self.duration = None
+        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+        self.future = self.executor.submit(target,*args,**kwargs)
+
+    def wait_for_completed(self):
+        res = None
+        try:
+            res = self.future.result(self.timeout)
+        except Exception:
+            pass
+        finally:
+            self.duration = time.perf_counter() - self.start_time
+            self.executor.shutdown(wait=False)
+        return res
+
+
+class iCubTask:
+
+    @staticmethod
+    def request(timeout=TIMEOUT_REQUEST):
+        def wrapper(target):
+                def f(*args, **kwargs):
+                    return iCubRequest(timeout, target, *args, **kwargs)
+                return f
+        return wrapper
+
+    @staticmethod
+    def join(requests):
+        for req in requests:
+            req.wait_for_completed()
 
 class iCub:
 
