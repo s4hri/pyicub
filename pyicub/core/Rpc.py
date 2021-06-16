@@ -29,7 +29,7 @@ class RpcClient:
 
     def execute(self, cmd):
         ans = yarp.Bottle()
-        self.__logger__logging.debug("Executing RPC command %s" % cmd.toString())
+        self.__logger__.debug("Executing RPC command %s" % cmd.toString())
         res = self.__rpc_client__.write(cmd, ans)
         self.__logger__.debug("Result: %s" % ans.toString())
         return ans
