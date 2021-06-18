@@ -1,4 +1,4 @@
-#   Copyright (C) 2019  Davide De Tommaso
+#   Copyright (C) 2021  Davide De Tommaso
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -13,13 +13,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.iCubHelper import iCub, JointAction, ICUB_PARTS
-
+from pyicub.iCubHelper import iCub
+import time
 icub = iCub()
 
-a = JointAction(ICUB_PARTS.HEAD, req_time=1.0, target_position=[-15.0, 20.0, 5.0, 0.0, 0.0, 5.0])
-b = JointAction(ICUB_PARTS.HEAD, req_time=1.0, target_position=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
-icub.move(a)
-icub.move(b)
-
-icub.close()
+for _ in range(0,10):
+    print(icub.facelandmarks.getCenterEyes())
+    time.sleep(0.1)

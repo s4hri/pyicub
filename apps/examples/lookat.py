@@ -18,7 +18,7 @@ import time
 
 icub = iCub()
 t0 = time.time()
-req = icub.gaze.lookAtFixationPoint(-1.0, -0.5, 1.0, waitMotionDone=False)
+icub.gaze.lookAtFixationPoint(-1.0, -0.5, 1.0, waitMotionDone=False)
 icub.gaze.waitMotionOnset()
 
 icub.gaze.lookAtFixationPoint(-1.0, -0.2, 0.5)

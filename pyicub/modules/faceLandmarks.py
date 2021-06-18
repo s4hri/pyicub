@@ -17,12 +17,17 @@ import yarp
 from pyicub.core.Rpc import RpcClient
 from pyicub.core.BufferedPort import BufferedReadPort
 
-
 class faceLandmarksPyCtrl:
 
     def __init__(self):
-        self.__rpc__ = RpcClient("/faceLandmarks/rpc:i")
-        self.__port_landmarks__ = BufferedReadPort("/faceLandmarksPyCtrl/landmarks:i", "/faceLandmarks/landmarks:o")
+        self.__landmarks__ = None
+        self.__port_landmarks__ = BufferedReadPort("/faceLandmarksPyCtrl/landmarks:i", "/faceLandmarks/landmarks:o", callback=self.onRead)
+
+    def onRead(self, bottle):
+        if bottle is None:
+            self.__landmarks__ = None
+        else:
+            self.__landmarks__ = bottle.toString()[2:-2].split(') (')
 
     def sendCmd(self, cmd, option):
         btl = yarp.Bottle()
@@ -30,25 +35,15 @@ class faceLandmarksPyCtrl:
         map(btl.addString, [cmd, option])
         return self.__rpc__.execute(btl)
 
-    def getLandmark(self, index, shouldWait=False):
-        L = self.getLandmarks(shouldWait)
-        if L is None:
+    def getLandmark(self, index):
+        if self.__landmarks__ is None:
             return (None, None)
-        return map(int, L[index].split())
+        return map(int, self.__landmarks__[index].split())
 
-    def getCenterFace(self, shouldWait=False):
-        res = self.getLandmark(27, shouldWait)
+    def getCenterEyes(self):
+        res = self.getLandmark(27)
         if type(res) == map:
             (fx, fy) = res
             return [fx, fy]
         else:
             return (None, None)
-
-    def getLandmarks(self, shouldWait=False):
-        btl = self.__port_landmarks__.read(shouldWait)
-        if btl is None:
-            return None
-        return btl.toString()[2:-2].split(') (')
-
-    def close(self):
-        self.__rpc__.close()

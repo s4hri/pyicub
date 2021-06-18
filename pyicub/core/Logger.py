@@ -15,6 +15,10 @@
 
 import sys
 import yarp
+import os
+import subprocess
+
+
 
 class YarpLogger:
 
@@ -32,15 +36,26 @@ class YarpLogger:
         else:
             YarpLogger._instance = self
         self.__yarp_logger__ = yarp.Log("",0,"") #FIXME: without params I get segfault
+        self.enable_logs()
+
+    def disable_logs(self):
+        self.__logging__ = False
+
+    def enable_logs(self):
+        self.__logging__ = True
 
     def error(self, msg):
-        self.__yarp_logger__.error(msg)
+        if self.__logging__:
+            self.__yarp_logger__.error(msg)
 
     def warning(self, msg):
-        self.__yarp_logger__.warning(msg)
+        if self.__logging__:
+            self.__yarp_logger__.warning(msg)
 
     def debug(self, msg):
-        self.__yarp_logger__.debug(msg)
+        if self.__logging__:
+            self.__yarp_logger__.debug(msg)
 
     def info(self, msg):
-        self.__yarp_logger__.info(msg)
+        if self.__logging__:
+            self.__yarp_logger__.info(msg)

@@ -1,4 +1,4 @@
-.PHONY: setup clean_dist distro clean install uninstall test
+.PHONY: setup clean_dist distro clean install uninstall test docker_build docker_run
 
 NAME='pyicub'
 VERSION=`python3 setup.py -V`
@@ -31,13 +31,8 @@ uninstall:
 test:
 	python3 -m unittest discover -s tests
 
-
 docker_build:
 	docker-compose -f docker/docker-compose.yml build
 
-docker_run_dev: docker_build
+docker_run: docker_build
 	docker-compose -f docker/docker-compose.yml up --remove-orphans
-
-docker_run:
-	docker-compose -f apps/docker-compose.yml build
-	docker-compose -f apps/docker-compose.yml up --remove-orphans

@@ -22,10 +22,11 @@ from pyicub.core.Logger import YarpLogger
 class GazeController:
 
     MIN_JOINTS_DIST = 5
-    WAITMOTIONDONE_PERIOD = 0.01
+    WAITMOTION_PERIOD = 0.01
+    WAITMOTIONDONE_TIMEOUT = 1.0
 
-    def __init__(self, robot):
-        self.__logger__ = YarpLogger.getLogger()
+    def __init__(self, robot, logger=YarpLogger.getLogger()):
+        self.__logger__ = logger
         self.__props__ = yarp.Property()
         self.__driver__ = yarp.PolyDriver()
         self.__props__.put("robot", robot)
@@ -46,25 +47,14 @@ class GazeController:
     def IGazeControl(self):
         return self.__IGazeControl__
 
-    def __waitMotionDone__(self, target_angles):
-        self.__logger__.debug("""Waiting for motion done STARTED!
-                              target_angles: %s""" % str([target_angles[0], target_angles[1], target_angles[2]]))
-        angles = yarp.Vector(6)
-        while True:
-            self.IGazeControl.getAngles(angles)
-            v = []
-            w = []
-            for i in range(0,6):
-                v.append(angles[i])
-                w.append(target_angles[i])
-            if len(v) != len(w):
-                break
-            dist = utils.vector_distance(v, w)
-            if dist < GazeController.MIN_JOINTS_DIST:
-                break
-            yarp.delay(GazeController.WAITMOTIONDONE_PERIOD)
-        self.__logger__.debug("""Waiting for motion done COMPLETED!
-                              target_angles: %s""" % str([target_angles[0], target_angles[1], target_angles[2]]))
+    def __lookAtAbsAngles__(self, angles, waitMotionDone=True):
+        self.__logger__.info("""Looking at angles STARTED!
+                                 angles=%s, waitMotionDone=%s""" % (str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+        self.IGazeControl.lookAtAbsAngles(angles)
+        if waitMotionDone is True:
+            self.waitMotionDone(angles)
+        self.__logger__.info("""Looking at angles COMPLETED!
+                                 angles=%s, waitMotionDone=%s""" % (str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
 
     def blockEyes(self, vergence):
         self.IGazeControl.blockEyes(vergence)
@@ -81,15 +71,6 @@ class GazeController:
         self.IGazeControl.clearNeckYaw()
         self.IGazeControl.clearNeckRoll()
         self.IGazeControl.clearNeckPitch()
-
-    def __lookAtAbsAngles__(self, angles, waitMotionDone=True):
-        self.__logger__.debug("""Looking at angles STARTED!
-                                 angles=%s, waitMotionDone=%s""" % (str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
-        self.IGazeControl.lookAtAbsAngles(angles)
-        if waitMotionDone is True:
-            self.__waitMotionDone__(angles)
-        self.__logger__.debug("""Looking at angles COMPLETED!
-                                 angles=%s, waitMotionDone=%s""" % (str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
 
     def lookAtAbsAngles(self, azi, ele, ver, waitMotionDone=True):
         angles = yarp.Vector(3)
@@ -118,21 +99,43 @@ class GazeController:
     def setTrackingMode(self, mode):
         self.IGazeControl.setTrackingMode(mode)
 
-    def waitMotionOnset(self, speed_ref=0):
-        self.__logger__.debug("""Waiting for gaze motion onset STARTED!
+    def waitMotionDone(self, target_angles, period=WAITMOTION_PERIOD, timeout=WAITMOTIONDONE_TIMEOUT):
+        self.__logger__.info("""Waiting for motion done STARTED! target_angles: %s""" % str([target_angles[0], target_angles[1], target_angles[2]]))
+        angles = yarp.Vector(6)
+        max_attempts = int(timeout/period)
+        for _ in range(0, max_attempts):
+            self.IGazeControl.getAngles(angles)
+            v = []
+            w = []
+            for i in range(0,6):
+                v.append(angles[i])
+                w.append(target_angles[i])
+            if len(v) != len(w):
+                break
+            dist = utils.vector_distance(v, w)
+            if dist < GazeController.MIN_JOINTS_DIST:
+                self.__logger__.info("""Motion done DETECTED! target_angles: %s""" % str([target_angles[0], target_angles[1], target_angles[2]]))
+                return True
+            yarp.delay(period)
+        self.__logger__.warning("""Motion done TIMEOUT! target_angles: %s""" % str([target_angles[0], target_angles[1], target_angles[2]]))
+        return False
+
+    def waitMotionOnset(self, speed_ref=0, period=WAITMOTION_PERIOD, max_attempts=10):
+        self.__logger__.info("""Waiting for gaze motion onset STARTED!
                                  speed_ref=%s""" % str(speed_ref))
         q = yarp.Vector(6)
-        while True:
+        for _ in range(0, max_attempts):
             self.IGazeControl.getJointsVelocities(q)
             v = []
             for i in range(0,6):
                 v.append(q[i])
             speed = utils.norm(v)
             if speed > speed_ref:
-                break
-            yarp.delay(GazeController.WAITMOTIONDONE_PERIOD)
-        self.__logger__.debug("""Waiting for gaze motion onset COMPLETED!
-                                 speed_ref=%s""" % str(speed_ref))
+                self.__logger__.info("""Motion onset DETECTED! speed_ref=%s""" % str(speed_ref))
+                return True
+            yarp.delay(period)
+        self.__logger__.warning("""Motion onset TIMEOUT! speed_ref=%s""" % str(speed_ref))
+        return False
 
     def __del__(self):
         self.__IGazeControl__.stopControl()

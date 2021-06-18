@@ -1,0 +1,41 @@
+<application>
+<name>iCub faceLandmarks</name>
+
+        <module>
+                <name>yarplogger</name>
+                <parameters>--start --no_stop</parameters>
+                <node>localhost</node>
+        </module>
+
+        <module>
+                <name>yarpdev</name>
+                <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
+                <parameters>--device opencv_grabber</parameters>
+                <node>localhost</node>
+        </module>
+
+        <module>
+            <name>yarpview</name>
+            <parameters>--name /face --x 0 --y 0 --p 50 --w 320 --h 240</parameters>
+            <node>localhost</node>
+          </module>
+
+          <module>
+            <name>faceLandmarks</name>
+            <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
+            <node>localhost</node>
+          </module>
+
+            <connection>
+              <from>/faceLandmarks/image:o</from>
+              <to>/face</to>
+              <protocol>udp</protocol>
+            </connection>
+
+            <connection>
+              <output>/grabber</output>
+              <input>/faceLandmarks/image:i</input>
+              <protocol>udp</protocol>
+            </connection>
+
+</application>

@@ -24,8 +24,8 @@ class PositionController:
     MIN_JOINTS_DIST = 1
     WAITMOTIONDONE_PERIOD = 0.01
 
-    def __init__(self, driver, joints_list, iencoders):
-        self.__logger__ = YarpLogger.getLogger()
+    def __init__(self, driver, joints_list, iencoders, logger=YarpLogger.getLogger()):
+        self.__logger__ = logger
         self.__IControlMode__ = driver.viewIControlMode()
         self.__IEncoders__ = iencoders
         self.__joints_list__ = joints_list
@@ -36,19 +36,6 @@ class PositionController:
         for joint in joints_list:
             self.__IControlMode__.setControlMode(joint, yarp.VOCAB_CM_POSITION)
 
-    def __waitMotionDone__(self, target_joints, joints_list):
-        encs=yarp.Vector(16)
-        while True:
-            while not self.__IEncoders__.getEncoders(encs.data()):
-                yarp.delay(0.005)
-            v = []
-            for j in joints_list:
-                v.append(encs[j])
-            dist = utils.vector_distance(v, target_joints)
-            if dist < PositionController.MIN_JOINTS_DIST:
-                break
-            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
-
     def getIPositionControl(self):
         return self.__IPositionControl__
 
@@ -56,7 +43,7 @@ class PositionController:
         return self.__IEncoders__
 
     def move(self, target_joints, req_time, joints_list=None, waitMotionDone=True):
-        self.__logger__.debug("""Moving joints STARTED!
+        self.__logger__.info("""Moving joints STARTED!
                               target_joints:%s
                               req_time:%.2f,
                               joints_list=%s,
@@ -84,8 +71,8 @@ class PositionController:
             self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
         if waitMotionDone is True:
-            self.__waitMotionDone__(target_joints, joints_list)
-        self.__logger__.debug("""Moving joints COMPLETED!
+            self.waitMotionDone(target_joints, joints_list, timeout=2*req_time)
+        self.__logger__.info("""Moving joints COMPLETED!
                               target_joints:%s
                               req_time:%.2f,
                               joints_list=%s,
@@ -96,7 +83,7 @@ class PositionController:
                               str(waitMotionDone)) )
 
     def moveRefVel(self, req_time, target_joints, joints_list=None, vel_list=None, waitMotionDone=True):
-        self.__logger__.debug("""Moving joints in position control STARTED!
+        self.__logger__.info("""Moving joints in position control STARTED!
                               target_joints:%s
                               req_time:%.2f,
                               vel_list=%s,
@@ -118,7 +105,7 @@ class PositionController:
             self.__IPositionControl__.positionMove(j, jl[i])
             i+=1
         if waitMotionDone is True:
-            self.__waitMotionDone__(target_joints, joints_list)
+            self.waitMotionDone(target_joints, joints_list, timeout=2*req_time)
         self.__logger__.debug("""Moving joints COMPLETED!
                               target_joints:%s
                               req_time:%.2f,
@@ -128,3 +115,21 @@ class PositionController:
                               req_time,
                               str(vel_list),
                               str(waitMotionDone))
+
+    def waitMotionDone(self, target_joints, joints_list, timeout):
+        self.__logger__.info("""Waiting for motion done STARTED!""")
+        encs=yarp.Vector(16)
+        max_attempts = int(timeout/PositionController.WAITMOTIONDONE_PERIOD)
+        for _ in range(0, max_attempts):
+            while not self.__IEncoders__.getEncoders(encs.data()):
+                yarp.delay(0.05)
+            v = []
+            for j in joints_list:
+                v.append(encs[j])
+            dist = utils.vector_distance(v, target_joints)
+            if dist < PositionController.MIN_JOINTS_DIST:
+                self.__logger__.info("""Motion done DETECTED!""")
+                return True
+            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
+        self.__logger__.warning("""Motion done TIMEOUT!""")
+        return False

@@ -14,6 +14,7 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
+yarp.Network.init()
 
 from pyicub.controllers.GazeController import GazeController
 from pyicub.controllers.PositionController import PositionController
@@ -22,6 +23,7 @@ from pyicub.modules.speech import speechPyCtrl
 from pyicub.modules.face import facePyCtrl
 from pyicub.modules.faceLandmarks import faceLandmarksPyCtrl
 from pyicub.core.BufferedPort import BufferedReadPort
+from pyicub.core.Logger import YarpLogger
 
 import threading
 import yaml
@@ -89,6 +91,8 @@ class PortMonitor:
 
 class iCubRequest:
 
+    TIMEOUT_REQUEST = 30.0
+
     def __init__(self, timeout, target, *args, **kwargs):
         self.start_time = time.perf_counter()
         self.timeout = timeout
@@ -111,7 +115,7 @@ class iCubRequest:
 class iCubTask:
 
     @staticmethod
-    def request(timeout=TIMEOUT_REQUEST):
+    def request(timeout=iCubRequest.TIMEOUT_REQUEST):
         def wrapper(target):
                 def f(*args, **kwargs):
                     return iCubRequest(timeout, target, *args, **kwargs)
@@ -125,7 +129,7 @@ class iCubTask:
 
 class iCub:
 
-    def __init__(self, configuration_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'robot_configuration.yaml')):
+    def __init__(self, configuration_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'robot_configuration.yaml'), disable_logs=False):
         self.__icub_controllers__ = {}
         self.__position_controllers__ = {}
         self.__drivers__ = {}
@@ -136,6 +140,10 @@ class iCub:
         self.__face__ = None
         self.__facelandmarks__ = None
         self.__monitors__ = []
+        self.__logger__ = YarpLogger.getLogger()
+
+        if disable_logs:
+            self.__logger__.disable_logs()
 
         self.__icub_parts__ = {}
         self.__icub_parts__[ICUB_PARTS.HEAD] = iCubPart(ICUB_PARTS.HEAD, 6)
@@ -158,8 +166,6 @@ class iCub:
         if 'position_controllers' in self.__robot_conf__.keys():
             for part_name in self.__robot_conf__['position_controllers']:
                 self.__icub_controllers__[part_name] = self.getPositionController(self.__icub_parts__[part_name])
-
-        yarp.Network.init()
 
     def __getDriver__(self, robot_part):
         if not robot_part.name in self.__drivers__.keys():
@@ -186,7 +192,7 @@ class iCub:
                 v.stop()
         for driver in self.__drivers__.values():
             driver.close()
-        #yarp.Network.fini() #FIXME: Due to an issue with YarpLogger a segfault occurs
+        yarp.Network.fini()
 
     @property
     def face(self):

@@ -16,12 +16,20 @@
 import yarp
 from pyicub.core.Logger import YarpLogger
 
+
+class CustomCallback(yarp.BottleCallback):
+    def __init__(self, user_callback):
+        yarp.BottleCallback.__init__(self)
+        self.__user_callback__ = user_callback
+
+    def onRead(self, bottle, reader):
+        self.__user_callback__(bottle)
+
 class BufferedPort:
 
     def __init__(self):
         self.__logger__ = YarpLogger.getLogger()
         self.__port__ = yarp.BufferedPortBottle()
-        self.__port_name__ = None
 
     @property
     def name(self):
@@ -66,10 +74,13 @@ class BufferedPort:
 
 class BufferedReadPort(BufferedPort):
 
-    def __init__(self, port_name, port_src):
+    def __init__(self, port_name, port_src, callback=None):
         BufferedPort.__init__(self)
         self.__port_name__ = port_name
         self.__port_src__ = port_src
+        if callback:
+            self.__callback__ = CustomCallback(callback)
+            self.__port__.useCallback(self.__callback__)
         self.open(self.__port_name__)
         yarp.Network.connect(self.__port_src__, self.__port_name__)
 
