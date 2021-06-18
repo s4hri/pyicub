@@ -120,7 +120,7 @@ class GazeController:
         self.__logger__.warning("""Motion done TIMEOUT! target_angles: %s""" % str([target_angles[0], target_angles[1], target_angles[2]]))
         return False
 
-    def waitMotionOnset(self, speed_ref=0, period=WAITMOTION_PERIOD, max_attempts=10):
+    def waitMotionOnset(self, speed_ref=0, period=WAITMOTION_PERIOD, max_attempts=50):
         self.__logger__.info("""Waiting for gaze motion onset STARTED!
                                  speed_ref=%s""" % str(speed_ref))
         q = yarp.Vector(6)
