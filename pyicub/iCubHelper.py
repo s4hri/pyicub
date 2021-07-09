@@ -28,6 +28,7 @@ from pyicub.core.Logger import YarpLogger
 import threading
 import yaml
 import os
+import time
 from collections import deque
 import concurrent.futures
 
@@ -100,15 +101,18 @@ class iCubRequest:
         self.duration = None
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
         self.future = self.executor.submit(target,*args,**kwargs)
+        self.future.add_done_callback(self.on_completed)
+
+    def on_completed(self, future):
+        self.duration = time.perf_counter() - self.start_time
 
     def wait_for_completed(self):
         res = None
         try:
             res = self.future.result(self.timeout)
         except Exception:
-            pass
-        finally:
             self.duration = time.perf_counter() - self.start_time
+        finally:
             self.executor.shutdown(wait=False)
         return res
 

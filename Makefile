@@ -32,7 +32,7 @@ test:
 	python3 -m unittest discover -s tests
 
 docker_build:
-	docker-compose -f docker/docker-compose.yml build
+	docker-compose -f docker/docker-compose.yml --env docker/.env build --no-cache
 
 docker_run: docker_build
-	docker-compose -f docker/docker-compose.yml up --remove-orphans
+	docker-compose -f docker/docker-compose.yml --env docker/.env up --remove-orphans
