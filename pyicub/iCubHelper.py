@@ -47,11 +47,12 @@ class iCubPart:
         self.joints_list = range(0, joints_n)
 
 class JointAction:
-    def __init__(self, part_name, target_position, req_time, joints_list=None):
+    def __init__(self, part_name, target_position, req_time, joints_list=None, vel_list=None):
         self.part_name = part_name
         self.target_position = target_position
         self.req_time = req_time
         self.joints_list = joints_list
+        self.vel_list = vel_list
 
 class PortMonitor:
     def __init__(self, yarp_src_port, activate_function, callback, period=0.01, autostart=False):
@@ -236,4 +237,7 @@ class iCub:
 
     def move(self, action):
         ctrl = self.__icub_controllers__[action.part_name]
-        return ctrl.move(target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list)
+        if action.vel_list is None:
+            return ctrl.move(target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list)
+        else:
+            return ctrl.moveRefVel(target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list, vel_list=action.vel_list)
