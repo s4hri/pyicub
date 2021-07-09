@@ -88,10 +88,10 @@ class PositionController:
                               req_time:%.2f,
                               vel_list=%s,
                               waitMotionDone=%s""" %
-                              str(target_joints),
+                              (str(target_joints),
                               req_time,
                               str(vel_list),
-                              str(waitMotionDone))
+                              str(waitMotionDone)) )
 
         if joints_list is None:
             joints_list = self.__joints_list__
@@ -111,10 +111,10 @@ class PositionController:
                               req_time:%.2f,
                               vel_list=%s,
                               waitMotionDone=%s""" %
-                              str(target_joints),
+                              (str(target_joints),
                               req_time,
                               str(vel_list),
-                              str(waitMotionDone))
+                              str(waitMotionDone)) )
 
     def waitMotionDone(self, target_joints, joints_list, timeout):
         self.__logger__.info("""Waiting for motion done STARTED!""")
