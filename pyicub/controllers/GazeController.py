@@ -138,6 +138,7 @@ class GazeController:
         return False
 
     def __del__(self):
-        self.__IGazeControl__.stopControl()
-        self.__IGazeControl__.setTrackingMode(False)
-        self.__driver__.close()
+        if self.__driver__.isValid():
+            self.__IGazeControl__.stopControl()
+            self.__IGazeControl__.setTrackingMode(False)
+            self.__driver__.close()

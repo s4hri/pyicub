@@ -239,9 +239,16 @@ class iCub:
             self.__position_controllers__[robot_part.name] = PositionController(driver, joints_list, iencoders)
         return self.__position_controllers__[robot_part.name]
 
-    def move(self, action):
+    def move(self, action, in_parallel=False):
         ctrl = self.__icub_controllers__[action.part_name]
-        if action.vel_list is None:
-            return ctrl.move(target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list)
+
+        if in_parallel is True:
+            if action.vel_list is None:
+                return iCubRequest(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move, target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list)
+            else:
+                return iCubRequest(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.moveRefVel, target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list, vel_list=action.vel_list)
         else:
-            return ctrl.moveRefVel(target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list, vel_list=action.vel_list)
+            if action.vel_list is None:
+                return ctrl.move(target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list)
+            else:
+                return ctrl.moveRefVel(target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list, vel_list=action.vel_list)
