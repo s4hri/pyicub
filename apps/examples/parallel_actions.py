@@ -13,23 +13,23 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.iCubHelper import iCub, JointAction, ICUB_PARTS, iCubTask
+from pyicub.iCubHelper import iCub, JointPose, ICUB_PARTS, iCubTask
 
 icub = iCub()
 
-init_l = JointAction(ICUB_PARTS.LEFT_ARM, req_time=1.0, target_position=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-init_r = JointAction(ICUB_PARTS.RIGHT_ARM, req_time=1.0, target_position=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+init_l = JointPose(ICUB_PARTS.LEFT_ARM, target_position=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+init_r = JointPose(ICUB_PARTS.RIGHT_ARM, target_position=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
-up_r = JointAction(ICUB_PARTS.RIGHT_ARM, req_time=1.0, target_position=[-90.0, 20.0, 10.0, 90.0, 0.0, 0.0, 0.0, 60.0, 20.0, 20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0])
-up_l = JointAction(ICUB_PARTS.LEFT_ARM, req_time=1.0, target_position=[-90.0, 20.0, 10.0, 90.0, 0.0, 0.0, 0.0, 60.0, 20.0, 20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0])
+up_r = JointPose(ICUB_PARTS.RIGHT_ARM, target_position=[-90.0, 20.0, 10.0, 90.0, 0.0, 0.0, 0.0, 60.0, 20.0, 20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0])
+up_l = JointPose(ICUB_PARTS.LEFT_ARM, target_position=[-90.0, 20.0, 10.0, 90.0, 0.0, 0.0, 0.0, 60.0, 20.0, 20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0])
 
-req1 = icub.move(init_l, in_parallel=True)
-req2 = icub.move(init_r, in_parallel=True)
+req1 = icub.move(init_l, req_time=1.0, in_parallel=True)
+req2 = icub.move(init_r, req_time=1.0, in_parallel=True)
 
 req1.wait_for_completed()
 req2.wait_for_completed()
 
-icub.move(up_r)
-icub.move(up_l)
+icub.move(up_r, req_time=1.0)
+icub.move(up_l, req_time=1.0)
 
 icub.close()

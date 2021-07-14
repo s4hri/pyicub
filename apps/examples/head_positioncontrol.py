@@ -13,13 +13,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.iCubHelper import iCub, JointAction, ICUB_PARTS
+from pyicub.iCubHelper import iCub, JointPose, ICUB_PARTS
 
 icub = iCub()
 
-a = JointAction(ICUB_PARTS.HEAD, req_time=1.0, target_position=[-15.0, 20.0, 5.0, 0.0, 0.0, 5.0])
-b = JointAction(ICUB_PARTS.HEAD, req_time=1.0, target_position=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
-icub.move(a)
-icub.move(b)
+a = JointPose(ICUB_PARTS.HEAD, target_position=[-15.0, 20.0, 5.0, 0.0, 0.0, 5.0])
+b = JointPose(ICUB_PARTS.HEAD, target_position=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+icub.move(a, req_time=1.0)
+icub.move(b, req_time=1.0)
 
 icub.close()

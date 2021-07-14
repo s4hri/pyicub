@@ -47,13 +47,11 @@ class iCubPart:
         self.joints_n = joints_n
         self.joints_list = range(0, joints_n)
 
-class JointAction:
-    def __init__(self, part_name, target_position, req_time, joints_list=None, vel_list=None):
+class JointPose:
+    def __init__(self, part_name, target_position, joints_list=None):
         self.part_name = part_name
         self.target_position = target_position
-        self.req_time = req_time
         self.joints_list = joints_list
-        self.vel_list = vel_list
 
 class PortMonitor:
     def __init__(self, yarp_src_port, activate_function, callback, period=0.01, autostart=False):
@@ -239,16 +237,16 @@ class iCub:
             self.__position_controllers__[robot_part.name] = PositionController(driver, joints_list, iencoders)
         return self.__position_controllers__[robot_part.name]
 
-    def move(self, action, in_parallel=False):
-        ctrl = self.__icub_controllers__[action.part_name]
+    def move(self, pose, req_time, in_parallel=False, vel_list=None):
+        ctrl = self.__icub_controllers__[pose.part_name]
 
         if in_parallel is True:
-            if action.vel_list is None:
-                return iCubRequest(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move, target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list)
+            if vel_list is None:
+                return iCubRequest(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move, target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list)
             else:
-                return iCubRequest(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.moveRefVel, target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list, vel_list=action.vel_list)
+                return iCubRequest(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.moveRefVel, target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list, vel_list=vel_list)
         else:
-            if action.vel_list is None:
-                return ctrl.move(target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list)
+            if vel_list is None:
+                return ctrl.move(target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list)
             else:
-                return ctrl.moveRefVel(target_joints=action.target_position, req_time=action.req_time, joints_list=action.joints_list, vel_list=action.vel_list)
+                return ctrl.moveRefVel(target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list, vel_list=vel_list)
