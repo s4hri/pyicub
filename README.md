@@ -46,22 +46,6 @@ or
 pip3 install .
 ```
 
-# Usage example
-
-```
-import yarp
-yarp.Network.init()
-
-from pyicub import *
-icub = iCub( ROBOT_TYPE.ICUB_SIMULATOR )
-rightarm = icub.getPositionController( ICUB_PARTS.RIGHT_ARM )
-rightarm.move(  target_joints=[10.06, 99.47, 5.31, 102.67, -13.50, -4.21], \
-                req_time=1.0, joints_list=[0,1,2,3,4,5], waitMotionDone=True )
-rightarm.move( target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0], \
-                req_time=1.0, joints_list=[0,1,2,3,4,5], waitMotionDone=True )
-
-```
-
 
 ## Usage in Matlab
 
