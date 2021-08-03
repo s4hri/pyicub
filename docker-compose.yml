@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+
+  main:
+    image: ${LOCAL_DOCKER_IMAGE}
+
+    environment:
+        - PROJECT_NAME=${PROJECT_NAME}
+
+    entrypoint: bash
+
+    command: init.sh ${ICUB_SIMULATION} ${ICUB_USER} ${ICUB_PSW} ${ICUB_HOSTNAME} ${APPS}
+
+    volumes:
+      - type: bind
+        source: ./pyicub
+        target: /home/docky/pyicub
