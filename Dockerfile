@@ -15,4 +15,4 @@ RUN cd ${HOME} && \
     git checkout ${PYICUB_TAG} && \
     pip3 install --user -r requirements.txt
 
-ENV PYTHONPATH ${PYTHONPATH}:/home/docky
+ENV PYTHONPATH ${PYTHONPATH}:/home/docky/pyicub

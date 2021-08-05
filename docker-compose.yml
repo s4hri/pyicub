@@ -12,5 +12,5 @@ services:
 
     volumes:
       - type: bind
-        source: ./pyicub
+        source: ./
         target: /home/docky/pyicub
