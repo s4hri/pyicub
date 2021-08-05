@@ -1,7 +1,7 @@
 LOCAL_USER_ID := $(shell id -u)
 export LOCAL_USER_ID
 
-include .env
+include ../.env
 include .version
 
 SHELL := /bin/bash
@@ -111,7 +111,7 @@ setup:
 
 init: setup
 	echo "Building project docker image ${PJT_DOCKER_IMAGE}"; \
-	docker build docker -t ${PJT_DOCKER_IMAGE} --build-arg DOCKER_SRC=${DOCKER_SRC} ${BUILD_ARGS};
+	docker build .. -t ${PJT_DOCKER_IMAGE} --build-arg DOCKER_SRC=${DOCKER_SRC} ${BUILD_ARGS};
 
 
 build:
@@ -131,8 +131,8 @@ ifneq (, ${XRANDR_CONF})
 	$(shell ${XRANDR_CONF})
 endif
 	@echo "Running docker image ${LOCAL_DOCKER_IMAGE}"
-	docker-compose -f docker-compose.yml -f docker-compose.base.yml ${NVIDIA_COMPOSE} up --remove-orphans
-	docker-compose down
+	docker-compose -f ../docker-compose.yml -f docker-compose.base.yml ${NVIDIA_COMPOSE} up --remove-orphans
+	docker-compose -f ../docker-compose.yml -f docker-compose.base.yml ${NVIDIA_COMPOSE} down
 
 distro: build
 	@echo "Pushing docker image ${PJT_DOCKER_IMAGE} on dockerhub"

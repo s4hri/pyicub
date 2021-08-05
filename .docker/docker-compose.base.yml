@@ -31,6 +31,10 @@ services:
         target: ${XDG_RUNTIME_DIR}/pulse
 
       - type: bind
+        source: ${XDG_RUNTIME_DIR}/dconf
+        target: ${XDG_RUNTIME_DIR}/dconf
+
+      - type: bind
         source: ./workdir
         target: /home/docky/workdir
 
