@@ -15,8 +15,19 @@
 
 from pyicub.iCubHelper import iCub
 import time
-icub = iCub()
+icub = iCub(configuration_file="robot_configuration.yaml")
 
-for _ in range(0,10):
-    print(icub.facelandmarks.getCenterEyes())
+for j in range(100):
+    # get number of face detected
+    faces     = icub.facelandmarks.getFaces()
+    if faces > 0:
+        for i in range(faces):
+            # for each face get center eyes
+            center_eye = icub.facelandmarks.getCenterEyes(i)
+            print("face %i - [x: %s , y: %s ]" % (i+1, center_eye[0], center_eye[1]))
+    else:
+        # no face detected
+        print("no face detected")
+            
     time.sleep(0.1)
+
