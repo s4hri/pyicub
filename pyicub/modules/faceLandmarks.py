@@ -13,37 +13,37 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-import yarp
-from pyicub.core.Rpc import RpcClient
 from pyicub.core.BufferedPort import BufferedReadPort
 
 class faceLandmarksPyCtrl:
 
     def __init__(self):
-        self.__landmarks__ = None
+        self.__landmarks__ = []
+        self.__faces__     = 0
         self.__port_landmarks__ = BufferedReadPort("/faceLandmarksPyCtrl/landmarks:i", "/faceLandmarks/landmarks:o", callback=self.onRead)
+        self.__port_faces__     = BufferedReadPort("/faceLandmarksPyCtrl/faces:i", "/faceLandmarks/faces:o", callback=self.onReadFaces)
 
+## LANDMARKS
     def onRead(self, bottle):
-        if bottle is None:
-            self.__landmarks__ = None
+        self.__landmarks__ = []
+        for i in range(bottle.size()):
+            self.__landmarks__.append(bottle.get(i).asList())
+
+    def getLandmark(self, landmark_index, face_index = 0):
+        if self.__landmarks__:
+            x = self.__landmarks__[face_index].get(landmark_index).asList().get(0).asInt32()
+            y = self.__landmarks__[face_index].get(landmark_index).asList().get(1).asInt32()
+            return [x, y]
         else:
-            self.__landmarks__ = bottle.toString()[2:-2].split(') (')
+            return [None, None]
+    
+    def getCenterEyes(self, face_index = 0):
+        [x, y] = self.getLandmark(27, face_index)
+        return [x, y]
 
-    def sendCmd(self, cmd, option):
-        btl = yarp.Bottle()
-        btl.clear()
-        map(btl.addString, [cmd, option])
-        return self.__rpc__.execute(btl)
-
-    def getLandmark(self, index):
-        if self.__landmarks__ is None:
-            return (None, None)
-        return map(int, self.__landmarks__[index].split())
-
-    def getCenterEyes(self):
-        res = self.getLandmark(27)
-        if type(res) == map:
-            (fx, fy) = res
-            return [fx, fy]
-        else:
-            return (None, None)
+## FACES
+    def onReadFaces(self, bottle):
+        self.__faces__= bottle.get(0).asInt32()
+    
+    def getFaces(self):
+        return self.__faces__
