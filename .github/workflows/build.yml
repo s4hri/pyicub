@@ -28,20 +28,5 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: write version
-        run: echo RELEASE_TAG=${{ github.event.release.tag_name }} > .docker/.version
-
-      - name: commit files
-        run: |
-            git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git config --local user.name "github-actions[bot]"
-            git commit -m "Add changes" -a
-
-      - name: push changes
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: refs/heads/master
-
       - name: init build
-        run: cd .docker && make init build distro
+        run: cd .init && source init.sh install && cd .. && xpman init build distro
