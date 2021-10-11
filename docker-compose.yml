@@ -8,7 +8,7 @@ services:
     environment:
         - PROJECT_NAME=${PROJECT_NAME}
 
-    command: sh -c "terminator & bash /home/docky/init.sh ${ICUB_SIMULATION} ${ICUB_USER} ${ICUB_PSW} ${ICUB_HOSTNAME} ${APPS}"
+    command: sh -c "terminator & bash /home/docky/init.sh"
 
     volumes:
       - type: bind
