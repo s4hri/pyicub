@@ -29,4 +29,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: init build
-        run: cd .init && source init.sh install && cd .. && xpman init build distro
+        run: git clone https://github.com/s4hri/xpman && xpman/xpman build distro
