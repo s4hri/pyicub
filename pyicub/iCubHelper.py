@@ -32,6 +32,9 @@ import time
 from collections import deque
 import concurrent.futures
 
+from flask import Flask, jsonify, request
+import jsonpickle
+
 class ICUB_PARTS:
     HEAD       = 'head'
     FACE       = 'face'
@@ -55,64 +58,204 @@ class JointPose:
 
 class PortMonitor:
     def __init__(self, yarp_src_port, activate_function, callback, period=0.01, autostart=False):
-        self._port = BufferedReadPort(yarp_src_port + "_reader_" + str(id(self)), yarp_src_port,)
-        self._activate = activate_function
-        self._callback = callback
-        self._period = period
-        self._values = deque( int(1000/(period*1000))*[None], maxlen=int(1000/(period*1000))) #Values of the last second
-        self._stop_thread = False
+        self._port_ = BufferedReadPort(yarp_src_port + "_reader_" + str(id(self)), yarp_src_port,)
+        self._activate_ = activate_function
+        self._callback_ = callback
+        self._period_ = period
+        self._values_ = deque( int(1000/(period*1000))*[None], maxlen=int(1000/(period*1000))) #Values of the last second
+        self._stop_thread_ = False
         if autostart:
             self.start()
 
     def start(self):
-        if self._stop_thread:
+        if self._stop_thread_:
            self.stop()
-        self._worker_thread = threading.Thread(target=self.worker)
-        self._worker_thread.start()
+        self._worker_thread_ = threading.Thread(target=self.worker)
+        self._worker_thread_.start()
 
     def stop(self):
-        if not self._stop_thread:
-            self._stop_thread = True
-        self._worker_thread.join()
-        self._stop_thread = False
+        if not self._stop_thread_:
+            self._stop_thread_ = True
+        self._worker_thread_.join()
+        self._stop_thread_ = False
 
     def worker(self):
-        while not self._stop_thread:
-            res = self._port.read(shouldWait=False)
+        while not self._stop_thread_:
+            res = self._port_.read(shouldWait=False)
             if not res is None:
-                self._values.append(res.toString())
-                if self._activate(self._values):
-                    self._callback()
-            yarp.delay(self._period)
+                self._values_.append(res.toString())
+                if self._activate_(self._values_):
+                    self._callback_()
+            yarp.delay(self._period_)
 
     def __del__(self):
         self.stop()
-        del self._port
+        del self._port_
+
+class SingletonMeta(type):
+
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
+
 
 class iCubRequest:
 
+    INIT    = 'INIT'
+    RUNNING = 'RUNNING'
+    TIMEOUT = 'TIMEOUT'
+    DONE    = 'DONE'
+    FAILED  = 'FAILED'
+
     TIMEOUT_REQUEST = 30.0
 
-    def __init__(self, timeout, target, *args, **kwargs):
-        self.start_time = time.perf_counter()
-        self.timeout = timeout
-        self.duration = None
-        self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
-        self.future = self.executor.submit(target,*args,**kwargs)
-        self.future.add_done_callback(self.on_completed)
+    def __init__(self, req_id, timeout, target):
+        self._start_time_ = time.perf_counter()
+        self._end_time_ = None
+        self._req_id_ = req_id
+        self._status_ = iCubRequest.INIT
+        self._timeout_ = timeout
+        self._duration_ = None
+        self._exception_ = None
+        self._executor_ = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+        self._target_ = target
+        self._retval_ = None
+
+    @property
+    def duration(self):
+        return self._duration_
+
+    @property
+    def end_time(self):
+        return self._end_time_
+
+    @property
+    def exception(self):
+        return self._exception_
+
+    @property
+    def req_id(self):
+        return self._req_id_
+
+    @property
+    def retval(self):
+        return self._retval_
+
+    @property
+    def status(self):
+        return self._status_
+
+    @property
+    def start_time(self):
+        return self._start_time_
+
+    @property
+    def target(self):
+        return self._target_
+
+
+    def run(self, *args, **kwargs):
+        self._future_ = self._executor_.submit(self._target_, *args, **kwargs)
+        self._future_.add_done_callback(self.on_completed)
+        self._status_ = iCubRequest.RUNNING
 
     def on_completed(self, future):
-        self.duration = time.perf_counter() - self.start_time
+        self._end_time_ = time.perf_counter()
+        self._duration_ = self._end_time_ - self._start_time_
+        self._status_ = iCubRequest.DONE
 
     def wait_for_completed(self):
         res = None
         try:
-            res = self.future.result(self.timeout)
-        except Exception:
-            self.duration = time.perf_counter() - self.start_time
+            res = self._future_.result(self._timeout_)
+        except Exception as e:
+            self._end_time_ = time.perf_counter()
+            self._duration_ = self._end_time_ - self._start_time_
+            self._status_ = iCubRequest.FAILED
+            self._exception_ = str(e)
         finally:
-            self.executor.shutdown(wait=False)
+            self._executor_.shutdown(wait=False)
+        self._retval_ = res
         return res
+
+class iCubRequestsManager(metaclass=SingletonMeta):
+
+    def __init__(self):
+        self._requests_ = {}
+
+    def create(self, timeout, target):
+        if len(self._requests_) == 0:
+            req_id = 0
+        else:
+            req_id = max(self._requests_.keys()) + 1
+        req = iCubRequest(req_id, timeout, target)
+        self._requests_[req_id] = req
+        return req
+
+    def run(self, req_id, *args, **kwargs):
+        self._requests_[req_id].run(*args, **kwargs)
+        threading.Thread(target=self._requests_[req_id].wait_for_completed).start()
+        return self.info(req_id)
+
+    def info(self, req_id):
+        info = {}
+        req_id = int(req_id)
+        info['target'] = self._requests_[req_id].target.__name__
+        info['id'] = self._requests_[req_id].req_id
+        info['status'] = self._requests_[req_id].status
+        info['start_time'] = self._requests_[req_id].start_time
+        info['end_time'] = self._requests_[req_id].end_time
+        info['duration'] = self._requests_[req_id].duration
+        info['exception'] = self._requests_[req_id].exception
+        info['retval'] = self._requests_[req_id].retval
+        return info
+
+
+class iCubHTTPRequestsManager(iCubRequestsManager):
+
+    def __init__(self, rule_prefix="/pyicub", host=None, port=None):
+        iCubRequestsManager.__init__(self)
+        self._services_ = {}
+        self._flaskapp_ = Flask(__name__)
+        threading.Thread(target=self._flaskapp_.run, args=(host, port,)).start()
+        self._rule_prefix_ = rule_prefix
+        self._flaskapp_.add_url_rule(self._rule_prefix_, methods=['GET'], view_func=self.list)
+
+    def wrapper_target(self, *args, **kwargs):
+        rule = str(request.url_rule).strip()
+        if request.method == 'GET':
+            name = self._services_[rule].__name__
+            res = []
+            for req_id, req in self._requests_.items():
+                if req.target.__name__ == name:
+                    res.append(self.info(req_id))
+            return jsonify(res)
+        elif request.method == 'POST':
+            req = self.create(iCubRequest.TIMEOUT_REQUEST, self._services_[rule])
+            self._requests_[req.req_id] = req
+            res = request.get_json(force=True)
+            args = tuple(res.values())
+            kwargs =  res
+            self.run(req.req_id, **kwargs)
+            return jsonify(req.req_id)
+
+    def wrapper_info(self, req_id):
+        return self.info(req_id)
+
+    def list(self):
+        return jsonify(list(self._services_.keys()))
+
+    def register(self, target):
+        rule = ("%s/%s" % (self._rule_prefix_, target.__name__))
+        self._flaskapp_.add_url_rule(rule, methods=['GET', 'POST'], view_func=self.wrapper_target)
+        self._services_[rule] = target
+        rule = ("%s/%s/<req_id>" % (self._rule_prefix_, target.__name__))
+        self._flaskapp_.add_url_rule(rule, methods=['GET'], view_func=self.wrapper_info)
+
 
 
 class iCubTask:
@@ -121,7 +264,8 @@ class iCubTask:
     def request(timeout=iCubRequest.TIMEOUT_REQUEST):
         def wrapper(target):
                 def f(*args, **kwargs):
-                    return iCubRequest(timeout, target, *args, **kwargs)
+                    req = iCubRequestsManager().create(timeout, target)
+                    return req.run(*args, **kwargs)
                 return f
         return wrapper
 
@@ -133,118 +277,118 @@ class iCubTask:
 class iCub:
 
     def __init__(self, configuration_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'robot_configuration.yaml'), disable_logs=False):
-        self.__icub_controllers__ = {}
-        self.__position_controllers__ = {}
-        self.__drivers__ = {}
-        self.__encoders__ = {}
-        self.__gazectrl__ = None
-        self.__emo__ = None
-        self.__speech__ = None
-        self.__face__ = None
-        self.__facelandmarks__ = None
-        self.__monitors__ = []
-        self.__logger__ = YarpLogger.getLogger()
+        self._icub_controllers_ = {}
+        self._position_controllers_ = {}
+        self._drivers_ = {}
+        self._encoders_ = {}
+        self._gazectrl_ = None
+        self._emo_ = None
+        self._speech_ = None
+        self._face_ = None
+        self._facelandmarks_ = None
+        self._monitors_ = []
+        self._logger_ = YarpLogger.getLogger()
 
         if disable_logs:
-            self.__logger__.disable_logs()
+            self._logger_.disable_logs()
 
-        self.__icub_parts__ = {}
-        self.__icub_parts__[ICUB_PARTS.HEAD] = iCubPart(ICUB_PARTS.HEAD, 6)
-        self.__icub_parts__[ICUB_PARTS.FACE] = iCubPart(ICUB_PARTS.FACE, 1)
-        self.__icub_parts__[ICUB_PARTS.LEFT_ARM] = iCubPart(ICUB_PARTS.LEFT_ARM, 16)
-        self.__icub_parts__[ICUB_PARTS.RIGHT_ARM] = iCubPart(ICUB_PARTS.RIGHT_ARM, 16)
-        self.__icub_parts__[ICUB_PARTS.TORSO] = iCubPart(ICUB_PARTS.TORSO, 3)
-        self.__icub_parts__[ICUB_PARTS.LEFT_LEG] = iCubPart(ICUB_PARTS.LEFT_LEG, 6)
-        self.__icub_parts__[ICUB_PARTS.RIGHT_LEG] = iCubPart(ICUB_PARTS.RIGHT_LEG, 6)
+        self._icub_parts_ = {}
+        self._icub_parts_[ICUB_PARTS.HEAD] = iCubPart(ICUB_PARTS.HEAD, 6)
+        self._icub_parts_[ICUB_PARTS.FACE] = iCubPart(ICUB_PARTS.FACE, 1)
+        self._icub_parts_[ICUB_PARTS.LEFT_ARM] = iCubPart(ICUB_PARTS.LEFT_ARM, 16)
+        self._icub_parts_[ICUB_PARTS.RIGHT_ARM] = iCubPart(ICUB_PARTS.RIGHT_ARM, 16)
+        self._icub_parts_[ICUB_PARTS.TORSO] = iCubPart(ICUB_PARTS.TORSO, 3)
+        self._icub_parts_[ICUB_PARTS.LEFT_LEG] = iCubPart(ICUB_PARTS.LEFT_LEG, 6)
+        self._icub_parts_[ICUB_PARTS.RIGHT_LEG] = iCubPart(ICUB_PARTS.RIGHT_LEG, 6)
 
         with open(configuration_file) as f:
-            self.__robot_conf__ = yaml.load(f, Loader=yaml.FullLoader)
+            self._robot_conf_ = yaml.load(f, Loader=yaml.FullLoader)
 
-        self.__robot__ = self.__robot_conf__['robot_name']
+        self._robot_ = self._robot_conf_['robot_name']
 
-        if 'gaze_controller' in self.__robot_conf__.keys():
-            if self.__robot_conf__['gaze_controller'] is True:
-                self.__gazectrl__ = GazeController(self.__robot__)
+        if 'gaze_controller' in self._robot_conf_.keys():
+            if self._robot_conf_['gaze_controller'] is True:
+                self._gazectrl_ = GazeController(self._robot_)
 
-        if 'position_controllers' in self.__robot_conf__.keys():
-            for part_name in self.__robot_conf__['position_controllers']:
-                self.__icub_controllers__[part_name] = self.getPositionController(self.__icub_parts__[part_name])
+        if 'position_controllers' in self._robot_conf_.keys():
+            for part_name in self._robot_conf_['position_controllers']:
+                self._icub_controllers_[part_name] = self.getPositionController(self._icub_parts_[part_name])
 
-    def __getDriver__(self, robot_part):
-        if not robot_part.name in self.__drivers__.keys():
-            props = self.__getRobotPartProperties__(robot_part)
-            self.__drivers__[robot_part.name] = yarp.PolyDriver(props)
-        return self.__drivers__[robot_part.name]
+    def _getDriver_(self, robot_part):
+        if not robot_part.name in self._drivers_.keys():
+            props = self._getRobotPartProperties_(robot_part)
+            self._drivers_[robot_part.name] = yarp.PolyDriver(props)
+        return self._drivers_[robot_part.name]
 
-    def __getIEncoders__(self, robot_part):
-        if not robot_part.name in self.__encoders__.keys():
-            driver = self.__getDriver__(robot_part)
-            self.__encoders__[robot_part.name] = driver.viewIEncoders()
-        return self.__encoders__[robot_part.name]
+    def _getIEncoders_(self, robot_part):
+        if not robot_part.name in self._encoders_.keys():
+            driver = self._getDriver_(robot_part)
+            self._encoders_[robot_part.name] = driver.viewIEncoders()
+        return self._encoders_[robot_part.name]
 
-    def __getRobotPartProperties__(self, robot_part):
+    def _getRobotPartProperties_(self, robot_part):
         props = yarp.Property()
         props.put("device","remote_controlboard")
-        props.put("local","/client/" + self.__robot__ + "/" + robot_part.name)
-        props.put("remote","/" + self.__robot__ + "/" + robot_part.name)
+        props.put("local","/client/" + self._robot_ + "/" + robot_part.name)
+        props.put("remote","/" + self._robot_ + "/" + robot_part.name)
         return props
 
     def close(self):
-        if len(self.__monitors__) > 0:
-            for v in self.__monitors__:
+        if len(self._monitors_) > 0:
+            for v in self._monitors_:
                 v.stop()
-        for driver in self.__drivers__.values():
+        for driver in self._drivers_.values():
             driver.close()
         yarp.Network.fini()
 
     @property
     def face(self):
-        if self.__face__ is None:
-            self.__face__ = facePyCtrl(self.__robot__)
-        return self.__face__
+        if self._face_ is None:
+            self._face_ = facePyCtrl(self._robot_)
+        return self._face_
 
     @property
     def facelandmarks(self):
-        if self.__facelandmarks__ is None:
-           self.__facelandmarks__ = faceLandmarksPyCtrl()
-        return self.__facelandmarks__
+        if self._facelandmarks_ is None:
+           self._facelandmarks_ = faceLandmarksPyCtrl()
+        return self._facelandmarks_
 
     @property
     def gaze(self):
-        return self.__gazectrl__
+        return self._gazectrl_
 
     @property
     def emo(self):
-        if self.__emo__ is None:
-            self.__emo__ = emotionsPyCtrl(self.__robot__)
-        return self.__emo__
+        if self._emo_ is None:
+            self._emo_ = emotionsPyCtrl(self._robot_)
+        return self._emo_
 
     @property
     def speech(self):
-        if self.__speech__ is None:
-            self.__speech__ = speechPyCtrl(self.__robot__)
-        return self.__speech__
+        if self._speech_ is None:
+            self._speech_ = speechPyCtrl(self._robot_)
+        return self._speech_
 
     def portmonitor(self, yarp_src_port, activate_function, callback):
-        self.__monitors__.append(PortMonitor(yarp_src_port, activate_function, callback, period=0.01, autostart=True))
+        self._monitors_.append(PortMonitor(yarp_src_port, activate_function, callback, period=0.01, autostart=True))
 
     def getPositionController(self, robot_part, joints_list=None):
-        if not robot_part in self.__position_controllers__.keys():
-            driver = self.__getDriver__(robot_part)
-            iencoders = self.__getIEncoders__(robot_part)
+        if not robot_part in self._position_controllers_.keys():
+            driver = self._getDriver_(robot_part)
+            iencoders = self._getIEncoders_(robot_part)
             if joints_list is None:
                 joints_list = robot_part.joints_list
-            self.__position_controllers__[robot_part.name] = PositionController(driver, joints_list, iencoders)
-        return self.__position_controllers__[robot_part.name]
+            self._position_controllers_[robot_part.name] = PositionController(driver, joints_list, iencoders)
+        return self._position_controllers_[robot_part.name]
 
     def move(self, pose, req_time, in_parallel=False, vel_list=None):
-        ctrl = self.__icub_controllers__[pose.part_name]
+        ctrl = self._icub_controllers_[pose.part_name]
 
         if in_parallel is True:
             if vel_list is None:
-                return iCubRequest(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move, target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list)
+                return iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move, target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list)
             else:
-                return iCubRequest(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.moveRefVel, target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list, vel_list=vel_list)
+                return iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.moveRefVel, target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list, vel_list=vel_list)
         else:
             if vel_list is None:
                 return ctrl.move(target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list)
