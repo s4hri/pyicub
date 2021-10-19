@@ -33,7 +33,6 @@ from collections import deque
 import concurrent.futures
 
 from flask import Flask, jsonify, request
-import jsonpickle
 
 class ICUB_PARTS:
     HEAD       = 'head'
@@ -215,15 +214,22 @@ class iCubRequestsManager(metaclass=SingletonMeta):
         return info
 
 
-class iCubHTTPRequestsManager(iCubRequestsManager):
+class iCubHTTPManager(iCubRequestsManager):
 
     def __init__(self, rule_prefix="/pyicub", host=None, port=None):
         iCubRequestsManager.__init__(self)
         self._services_ = {}
         self._flaskapp_ = Flask(__name__)
-        threading.Thread(target=self._flaskapp_.run, args=(host, port,)).start()
         self._rule_prefix_ = rule_prefix
         self._flaskapp_.add_url_rule(self._rule_prefix_, methods=['GET'], view_func=self.list)
+        threading.Thread(target=self._flaskapp_.run, args=(host, port,)).start()
+
+    def shutdown(self):
+        print("SHOO")
+        func = request.environ.get('werkzeug.server.shutdown')
+        if func is None:
+            raise RuntimeError('Not running with the Werkzeug Server')
+        func()
 
     def wrapper_target(self, *args, **kwargs):
         rule = str(request.url_rule).strip()
@@ -249,12 +255,14 @@ class iCubHTTPRequestsManager(iCubRequestsManager):
     def list(self):
         return jsonify(list(self._services_.keys()))
 
-    def register(self, target):
-        rule = ("%s/%s" % (self._rule_prefix_, target.__name__))
+    def register(self, target, rule_prefix=None):
+        if rule_prefix:
+            rule = "%s/%s/%s" % (self._rule_prefix_, rule_prefix, target.__name__)
+        else:
+            rule = "%s/%s" % (self._rule_prefix_, target.__name__)
         self._flaskapp_.add_url_rule(rule, methods=['GET', 'POST'], view_func=self.wrapper_target)
         self._services_[rule] = target
-        rule = ("%s/%s/<req_id>" % (self._rule_prefix_, target.__name__))
-        self._flaskapp_.add_url_rule(rule, methods=['GET'], view_func=self.wrapper_info)
+        self._flaskapp_.add_url_rule("%s/<req_id>" % rule, methods=['GET'], view_func=self.wrapper_info)
 
 
 
@@ -276,7 +284,7 @@ class iCubTask:
 
 class iCub:
 
-    def __init__(self, configuration_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'robot_configuration.yaml'), disable_logs=False):
+    def __init__(self, configuration_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'robot_configuration.yaml'), disable_logs=False, http_server=False):
         self._icub_controllers_ = {}
         self._position_controllers_ = {}
         self._drivers_ = {}
@@ -291,6 +299,11 @@ class iCub:
 
         if disable_logs:
             self._logger_.disable_logs()
+
+        if http_server:
+            self._http_manager_ = iCubHTTPManager()
+        else:
+            self._http_manager_ = None
 
         self._icub_parts_ = {}
         self._icub_parts_[ICUB_PARTS.HEAD] = iCubPart(ICUB_PARTS.HEAD, 6)
@@ -314,6 +327,9 @@ class iCub:
             for part_name in self._robot_conf_['position_controllers']:
                 self._icub_controllers_[part_name] = self.getPositionController(self._icub_parts_[part_name])
 
+        if self._http_manager_:
+            self._registerDefaultServices_()
+
     def _getDriver_(self, robot_part):
         if not robot_part.name in self._drivers_.keys():
             props = self._getRobotPartProperties_(robot_part)
@@ -332,6 +348,20 @@ class iCub:
         props.put("local","/client/" + self._robot_ + "/" + robot_part.name)
         props.put("remote","/" + self._robot_ + "/" + robot_part.name)
         return props
+
+    def _registerDefaultServices_(self):
+
+        if self.gaze:
+            self.http_manager.register(self.gaze.blockEyes, rule_prefix="gaze_controller")
+            self.http_manager.register(self.gaze.blockNeck, rule_prefix="gaze_controller")
+            self.http_manager.register(self.gaze.clearEyes, rule_prefix="gaze_controller")
+            self.http_manager.register(self.gaze.clearNeck, rule_prefix="gaze_controller")
+            self.http_manager.register(self.gaze.lookAtAbsAngles, rule_prefix="gaze_controller")
+            self.http_manager.register(self.gaze.lookAtFixationPoint, rule_prefix="gaze_controller")
+            self.http_manager.register(self.gaze.reset, rule_prefix="gaze_controller")
+            self.http_manager.register(self.gaze.setParams, rule_prefix="gaze_controller")
+            self.http_manager.register(self.gaze.setTrackingMode, rule_prefix="gaze_controller")
+
 
     def close(self):
         if len(self._monitors_) > 0:
@@ -356,6 +386,10 @@ class iCub:
     @property
     def gaze(self):
         return self._gazectrl_
+
+    @property
+    def http_manager(self):
+        return self._http_manager_
 
     @property
     def emo(self):
