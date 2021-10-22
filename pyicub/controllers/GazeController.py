@@ -136,9 +136,3 @@ class GazeController:
             yarp.delay(period)
         self.__logger__.warning("""Motion onset TIMEOUT! speed_ref=%s""" % str(speed_ref))
         return False
-
-    def __del__(self):
-        if self.__driver__.isValid():
-            self.__IGazeControl__.stopControl()
-            self.__IGazeControl__.setTrackingMode(False)
-            self.__driver__.close()

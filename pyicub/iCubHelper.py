@@ -420,9 +420,13 @@ class iCub:
 
         if in_parallel is True:
             if vel_list is None:
-                return iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move, target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list)
+                req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move)
+                req.run(target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list)
+                return req
             else:
-                return iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.moveRefVel, target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list, vel_list=vel_list)
+                req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.moveRefVel)
+                req.run(target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list, vel_list=vel_list)
+                return req
         else:
             if vel_list is None:
                 return ctrl.move(target_joints=pose.target_position, req_time=req_time, joints_list=pose.joints_list)
