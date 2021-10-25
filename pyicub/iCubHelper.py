@@ -159,8 +159,8 @@ class iCubRequest:
 
     def run(self, *args, **kwargs):
         self._future_ = self._executor_.submit(self._target_, *args, **kwargs)
-        self._future_.add_done_callback(self.on_completed)
         self._status_ = iCubRequest.RUNNING
+        self._future_.add_done_callback(self.on_completed)
 
     def on_completed(self, future):
         self._end_time_ = time.perf_counter()
@@ -225,7 +225,6 @@ class iCubHTTPManager(iCubRequestsManager):
         threading.Thread(target=self._flaskapp_.run, args=(host, port,)).start()
 
     def shutdown(self):
-        print("SHOO")
         func = request.environ.get('werkzeug.server.shutdown')
         if func is None:
             raise RuntimeError('Not running with the Werkzeug Server')
@@ -250,7 +249,14 @@ class iCubHTTPManager(iCubRequestsManager):
             return jsonify(req.req_id)
 
     def wrapper_info(self, req_id):
-        return self.info(req_id)
+        res = []
+        req_id = int(req_id)
+        if req_id in self._requests_.keys():
+            rule = str(request.url_rule).strip()
+            target = rule.split('/')[-2]
+            if self._requests_[req_id].target.__name__ == target:
+                res = self.info(req_id)
+        return jsonify(res)
 
     def list(self):
         return jsonify(list(self._services_.keys()))
