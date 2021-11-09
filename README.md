@@ -9,10 +9,14 @@ A Python framework for developing iCub applications
 
 - Ubuntu (20.04 tested)
 - make
-    sudo apt-get install make
+```
+sudo apt-get install make
+```
 - xpman (follow instructions at: https://github.com/s4hri/xpman)
 
 2. Clone the repository and run the docker container
-    git clone https://github.com/s4hri/pyicub.git
-    cd pyicub
-    xpman run
+```
+git clone https://github.com/s4hri/pyicub.git
+cd pyicub
+xpman run
+```
