@@ -17,7 +17,90 @@ import yarp
 import time
 import pyicub.utils as utils
 
-from pyicub.core.Logger import YarpLogger
+from pyicub.core.logger import YarpLogger
+
+class ICUB_PARTS:
+    HEAD       = 'head'
+    FACE       = 'face'
+    TORSO      = 'torso'
+    LEFT_ARM   = 'left_arm'
+    RIGHT_ARM  = 'right_arm'
+    LEFT_LEG   = 'left_leg'
+    RIGHT_LEG  = 'right_leg'
+
+class iCubPart:
+    def __init__(self, name, joints_n):
+        self.name = name
+        self.joints_n = joints_n
+        self.joints_list = range(0, joints_n)
+
+class JointPose:
+
+    def __init__(self, target_joints, joints_list=None):
+        self._target_joints_ = target_joints
+        self._joints_list_ = joints_list
+
+    @property
+    def target_joints(self):
+        return self._target_joints_
+
+    @property
+    def joints_list(self):
+        return self._joints_list_
+
+class JointPoseVel:
+
+    def __init__(self, target_position, vel_list, joints_list=None):
+        self._target_position_ = target_position
+        self._vel_list_ = vel_list
+        self._joints_list_ = joints_list
+
+    @property
+    def joints_list(self):
+        return self._joints_list_
+
+    @property
+    def target_position(self):
+        return self._target_position_
+
+    @property
+    def vel_list(self):
+        return self._vel_list_
+
+class JointsTrajectoryCheckpoint:
+
+    def __init__(self, pose: JointPose, duration: float):
+        self._pose_ = pose
+        self._duration_ = duration
+
+    @property
+    def pose(self):
+        return self._pose_
+
+    @property
+    def duration(self):
+        return self._duration_
+
+
+class LimbMotion:
+    def __init__(self, part_name: iCubPart):
+        self._part_name_ = part_name
+        self._checkpoints_ = []
+
+    @property
+    def durations(self):
+        return self._durations_
+
+    @property
+    def part_name(self):
+        return self._part_name_
+
+    @property
+    def checkpoints(self):
+        return self._checkpoints_
+
+    def addCheckpoint(self, checkpoint: JointsTrajectoryCheckpoint):
+        self._checkpoints_.append(checkpoint)
 
 class PositionController:
 
@@ -42,7 +125,9 @@ class PositionController:
     def getIEncoders(self):
         return self.__IEncoders__
 
-    def move(self, target_joints, req_time, joints_list=None, waitMotionDone=True):
+    def move(self, pose: JointPose, req_time: float, waitMotionDone: bool=True):
+        target_joints = pose.target_joints
+        joints_list = pose.joints_list
         self.__logger__.info("""Moving joints STARTED!
                               target_joints:%s
                               req_time:%.2f,
@@ -71,7 +156,7 @@ class PositionController:
             self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
         if waitMotionDone is True:
-            self.waitMotionDone(target_joints, joints_list, timeout=2*req_time)
+            self.waitMotionDone(JointPose(target_joints, joints_list), timeout=2*req_time)
         self.__logger__.info("""Moving joints COMPLETED!
                               target_joints:%s
                               req_time:%.2f,
@@ -82,7 +167,12 @@ class PositionController:
                               str(joints_list),
                               str(waitMotionDone)) )
 
-    def moveRefVel(self, req_time, target_joints, joints_list=None, vel_list=None, waitMotionDone=True):
+
+    def moveRefVel(self, pose: JointPoseVel, req_time: float, waitMotionDone: bool=True):
+        target_joints = pose.target_joints
+        vel_list = pose.vel_list
+        joints_list = pose.joints_list
+
         self.__logger__.info("""Moving joints in position control STARTED!
                               target_joints:%s
                               req_time:%.2f,
@@ -116,7 +206,9 @@ class PositionController:
                               str(vel_list),
                               str(waitMotionDone)) )
 
-    def waitMotionDone(self, target_joints, joints_list, timeout):
+    def waitMotionDone(self, pose: JointPose, timeout: float):
+        target_joints = pose.target_joints
+        joints_list = pose.joints_list
         self.__logger__.info("""Waiting for motion done STARTED!""")
         encs=yarp.Vector(16)
         max_attempts = int(timeout/PositionController.WAITMOTIONDONE_PERIOD)

@@ -1,4 +1,4 @@
-#   Copyright (C) 2019  Davide De Tommaso
+#   Copyright (C) 2021  Davide De Tommaso
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -13,23 +13,42 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.iCubHelper import iCub, JointPose, ICUB_PARTS, iCubTask
+from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, GazeMotion, GazeAbsAngles
 
 icub = iCub()
+arm_down = JointPose(target_joints=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+arm_up = JointPose(target_joints=[-90.0, 20.0, 10.0, 90.0, 0.0, 0.0, 0.0, 60.0, 20.0, 20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0])
 
-init_l = JointPose(ICUB_PARTS.LEFT_ARM, target_position=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-init_r = JointPose(ICUB_PARTS.RIGHT_ARM, target_position=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+up = JointsTrajectoryCheckpoint(arm_up, duration=1.0)
+down = JointsTrajectoryCheckpoint(arm_down, duration=1.0)
 
-up_r = JointPose(ICUB_PARTS.RIGHT_ARM, target_position=[-90.0, 20.0, 10.0, 90.0, 0.0, 0.0, 0.0, 60.0, 20.0, 20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0])
-up_l = JointPose(ICUB_PARTS.LEFT_ARM, target_position=[-90.0, 20.0, 10.0, 90.0, 0.0, 0.0, 0.0, 60.0, 20.0, 20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0])
+m1 = LimbMotion(ICUB_PARTS.RIGHT_ARM)
+m1.addCheckpoint(up)
+m1.addCheckpoint(down)
 
-req1 = icub.move(init_l, req_time=1.0, in_parallel=True)
-req2 = icub.move(init_r, req_time=1.0, in_parallel=True)
+m2 = LimbMotion(ICUB_PARTS.LEFT_ARM)
+m2.addCheckpoint(up)
+m2.addCheckpoint(down)
 
-req1.wait_for_completed()
-req2.wait_for_completed()
+g = GazeMotion()
+g.addCheckpoint(GazeAbsAngles(20.0, 0.0, 0.0))
+g.addCheckpoint(GazeAbsAngles(-20.0, 0.0, 0.0))
+g.addCheckpoint(GazeAbsAngles(0.0, 0.0, 0.0))
 
-icub.move(up_r, req_time=1.0)
-icub.move(up_l, req_time=1.0)
+action = icub.createFullbodyAction()
+
+step1 = action.addStep()
+step2 = action.addStep()
+step3 = action.addStep()
+
+step1.setLimbMotion(m1)
+
+step2.setLimbMotion(m2)
+
+step3.setGazeMotion(g)
+step3.setLimbMotion(m1)
+step3.setLimbMotion(m2)
+
+icub.move(action)
 
 icub.close()

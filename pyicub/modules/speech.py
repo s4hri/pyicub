@@ -14,7 +14,7 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-from pyicub.core.BufferedPort import BufferedWritePort
+from pyicub.core.ports import BufferedWritePort
 
 class speechPyCtrl:
 

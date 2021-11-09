@@ -14,7 +14,7 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-from pyicub.core.Logger import YarpLogger
+from pyicub.core.logger import YarpLogger
 
 class RpcClient:
 

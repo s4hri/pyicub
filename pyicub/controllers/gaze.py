@@ -16,7 +16,43 @@
 import yarp
 import pyicub.utils as utils
 
-from pyicub.core.Logger import YarpLogger
+from pyicub.core.logger import YarpLogger
+
+
+class GazeCheckpoint:
+
+    def __init__(self, value):
+        self._value_ = value
+
+    @property
+    def value(self):
+        return self._value_
+
+class GazeAbsAngles(GazeCheckpoint):
+
+    def __init__(self, azimuth, elevation, vergence):
+        GazeCheckpoint.__init__(self, [azimuth, elevation, vergence])
+
+class GazeRelAngles(GazeCheckpoint):
+
+    def __init__(self, azimuth, elevation, vergence):
+        GazeCheckpoint.__init__(self, [azimuth, elevation, vergence])
+
+class GazeXYZ(GazeCheckpoint):
+
+    def __init__(self, x, y, z):
+        GazeCheckpoint.__init__(self, [x, y, z])
+
+class GazeMotion:
+    def __init__(self):
+        self._checkpoints_ = []
+
+    @property
+    def checkpoints(self):
+        return self._checkpoints_
+
+    def addCheckpoint(self, checkpoint: GazeCheckpoint):
+        self._checkpoints_.append(checkpoint)
 
 
 class GazeController:
@@ -56,6 +92,15 @@ class GazeController:
         self.__logger__.info("""Looking at angles COMPLETED!
                                  angles=%s, waitMotionDone=%s""" % (str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
 
+    def __lookAtRelAngles__(self, angles, waitMotionDone=True):
+        self.__logger__.info("""Looking at angles STARTED!
+                                 angles=%s, waitMotionDone=%s""" % (str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+        self.IGazeControl.lookAtRelAngles(angles)
+        if waitMotionDone is True:
+            self.waitMotionDone(angles)
+        self.__logger__.info("""Looking at angles COMPLETED!
+                                 angles=%s, waitMotionDone=%s""" % (str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+
     def blockEyes(self, vergence):
         self.IGazeControl.blockEyes(vergence)
 
@@ -78,6 +123,13 @@ class GazeController:
         angles.set(1, ele)
         angles.set(2, ver)
         self.__lookAtAbsAngles__(angles, waitMotionDone)
+
+    def lookAtRelAngles(self, azi, ele, ver, waitMotionDone=True):
+        angles = yarp.Vector(3)
+        angles.set(0, azi)
+        angles.set(1, ele)
+        angles.set(2, ver)
+        self.__lookAtRelAngles__(angles, waitMotionDone)
 
     def lookAtFixationPoint(self, x, y, z, waitMotionDone=True):
         p = yarp.Vector(3)

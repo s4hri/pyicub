@@ -13,7 +13,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.core.BufferedPort import BufferedReadPort
+from pyicub.core.ports import BufferedReadPort
 
 class faceLandmarksPyCtrl:
 
@@ -36,7 +36,7 @@ class faceLandmarksPyCtrl:
             return [x, y]
         else:
             return [None, None]
-    
+
     def getCenterEyes(self, face_index = 0):
         [x, y] = self.getLandmark(27, face_index)
         return [x, y]
@@ -44,6 +44,6 @@ class faceLandmarksPyCtrl:
 ## FACES
     def onReadFaces(self, bottle):
         self.__faces__= bottle.get(0).asInt32()
-    
+
     def getFaces(self):
         return self.__faces__

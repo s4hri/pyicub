@@ -28,6 +28,5 @@ for j in range(100):
     else:
         # no face detected
         print("no face detected")
-            
-    time.sleep(0.1)
 
+    time.sleep(0.1)

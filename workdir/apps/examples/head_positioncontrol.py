@@ -1,4 +1,4 @@
-#   Copyright (C) 2019  Davide De Tommaso
+#   Copyright (C) 2021  Davide De Tommaso
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -13,13 +13,20 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.iCubHelper import iCub, JointPose, ICUB_PARTS
+from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, GazeMotion, GazeAbsAngles
 
 icub = iCub()
+down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-15.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.5)
+home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.0)
 
-a = JointPose(ICUB_PARTS.HEAD, target_position=[-15.0, 20.0, 5.0, 0.0, 0.0, 5.0])
-b = JointPose(ICUB_PARTS.HEAD, target_position=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
-icub.move(a, req_time=1.0)
-icub.move(b, req_time=1.0)
+example_motion = LimbMotion(ICUB_PARTS.HEAD)
+example_motion.addCheckpoint(down)
+example_motion.addCheckpoint(home)
+
+action = icub.createFullbodyAction()
+step = action.addStep()
+step.setLimbMotion(example_motion)
+
+icub.move(action)
 
 icub.close()

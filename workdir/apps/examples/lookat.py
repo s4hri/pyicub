@@ -1,4 +1,4 @@
-#   Copyright (C) 2019  Davide De Tommaso
+#   Copyright (C) 2021  Davide De Tommaso
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -13,15 +13,14 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.iCubHelper import iCub
-import time
+from pyicub.helper import iCub
 
 icub = iCub()
-t0 = time.time()
 icub.gaze.lookAtFixationPoint(-1.0, -0.5, 1.0, waitMotionDone=False)
 icub.gaze.waitMotionOnset()
 
 icub.gaze.lookAtFixationPoint(-1.0, -0.2, 0.5)
 icub.gaze.lookAtFixationPoint(-1.0, 0.2, 0.1)
+icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0)
 
 icub.close()

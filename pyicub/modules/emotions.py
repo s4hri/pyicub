@@ -14,7 +14,7 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-from pyicub.core.Rpc import RpcClient
+from pyicub.core.rpc import RpcClient
 
 
 class emotionsPyCtrl:

@@ -1,4 +1,4 @@
-#   Copyright (C) 2019  Davide De Tommaso
+#   Copyright (C) 2021  Davide De Tommaso
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-from pyicub.iCubHelper import iCub
+from pyicub.helper import iCub
 
 yarp.Network.init()
 
@@ -41,4 +41,5 @@ for _ in range(0,3):
     icub.gaze.lookAtAbsAngles(DOWN[0], DOWN[1], DOWN[2])
     icub.gaze.lookAtAbsAngles(UP[0], UP[1], UP[2])
 
+icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0)
 icub.close()
