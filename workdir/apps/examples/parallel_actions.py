@@ -13,7 +13,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, GazeMotion, GazeAbsAngles
+from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, GazeMotion, GazeAbsAngles, iCubFullbodyAction
 
 icub = iCub()
 arm_down = JointPose(target_joints=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
@@ -35,7 +35,7 @@ g.addCheckpoint(GazeAbsAngles(20.0, 0.0, 0.0))
 g.addCheckpoint(GazeAbsAngles(-20.0, 0.0, 0.0))
 g.addCheckpoint(GazeAbsAngles(0.0, 0.0, 0.0))
 
-action = icub.createFullbodyAction()
+action = iCubFullbodyAction()
 
 step1 = action.addStep()
 step2 = action.addStep()
@@ -49,6 +49,9 @@ step3.setGazeMotion(g)
 step3.setLimbMotion(m1)
 step3.setLimbMotion(m2)
 
-icub.move(action)
+action = action.toJSON()
 
+action2 = iCubFullbodyAction()
+action2.fromJSON(action)
+icub.move(action2)
 icub.close()

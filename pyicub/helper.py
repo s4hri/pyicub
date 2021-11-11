@@ -26,11 +26,12 @@ from pyicub.core.ports import BufferedReadPort
 from pyicub.core.logger import YarpLogger
 from pyicub.requests import iCubRequestsManager, iCubRequest
 
+from collections import deque
 import threading
 import yaml
 import os
 import time
-from collections import deque
+import json
 
 
 class PortMonitor:
@@ -92,7 +93,7 @@ class iCubFullbodyStep:
 
 class iCubFullbodyAction:
 
-    def __init__(self, icub_controllers):
+    def __init__(self):
         self._steps_ = []
 
     @property
@@ -103,6 +104,21 @@ class iCubFullbodyAction:
         step = iCubFullbodyStep()
         self._steps_.append(step)
         return step
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, indent=4)
+
+    def fromJSON(self, json_obj):
+        j = json.loads(json_obj)
+        for step in j["_steps_"]:
+            res = self.addStep()
+            for part,pose in step["_limb_motions_"].items():
+                lm = LimbMotion(part)
+                for v in pose["_checkpoints_"]:
+                    pose = JointPose(target_joints=v['_pose_']['_target_joints_'], joints_list=v['_pose_']['_joints_list_'])
+                    check = JointsTrajectoryCheckpoint(pose, duration=v['_duration_'])
+                    lm.addCheckpoint(check)
+                res.setLimbMotion(lm)
 
 class iCub:
 
@@ -224,9 +240,6 @@ class iCub:
         if self._speech_ is None:
             self._speech_ = speechPyCtrl(self._robot_)
         return self._speech_
-
-    def createFullbodyAction(self):
-        return iCubFullbodyAction(self._icub_controllers_)
 
     def portmonitor(self, yarp_src_port, activate_function, callback):
         self._monitors_.append(PortMonitor(yarp_src_port, activate_function, callback, period=0.01, autostart=True))
