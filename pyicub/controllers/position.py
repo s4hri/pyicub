@@ -37,70 +37,30 @@ class iCubPart:
 class JointPose:
 
     def __init__(self, target_joints, joints_list=None):
-        self._target_joints_ = target_joints
-        self._joints_list_ = joints_list
+        self.target_joints = target_joints
+        self.joints_list = joints_list
 
-    @property
-    def target_joints(self):
-        return self._target_joints_
-
-    @property
-    def joints_list(self):
-        return self._joints_list_
 
 class JointPoseVel:
 
     def __init__(self, target_position, vel_list, joints_list=None):
-        self._target_position_ = target_position
-        self._vel_list_ = vel_list
-        self._joints_list_ = joints_list
-
-    @property
-    def joints_list(self):
-        return self._joints_list_
-
-    @property
-    def target_position(self):
-        return self._target_position_
-
-    @property
-    def vel_list(self):
-        return self._vel_list_
+        self.target_position = target_position
+        self.vel_list = vel_list
+        self.joints_list = joints_list
 
 class JointsTrajectoryCheckpoint:
 
     def __init__(self, pose: JointPose, duration: float):
-        self._pose_ = pose
-        self._duration_ = duration
-
-    @property
-    def pose(self):
-        return self._pose_
-
-    @property
-    def duration(self):
-        return self._duration_
-
+        self.pose = pose
+        self.duration = duration
 
 class LimbMotion:
     def __init__(self, part_name: iCubPart):
-        self._part_name_ = part_name
-        self._checkpoints_ = []
-
-    @property
-    def durations(self):
-        return self._durations_
-
-    @property
-    def part_name(self):
-        return self._part_name_
-
-    @property
-    def checkpoints(self):
-        return self._checkpoints_
+        self.part_name = part_name
+        self.checkpoints = []
 
     def addCheckpoint(self, checkpoint: JointsTrajectoryCheckpoint):
-        self._checkpoints_.append(checkpoint)
+        self.checkpoints.append(checkpoint)
 
 class PositionController:
 

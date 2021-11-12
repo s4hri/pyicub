@@ -18,41 +18,13 @@ import pyicub.utils as utils
 
 from pyicub.core.logger import YarpLogger
 
-
-class GazeCheckpoint:
-
-    def __init__(self, value):
-        self._value_ = value
-
-    @property
-    def value(self):
-        return self._value_
-
-class GazeAbsAngles(GazeCheckpoint):
-
-    def __init__(self, azimuth, elevation, vergence):
-        GazeCheckpoint.__init__(self, [azimuth, elevation, vergence])
-
-class GazeRelAngles(GazeCheckpoint):
-
-    def __init__(self, azimuth, elevation, vergence):
-        GazeCheckpoint.__init__(self, [azimuth, elevation, vergence])
-
-class GazeXYZ(GazeCheckpoint):
-
-    def __init__(self, x, y, z):
-        GazeCheckpoint.__init__(self, [x, y, z])
-
 class GazeMotion:
-    def __init__(self):
-        self._checkpoints_ = []
+    def __init__(self, lookat_method: str):
+        self.checkpoints = []
+        self.lookat_method = lookat_method
 
-    @property
-    def checkpoints(self):
-        return self._checkpoints_
-
-    def addCheckpoint(self, checkpoint: GazeCheckpoint):
-        self._checkpoints_.append(checkpoint)
+    def addCheckpoint(self, value: list):
+        self.checkpoints.append(value)
 
 
 class GazeController:

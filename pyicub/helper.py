@@ -16,7 +16,7 @@
 import yarp
 yarp.Network.init()
 
-from pyicub.controllers.gaze import GazeMotion, GazeAbsAngles, GazeRelAngles, GazeXYZ, GazeController
+from pyicub.controllers.gaze import GazeMotion, GazeController
 from pyicub.controllers.position import JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubPart, PositionController
 from pyicub.modules.emotions import emotionsPyCtrl
 from pyicub.modules.speech import speechPyCtrl
@@ -70,39 +70,39 @@ class PortMonitor:
         self.stop()
         del self._port_
 
+class PyiCubCustomCall:
+
+    def __init__(self, target, args=()):
+        self.target = target
+        self.args = args
+
 class iCubFullbodyStep:
 
     def __init__(self):
-        self._limb_motions_ = {}
-        self._gaze_motion_ = None
-
-    @property
-    def limb_motions(self):
-        return self._limb_motions_
-
-    @property
-    def gaze_motion(self):
-        return self._gaze_motion_
+        self.limb_motions = {}
+        self.gaze_motion = None
+        self.custom_calls = []
 
     def setGazeMotion(self, gaze_motion: GazeMotion):
-        self._gaze_motion_ = gaze_motion
+        self.gaze_motion = gaze_motion
 
     def setLimbMotion(self, limb_motion: LimbMotion):
-        self._limb_motions_[limb_motion.part_name] = limb_motion
+        self.limb_motions[limb_motion.part_name] = limb_motion
+
+    def addCustomCall(self, custom_call: PyiCubCustomCall):
+        self.custom_calls.append(custom_call)
 
 
 class iCubFullbodyAction:
 
-    def __init__(self):
-        self._steps_ = []
-
-    @property
-    def steps(self):
-        return self._steps_
+    def __init__(self, JSON_file=None):
+        self.steps = []
+        if JSON_file:
+            self.importJSON(JSON_file)
 
     def addStep(self):
         step = iCubFullbodyStep()
-        self._steps_.append(step)
+        self.steps.append(step)
         return step
 
     def toJSON(self):
@@ -110,15 +110,34 @@ class iCubFullbodyAction:
 
     def fromJSON(self, json_obj):
         j = json.loads(json_obj)
-        for step in j["_steps_"]:
+        for step in j["steps"]:
             res = self.addStep()
-            for part,pose in step["_limb_motions_"].items():
+            for part,pose in step["limb_motions"].items():
                 lm = LimbMotion(part)
-                for v in pose["_checkpoints_"]:
-                    pose = JointPose(target_joints=v['_pose_']['_target_joints_'], joints_list=v['_pose_']['_joints_list_'])
-                    check = JointsTrajectoryCheckpoint(pose, duration=v['_duration_'])
+                for v in pose["checkpoints"]:
+                    pose = JointPose(target_joints=v['pose']['target_joints'], joints_list=v['pose']['joints_list'])
+                    check = JointsTrajectoryCheckpoint(pose, duration=v['duration'])
                     lm.addCheckpoint(check)
                 res.setLimbMotion(lm)
+            if step["gaze_motion"]:
+                gaze = GazeMotion(lookat_method=step["gaze_motion"]["lookat_method"])
+                for v in step["gaze_motion"]["checkpoints"]:
+                    gaze.addCheckpoint(v)
+                res.setGazeMotion(gaze)
+            if step["custom_calls"]:
+                for v in step["custom_calls"]:
+                    cc = PyiCubCustomCall(target=v["target"], args=v["args"])
+                    res.addCustomCall(cc)
+
+    def importJSON(self, JSON_file):
+        with open(JSON_file) as f:
+            data = f.read()
+        self.fromJSON(data)
+
+
+    def exportJSON(self, filepath):
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(self.toJSON())
 
 class iCub:
 
@@ -127,7 +146,7 @@ class iCub:
         self._position_controllers_ = {}
         self._drivers_ = {}
         self._encoders_ = {}
-        self._gazectrl_ = None
+        self._gaze_ctrl_ = None
         self._emo_ = None
         self._speech_ = None
         self._face_ = None
@@ -159,7 +178,7 @@ class iCub:
 
         if 'gaze_controller' in self._robot_conf_.keys():
             if self._robot_conf_['gaze_controller'] is True:
-                self._gazectrl_ = GazeController(self._robot_)
+                self._gaze_ctrl_ = GazeController(self._robot_)
 
         if 'position_controllers' in self._robot_conf_.keys():
             for part_name in self._robot_conf_['position_controllers']:
@@ -210,6 +229,12 @@ class iCub:
 
 
     @property
+    def gaze(self):
+        if self._gaze_ctrl_ is None:
+            self._gaze_ctrl_ = GazeController(self._robot_)
+        return self._gaze_ctrl_
+
+    @property
     def face(self):
         if self._face_ is None:
             self._face_ = facePyCtrl(self._robot_)
@@ -220,10 +245,6 @@ class iCub:
         if self._facelandmarks_ is None:
            self._facelandmarks_ = faceLandmarksPyCtrl()
         return self._facelandmarks_
-
-    @property
-    def gaze(self):
-        return self._gazectrl_
 
     @property
     def http_manager(self):
@@ -253,15 +274,19 @@ class iCub:
             self._position_controllers_[robot_part.name] = PositionController(driver, joints_list, iencoders)
         return self._position_controllers_[robot_part.name]
 
+    def execCustomCall(self, custom_call: PyiCubCustomCall):
+        calls = custom_call.target.split('.')
+        foo = self
+        for call in calls:
+            foo = getattr(foo, call)
+        req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=foo)
+        req.run(*custom_call.args)
+        req.wait_for_completed()
+
     def moveGaze(self, gaze_motion: GazeMotion):
         for i in range(0, len(gaze_motion.checkpoints)):
-            if isinstance(gaze_motion.checkpoints[i], GazeAbsAngles):
-                req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.gaze.lookAtAbsAngles)
-            elif isinstance(gaze_motion.checkpoints[i], GazeRelAngles):
-                req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.gaze.lookAtRelAngles)
-            elif isinstance(gaze_motion.checkpoints[i], GazeXYZ):
-                req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.gaze.lookAtFixationPoint)
-            req.run(gaze_motion.checkpoints[i].value[0], gaze_motion.checkpoints[i].value[1], gaze_motion.checkpoints[i].value[2])
+            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=getattr(self.gaze, gaze_motion.lookat_method))
+            req.run(gaze_motion.checkpoints[i][0], gaze_motion.checkpoints[i][1], gaze_motion.checkpoints[i][2])
             req.wait_for_completed()
 
     def movePart(self, limb_motion: LimbMotion):
@@ -273,19 +298,28 @@ class iCub:
             req.run(pose=limb_motion.checkpoints[i].pose, req_time=limb_motion.checkpoints[i].duration)
             req.wait_for_completed()
 
+    def execCustomCalls(self, calls):
+        for call in calls:
+            self.execCustomCall(call)
+
     def moveStep(self, step):
         requests = []
         if step.gaze_motion:
             req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.moveGaze)
             requests.append(req)
             req.run(step.gaze_motion)
+        if step.custom_calls:
+            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.execCustomCalls)
+            requests.append(req)
+            req.run(step.custom_calls)
         for part, limb_motion in step.limb_motions.items():
             req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.movePart)
             requests.append(req)
             req.run(limb_motion)
+
         return requests
 
-    def move(self, action: iCubFullbodyAction):
+    def play(self, action: iCubFullbodyAction):
         for step in action.steps:
             requests = self.moveStep(step)
             iCubRequest.join(requests)
