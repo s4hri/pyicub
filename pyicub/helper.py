@@ -25,6 +25,7 @@ from pyicub.modules.faceLandmarks import faceLandmarksPyCtrl
 from pyicub.core.ports import BufferedReadPort
 from pyicub.core.logger import YarpLogger
 from pyicub.requests import iCubRequestsManager, iCubRequest
+from pyicub.rest import iCubHTTPManager
 
 from collections import deque
 import threading
@@ -32,7 +33,7 @@ import yaml
 import os
 import time
 import json
-
+from io import IOBase
 
 class PortMonitor:
     def __init__(self, yarp_src_port, activate_function, callback, period=0.01, autostart=False):
@@ -68,7 +69,6 @@ class PortMonitor:
 
     def __del__(self):
         self.stop()
-        del self._port_
 
 class PyiCubCustomCall:
 
@@ -95,22 +95,18 @@ class iCubFullbodyStep:
 
 class iCubFullbodyAction:
 
-    def __init__(self, JSON_file=None):
+    def __init__(self, JSON_file=None, JSON_dict=None):
         self.steps = []
         if JSON_file:
-            self.importJSON(JSON_file)
+            self.importFromJSONFile(JSON_file)
 
     def addStep(self):
         step = iCubFullbodyStep()
         self.steps.append(step)
         return step
 
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, indent=4)
-
-    def fromJSON(self, json_obj):
-        j = json.loads(json_obj)
-        for step in j["steps"]:
+    def fromJSON(self, json_dict):
+        for step in json_dict["steps"]:
             res = self.addStep()
             for part,pose in step["limb_motions"].items():
                 lm = LimbMotion(part)
@@ -129,15 +125,16 @@ class iCubFullbodyAction:
                     cc = PyiCubCustomCall(target=v["target"], args=v["args"])
                     res.addCustomCall(cc)
 
-    def importJSON(self, JSON_file):
+    def importFromJSONFile(self, JSON_file):
         with open(JSON_file) as f:
             data = f.read()
-        self.fromJSON(data)
+        res = json.loads(data)
+        self.fromJSON(res)
 
-
-    def exportJSON(self, filepath):
+    def exportJSONFile(self, filepath):
+        res = json.dumps(self, default=lambda o: o.__dict__, indent=4)
         with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(self.toJSON())
+            f.write(res)
 
 class iCub:
 
@@ -207,6 +204,7 @@ class iCub:
         return props
 
     def _registerDefaultServices_(self):
+        self.http_manager.register(self.playActionFromJSON)
         if self.gaze:
             self.http_manager.register(self.gaze.blockEyes, rule_prefix="gaze_controller")
             self.http_manager.register(self.gaze.blockNeck, rule_prefix="gaze_controller")
@@ -318,6 +316,11 @@ class iCub:
             req.run(limb_motion)
 
         return requests
+
+    def playActionFromJSON(self, action_json):
+        action = iCubFullbodyAction()
+        action.fromJSON(action_json)
+        self.play(action)
 
     def play(self, action: iCubFullbodyAction):
         for step in action.steps:

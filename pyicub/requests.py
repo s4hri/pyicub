@@ -18,6 +18,7 @@ from pyicub.utils import SingletonMeta
 
 import time
 import concurrent.futures
+import threading
 
 class iCubRequest:
 
@@ -134,9 +135,3 @@ class iCubRequestsManager(metaclass=SingletonMeta):
         info['exception'] = self._requests_[req_id].exception
         info['retval'] = self._requests_[req_id].retval
         return info
-
-class PyiCubCustomCall:
-
-    def __init__(self, target, args):
-        self.target = target
-        self.args = args

@@ -13,20 +13,29 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.iCubHelper import iCub, JointPose, ICUB_PARTS
+from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubFullbodyAction
 
 class WebApp:
 
     def __init__(self):
         self.icub = iCub(http_server=True)
-        self.a = JointPose(ICUB_PARTS.HEAD, target_position=[-15.0, 20.0, 5.0, 0.0, 0.0, 5.0])
-        self.b = JointPose(ICUB_PARTS.HEAD, target_position=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+
+        down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-15.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.5)
+        home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.0)
+
+        example_motion = LimbMotion(ICUB_PARTS.HEAD)
+        example_motion.addCheckpoint(down)
+        example_motion.addCheckpoint(home)
+
+        self.action = iCubFullbodyAction()
+        step = self.action.addStep()
+        step.setLimbMotion(example_motion)
+
         self.icub.http_manager.register(target=self.foo, rule_prefix="mywebapp")
 
-    def foo(self, req_time):
-        self.icub.move(self.a, req_time=req_time)
-        self.icub.move(self.b, req_time=req_time)
-        return 1
+    def foo(self, value):
+        self.icub.play(self.action)
+        return value
 
 a = WebApp()
 input()

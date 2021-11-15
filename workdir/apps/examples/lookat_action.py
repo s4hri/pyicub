@@ -13,20 +13,25 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubFullbodyAction
+from pyicub.helper import iCub, GazeMotion, iCubFullbodyAction
 
 icub = iCub()
-down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-15.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.5)
-home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.0)
+g1 = GazeMotion(lookat_method="lookAtFixationPoint")
+g1.addCheckpoint([-1.0, -0.5, 1.0])
+g1.addCheckpoint([-1.0, -0.2, 0.5])
+g1.addCheckpoint([-1.0, 0.2, 0.1])
 
-example_motion = LimbMotion(ICUB_PARTS.HEAD)
-example_motion.addCheckpoint(down)
-example_motion.addCheckpoint(home)
+g2 = GazeMotion(lookat_method="lookAtAbsAngles")
+g2.addCheckpoint([0.0, 0.0, 0.0])
 
 action = iCubFullbodyAction()
-step = action.addStep()
-step.setLimbMotion(example_motion)
+step1 = action.addStep()
+step2 = action.addStep()
+step1.setGazeMotion(g1)
+step2.setGazeMotion(g2)
 
-icub.play(action)
+action.exportJSONFile('json/lookat.json')
 
+imported_action = iCubFullbodyAction(JSON_file='json/lookat.json')
+icub.play(imported_action)
 icub.close()

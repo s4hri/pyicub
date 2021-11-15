@@ -14,9 +14,10 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 
-from pyicub.requests import iCubRequestsManager
+from pyicub.requests import iCubRequest, iCubRequestsManager
 
 from flask import Flask, jsonify, request
+import threading
 
 class iCubHTTPManager(iCubRequestsManager):
 
