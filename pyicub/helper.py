@@ -78,10 +78,11 @@ class PyiCubCustomCall:
 
 class iCubFullbodyStep:
 
-    def __init__(self):
+    def __init__(self, offset_ms=None):
         self.limb_motions = {}
         self.gaze_motion = None
         self.custom_calls = []
+        self.offset_ms = offset_ms
 
     def setGazeMotion(self, gaze_motion: GazeMotion):
         self.gaze_motion = gaze_motion
@@ -100,8 +101,8 @@ class iCubFullbodyAction:
         if JSON_file:
             self.importFromJSONFile(JSON_file)
 
-    def addStep(self):
-        step = iCubFullbodyStep()
+    def addStep(self, offset_ms=None):
+        step = iCubFullbodyStep(offset_ms)
         self.steps.append(step)
         return step
 
@@ -324,5 +325,7 @@ class iCub:
 
     def play(self, action: iCubFullbodyAction):
         for step in action.steps:
+            if step.offset_ms:
+                time.sleep(step.offset_ms/1000.0)
             requests = self.moveStep(step)
             iCubRequest.join(requests)

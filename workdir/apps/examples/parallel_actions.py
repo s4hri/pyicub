@@ -39,7 +39,7 @@ action = iCubFullbodyAction()
 
 step1 = action.addStep()
 step2 = action.addStep()
-step3 = action.addStep()
+step3 = action.addStep(offset_ms=2000)
 
 step1.setLimbMotion(m1)
 
