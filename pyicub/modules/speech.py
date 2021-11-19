@@ -32,3 +32,14 @@ class speechPyCtrl:
 
     def close(self):
         self.__port__.close()
+
+class iSpeakPyCtrl:
+
+    def __init__(self):
+         self.__port__ = BufferedWritePort("/pyicub/speech:o", "/iSpeak")
+
+    def say(self, something):
+        self.__port__.write("\"%s\"" % something)
+
+    def close(self):
+        self.__port__.close()
