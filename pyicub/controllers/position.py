@@ -64,7 +64,7 @@ class LimbMotion:
 
 class PositionController:
 
-    MIN_JOINTS_DIST = 1
+    MIN_JOINTS_DIST = 10
     WAITMOTIONDONE_PERIOD = 0.01
 
     def __init__(self, driver, joints_list, iencoders, logger=YarpLogger.getLogger()):
