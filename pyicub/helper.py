@@ -19,7 +19,7 @@ yarp.Network.init()
 from pyicub.controllers.gaze import GazeMotion, GazeController
 from pyicub.controllers.position import JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubPart, PositionController
 from pyicub.modules.emotions import emotionsPyCtrl
-from pyicub.modules.speech import speechPyCtrl
+from pyicub.modules.speech import speechPyCtrl, iSpeakPyCtrl
 from pyicub.modules.face import facePyCtrl
 from pyicub.modules.faceLandmarks import faceLandmarksPyCtrl
 from pyicub.core.ports import BufferedReadPort
@@ -177,6 +177,12 @@ class iCub:
         if 'gaze_controller' in self._robot_conf_.keys():
             if self._robot_conf_['gaze_controller'] is True:
                 self._gaze_ctrl_ = GazeController(self._robot_)
+
+        if 'speech_controller' in self._robot_conf_.keys():
+            if self._robot_conf_['gaze_controller'] == 'svox':
+                self._speech_ = speechPyCtrl(self._robot_)
+            elif self._robot_conf_['gaze_controller'] == 'iSpeak':
+                self._speech_ = iSpeakPyCtrl(self._robot_)
 
         if 'position_controllers' in self._robot_conf_.keys():
             for part_name in self._robot_conf_['position_controllers']:
