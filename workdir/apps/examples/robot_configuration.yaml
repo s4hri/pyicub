@@ -2,6 +2,8 @@ robot_name: icubSim
 
 gaze_controller: True
 
+speech_controller: svox
+
 position_controllers:
   - head
   - left_arm

@@ -182,7 +182,7 @@ class iCub:
             if self._robot_conf_['speech_controller'] == 'svox':
                 self._speech_ = speechPyCtrl(self._robot_)
             elif self._robot_conf_['speech_controller'] == 'iSpeak':
-                self._speech_ = iSpeakPyCtrl(self._robot_)
+                self._speech_ = iSpeakPyCtrl()
 
         if 'position_controllers' in self._robot_conf_.keys():
             for part_name in self._robot_conf_['position_controllers']:
