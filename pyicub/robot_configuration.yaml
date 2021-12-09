@@ -1,4 +1,4 @@
-robot_name: icubSim
+robot_name: ${ICUB_NAME}
 
 gaze_controller: True
 

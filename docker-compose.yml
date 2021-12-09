@@ -7,6 +7,12 @@ services:
 
     environment:
         - PROJECT_NAME=${PROJECT_NAME}
+        - ICUB_SIMULATION=true
+        - ICUB_NAME=iCub
+        - ICUB_USER=icub
+        - ICUB_PSW=icub
+        - ICUB_HOST=pc104
+        - ICUB_APPS=/home/docky/workdir/apps
 
     command: sh -c "terminator & bash /home/docky/init.sh"
 
