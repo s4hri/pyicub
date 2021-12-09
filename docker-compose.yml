@@ -8,7 +8,7 @@ services:
     environment:
         - PROJECT_NAME=${PROJECT_NAME}
         - ICUB_SIMULATION=true
-        - ICUB_NAME=iCub
+        - ICUB_NAME=icubSim
         - ICUB_USER=icub
         - ICUB_PSW=icub
         - ICUB_HOST=pc104

@@ -172,7 +172,12 @@ class iCub:
         with open(configuration_file) as f:
             self._robot_conf_ = yaml.load(f, Loader=yaml.FullLoader)
 
-        self._robot_ = self._robot_conf_['robot_name']
+        ROBOT_NAME = os.getenv('ICUB_NAME')
+        if ROBOT_NAME is None:
+            self._robot_ = "icub"
+        else:
+            self._robot_ = ROBOT_NAME
+
 
         if 'gaze_controller' in self._robot_conf_.keys():
             if self._robot_conf_['gaze_controller'] is True:
