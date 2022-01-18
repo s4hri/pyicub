@@ -14,4 +14,4 @@ RUN cd ${WORKDIR} && \
     cd pyicub && \
     pip3 install --target=/usr/local/lib/python3.8/dist-packages -r requirements.txt;
 
-ENV PYTHONPATH ${PYTHONPATH}:${WORKDIR}
+ENV PYTHONPATH ${PYTHONPATH}:${WORKDIR}/pyicub
