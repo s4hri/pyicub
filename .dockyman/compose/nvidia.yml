@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+
+  common:
+    extends:
+      file: common.yml
+      service: common
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [graphics,utility]

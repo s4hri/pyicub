@@ -184,10 +184,8 @@ class iCub:
                 self._gaze_ctrl_ = GazeController(self._robot_)
 
         if 'speech_controller' in self._robot_conf_.keys():
-            if self._robot_conf_['speech_controller'] == 'svox':
+            if self._robot_conf_['speech_controller'] is True:
                 self._speech_ = speechPyCtrl(self._robot_)
-            elif self._robot_conf_['speech_controller'] == 'iSpeak':
-                self._speech_ = iSpeakPyCtrl()
 
         if 'position_controllers' in self._robot_conf_.keys():
             for part_name in self._robot_conf_['position_controllers']:

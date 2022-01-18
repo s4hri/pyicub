@@ -1,6 +1,6 @@
 gaze_controller: True
 
-speech_controller: svox
+speech_controller: True
 
 position_controllers:
   - head

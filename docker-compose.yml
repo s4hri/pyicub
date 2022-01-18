@@ -3,20 +3,25 @@ version: '3.8'
 services:
 
   main:
-    image: ${LOCAL_DOCKER_IMAGE}
+    image: ${DOCKER_DOMAIN}/${PROJECT_NAME}-docker:${RELEASE}.local
+
+    extends:
+      file: .dockyman/compose/common.yml
+      service: common
 
     environment:
         - PROJECT_NAME=${PROJECT_NAME}
+        - RELEASE=${RELEASE}
         - ICUB_SIMULATION=true
         - ICUB_NAME=icubSim
         - ICUB_USER=icub
         - ICUB_PSW=icub
         - ICUB_HOST=pc104
-        - ICUB_APPS=/home/docky/workdir/apps
+        - ICUB_APPS=/code/shared/icub/applications
 
-    command: sh -c "terminator & bash /home/docky/init.sh"
+    command: ["/bin/bash", "-c", "${WORKDIR}/init.sh"]
 
     volumes:
       - type: bind
-        source: ./
-        target: /home/docky/pyicub
+        source: ./pyicub
+        target: ${WORKDIR}/pyicub
