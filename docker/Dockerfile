@@ -14,7 +14,5 @@ USER root
 RUN cd ${WORKDIR} && \
     git clone https://github.com/s4hri/pyicub -b ${PYICUB_VER} && \
     cd pyicub && \
-    pip3 install --target=${PYTHON_PACKAGES_DIR} -r requirements.txt;
-
-ENV PYTHON_PACKAGES_DIR ${PYTHON_PACKAGES_DIR}
-ENV PYTHONPATH ${PYTHONPATH}:${PYTHON_PACKAGES_DIR}:${WORKDIR}/pyicub
+    pip3 install --target=${PYTHON_PACKAGES_DIR} -r requirements.txt && \
+    pip3 install --target=${PYTHON_PACKAGES_DIR} .
