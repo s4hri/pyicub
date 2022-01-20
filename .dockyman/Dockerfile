@@ -40,4 +40,4 @@ WORKDIR ${WORKDIR}
 
 ENV PATH=${PATH}:~/.local/bin:${WORKDIR}
 USER ${LOCAL_USER_ID}
-RUN mkdir ${HOME}/.local && mkdir ${HOME}/.config
+RUN mkdir -p ${HOME}/.local && mkdir -p ${HOME}/.config
