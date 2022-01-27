@@ -80,7 +80,7 @@
 
           <module>
               <name>yarpdev</name>
-              <parameters>--device speech --lingware-context speech --default-language it-IT --pitch 120 --speed 100 </parameters>
+              <parameters>--device speech --lingware-context speech --default-language en-US --pitch 120 --speed 100 </parameters>
               <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
               <node>localhost</node>
           </module>
