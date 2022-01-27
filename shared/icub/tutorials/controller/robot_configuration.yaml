@@ -1,0 +1,9 @@
+gaze_controller: True
+
+speech_controller: True
+
+position_controllers:
+  - head
+  - left_arm
+  - right_arm
+  - torso
