@@ -35,11 +35,31 @@
         </module>
 
         <module>
-            <name>yarpdev</name>
-            <parameters>--device speech --lingware-context speech --default-language it-IT --pitch 100 --speed 100</parameters>
+            <name>iSpeak</name>
+            <parameters></parameters>
             <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
             <node>localhost</node>
         </module>
+
+        <module>
+            <name>yarpdev</name>
+            <parameters>--device speech --lingware-context speech --default-language it-IT --pitch 100 --speed 100 --robot icubSim</parameters>
+            <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
+            <node>localhost</node>
+        </module>
+
+
+        <connection>
+            <from>/iSpeak/speech-dev/rpc</from>
+            <to>/icubSim/speech:rpc</to>
+            <protocol>tcp</protocol>
+        </connection>
+
+        <connection>
+            <from>/iSpeak/emotions:o</from>
+            <to>/icubSim/face/emotions/in</to>
+            <protocol>tcp</protocol>
+        </connection>
 
         <connection>
             <from>/face/eyelids</from>
