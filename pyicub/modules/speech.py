@@ -15,6 +15,7 @@
 
 import yarp
 from pyicub.core.ports import BufferedWritePort
+from pyicub.core.rpc import RpcClient
 
 class speechPyCtrl:
 
@@ -37,9 +38,17 @@ class iSpeakPyCtrl:
 
     def __init__(self):
          self.__port__ = BufferedWritePort("/pyicub/speech:o", "/iSpeak")
+         self.__rpcPort__ = RpcClient("/iSpeak/rpc")
 
     def say(self, something):
         self.__port__.write("\"%s\"" % something)
+        btl = yarp.Bottle()
+        btl.clear()
+        btl.addString("stat")
+        res = self.__rpcPort__.execute(btl)
+        while res.toString() == "speaking":
+            res = self.__rpcPort__.execute(btl)
+            yarp.dealy(0.01)
 
     def close(self):
         self.__port__.close()

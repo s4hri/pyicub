@@ -139,7 +139,7 @@ class iCubFullbodyAction:
 
 class iCub:
 
-    def __init__(self, configuration_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'robot_configuration.yaml'), disable_logs=False, http_server=False):
+    def __init__(self, configuration_file, disable_logs=False, http_server=False):
         self._icub_controllers_ = {}
         self._position_controllers_ = {}
         self._drivers_ = {}
@@ -181,11 +181,11 @@ class iCub:
 
         if 'gaze_controller' in self._robot_conf_.keys():
             if self._robot_conf_['gaze_controller'] is True:
-                self._gaze_ctrl_ = GazeController(self._robot_)
+                self.gaze()
 
         if 'speech_controller' in self._robot_conf_.keys():
             if self._robot_conf_['speech_controller'] is True:
-                self._speech_ = iSpeakPyCtrl()
+                self.speech()
 
         if 'position_controllers' in self._robot_conf_.keys():
             for part_name in self._robot_conf_['position_controllers']:
@@ -267,7 +267,7 @@ class iCub:
     @property
     def speech(self):
         if self._speech_ is None:
-            self._speech_ = speechPyCtrl(self._robot_)
+            self._speech_ = iSpeakPyCtrl()
         return self._speech_
 
     def portmonitor(self, yarp_src_port, activate_function, callback):

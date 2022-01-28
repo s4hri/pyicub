@@ -183,5 +183,5 @@ class PositionController:
                 self.__logger__.info("""Motion done DETECTED!""")
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
-        self.__logger__.warning("""Motion done TIMEOUT!""")
+        self.__logger__.warning("""Motion done TIMEOUT! target_joints: %s""" % str(target_joints))
         return False

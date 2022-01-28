@@ -13,21 +13,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubFullbodyAction
 
-icub = iCub('robot_configuration.yaml')
+from pyicub.modules.speech import iSpeakPyCtrl
+import yarp
 
-down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-15.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.5)
-home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.0)
+yarp.Network.init()
 
-example_motion = LimbMotion(ICUB_PARTS.HEAD)
-example_motion.addCheckpoint(down)
-example_motion.addCheckpoint(home)
+ctrl = iSpeakPyCtrl()
 
-action = iCubFullbodyAction()
-step = action.addStep()
-step.setLimbMotion(example_motion)
-
-icub.play(action)
-
-icub.close()
+ctrl.say("Hi, I'm iCub! Let's go to have some fun")
+print("done")
