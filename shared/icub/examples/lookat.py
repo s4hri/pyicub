@@ -15,7 +15,7 @@
 
 from pyicub.helper import iCub
 
-icub = iCub()
+icub = iCub(configuration_file="robot_configuration.yaml")
 icub.gaze.lookAtFixationPoint(-1.0, -0.5, 1.0, waitMotionDone=False)
 icub.gaze.waitMotionOnset()
 

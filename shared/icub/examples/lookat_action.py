@@ -15,7 +15,8 @@
 
 from pyicub.helper import iCub, GazeMotion, iCubFullbodyAction
 
-icub = iCub()
+icub = iCub('robot_configuration.yaml')
+
 g1 = GazeMotion(lookat_method="lookAtFixationPoint")
 g1.addCheckpoint([-1.0, -0.5, 1.0])
 g1.addCheckpoint([-1.0, -0.2, 0.5])

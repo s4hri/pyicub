@@ -15,7 +15,7 @@
 
 from pyicub.helper import iCub, GazeMotion, iCubFullbodyAction, PyiCubCustomCall
 
-icub = iCub()
+icub = iCub(configuration_file="robot_configuration.yaml")
 
 a = PyiCubCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
 b = PyiCubCustomCall(target="emo.neutral")

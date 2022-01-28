@@ -15,7 +15,8 @@
 
 from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubFullbodyAction
 
-icub = iCub()
+icub = iCub('robot_configuration.yaml')
+
 down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-15.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.5)
 home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.0)
 

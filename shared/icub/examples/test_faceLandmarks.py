@@ -15,7 +15,7 @@
 
 from pyicub.iCubHelper import iCub
 import time
-icub = iCub(configuration_file="robot_configuration.yaml")
+icub = iCub('robot_configuration.yaml')
 
 for _ in range(0,10):
     print(icub.facelandmarks.getCenterEyes())

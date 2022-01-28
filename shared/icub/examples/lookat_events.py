@@ -31,7 +31,7 @@ def af1(values):
 def cb1():
     print("Watching at ZERO detected!")
 
-icub = iCub()
+icub = iCub(configuration_file="robot_configuration.yaml")
 
 icub.portmonitor("/iKinGazeCtrl/angles:o", activate_function=af1, callback=cb1)
 
