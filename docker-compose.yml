@@ -6,8 +6,8 @@ services:
     image: ${DOCKER_DOMAIN}/${PROJECT_NAME}-docker:${RELEASE}.local
 
     extends:
-      file: .dockyman/compose/common.yml
-      service: common
+      file: ${BASE_SERVICE_FILENAME}
+      service: ${BASE_SERVICE_NAME}
 
     environment:
         - PROJECT_NAME=${PROJECT_NAME}
@@ -17,9 +17,9 @@ services:
         - ICUB_USER=icub
         - ICUB_PSW=icub
         - ICUB_HOST=pc104
-        - ICUB_APPS=/code/shared/icub/applications
+        - ICUB_APPS=${WORKDIR}/shared/icub/applications
 
-    command: ["/bin/bash", "-c", "${WORKDIR}/init.sh"]
+    command: ["/bin/bash", "-c", "terminator & bash /home/docky/init.sh"]
 
     volumes:
       - type: bind

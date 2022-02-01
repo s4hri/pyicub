@@ -2,10 +2,11 @@ version: '3.8'
 
 services:
 
-  common:
+  base:
+
     extends:
-      file: common.yml
-      service: common
+      file: base.yml
+      service: base
 
     deploy:
       resources:

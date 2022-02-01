@@ -16,7 +16,7 @@
 from pyicub.helper import iCub, iCubFullbodyAction
 import json
 
-icub = iCub(configuration_file="robot_configuration.yaml")
+icub = iCub()
 
 from pyicub.helper import JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, GazeMotion, iCubFullbodyAction, PyiCubCustomCall
 import json

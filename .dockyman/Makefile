@@ -21,14 +21,6 @@ export PJT_DOCKER_IMAGE
 CONTAINER_NAME := ${PROJECT_NAME}.${RELEASE}.local
 export CONTAINER_NAME
 LOCAL_DOCKER_IMAGE := ${PJT_DOCKER_IMAGE}.local
-
-ifeq (, $(shell lsmod | grep nvidia))
-	NVIDIA_ENV := 0
-else
-	NVIDIA_ENV := 1
-endif
-
-export NVIDIA_ENV
 export LOCAL_DOCKER_IMAGE
 
 ID := $(shell lsb_release -is | tr '[:upper:]' '[:lower:]')

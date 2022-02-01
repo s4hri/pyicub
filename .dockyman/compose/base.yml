@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
 
-  common:
+  base:
     environment:
         - DISPLAY=${DISPLAY}
         - QT_X11_NO_MITSHM=1

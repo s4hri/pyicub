@@ -13,14 +13,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.helper import iCub
+from pyicub.iCubHelper import iCub
+import time
+icub = iCub()
 
-icub = iCub(configuration_file="robot_configuration.yaml")
-icub.gaze.lookAtFixationPoint(-1.0, -0.5, 1.0, waitMotionDone=False)
-icub.gaze.waitMotionOnset()
-
-icub.gaze.lookAtFixationPoint(-1.0, -0.2, 0.5)
-icub.gaze.lookAtFixationPoint(-1.0, 0.2, 0.1)
-icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0)
-
-icub.close()
+for _ in range(0,10):
+    print(icub.facelandmarks.getCenterEyes())
+    time.sleep(0.1)

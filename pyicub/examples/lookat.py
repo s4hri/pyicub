@@ -13,26 +13,14 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.helper import iCub, GazeMotion, iCubFullbodyAction
+from pyicub.helper import iCub
 
-icub = iCub('robot_configuration.yaml')
+icub = iCub()
+icub.gaze.lookAtFixationPoint(-1.0, -0.5, 1.0, waitMotionDone=False)
+icub.gaze.waitMotionOnset()
 
-g1 = GazeMotion(lookat_method="lookAtFixationPoint")
-g1.addCheckpoint([-1.0, -0.5, 1.0])
-g1.addCheckpoint([-1.0, -0.2, 0.5])
-g1.addCheckpoint([-1.0, 0.2, 0.1])
+icub.gaze.lookAtFixationPoint(-1.0, -0.2, 0.5)
+icub.gaze.lookAtFixationPoint(-1.0, 0.2, 0.1)
+icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0)
 
-g2 = GazeMotion(lookat_method="lookAtAbsAngles")
-g2.addCheckpoint([0.0, 0.0, 0.0])
-
-action = iCubFullbodyAction()
-step1 = action.addStep()
-step2 = action.addStep()
-step1.setGazeMotion(g1)
-step2.setGazeMotion(g2)
-
-action.exportJSONFile('json/lookat.json')
-
-imported_action = iCubFullbodyAction(JSON_file='json/lookat.json')
-icub.play(imported_action)
 icub.close()
