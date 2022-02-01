@@ -12,7 +12,7 @@ USER docky
 
 RUN cd ${WORKDIR} && \
     git clone https://github.com/s4hri/pyicub -b ${PYICUB_VER} && \
-    cd pyicub && \
+    cd pyicub/pyicub && \
     pip3 install -r requirements.txt
 
 ENV PYTHONPATH $PYTHONPATH:${WORKDIR}/pyicub
