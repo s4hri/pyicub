@@ -1,3 +1,12 @@
+.dockyman
+.github
+docker
+shared
+tests
+.env
+docker-compose.yml
+go
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
