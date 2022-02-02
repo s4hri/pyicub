@@ -16,7 +16,8 @@
                     "target": "emo.neutral",
                     "args": []
                 }
-            ]
+            ],
+            "offset_ms": null
         },
         {
             "limb_motions": {},
@@ -34,7 +35,8 @@
                     "target": "emo.smile",
                     "args": []
                 }
-            ]
+            ],
+            "offset_ms": null
         }
     ]
 }

@@ -139,7 +139,7 @@ class iCubFullbodyAction:
 
 class iCub:
 
-    def __init__(self, configuration_file, disable_logs=False, http_server=False):
+    def __init__(self, disable_logs=False, http_server=False):
         self._icub_controllers_ = {}
         self._position_controllers_ = {}
         self._drivers_ = {}
@@ -169,27 +169,11 @@ class iCub:
         self._icub_parts_[ICUB_PARTS.LEFT_LEG] = iCubPart(ICUB_PARTS.LEFT_LEG, 6)
         self._icub_parts_[ICUB_PARTS.RIGHT_LEG] = iCubPart(ICUB_PARTS.RIGHT_LEG, 6)
 
-        with open(configuration_file) as f:
-            self._robot_conf_ = yaml.load(f, Loader=yaml.FullLoader)
-
         ROBOT_NAME = os.getenv('ICUB_NAME')
         if ROBOT_NAME is None:
             self._robot_ = "icub"
         else:
             self._robot_ = ROBOT_NAME
-
-
-        if 'gaze_controller' in self._robot_conf_.keys():
-            if self._robot_conf_['gaze_controller'] is True:
-                self.gaze()
-
-        if 'speech_controller' in self._robot_conf_.keys():
-            if self._robot_conf_['speech_controller'] is True:
-                self.speech()
-
-        if 'position_controllers' in self._robot_conf_.keys():
-            for part_name in self._robot_conf_['position_controllers']:
-                self._icub_controllers_[part_name] = self.getPositionController(self._icub_parts_[part_name])
 
         if self._http_manager_:
             self._registerDefaultServices_()
@@ -213,19 +197,22 @@ class iCub:
         props.put("remote","/" + self._robot_ + "/" + robot_part.name)
         return props
 
+    def _getPublicMethods(self, obj):
+        object_methods = [method_name for method_name in dir(obj) if callable(getattr(obj, method_name))]
+        public_object_methods = list(filter(lambda x: not x.startswith('_'), object_methods))
+        return public_object_methods
+
     def _registerDefaultServices_(self):
         self.http_manager.register(self.playActionFromJSON)
         if self.gaze:
-            self.http_manager.register(self.gaze.blockEyes, rule_prefix="gaze_controller")
-            self.http_manager.register(self.gaze.blockNeck, rule_prefix="gaze_controller")
-            self.http_manager.register(self.gaze.clearEyes, rule_prefix="gaze_controller")
-            self.http_manager.register(self.gaze.clearNeck, rule_prefix="gaze_controller")
-            self.http_manager.register(self.gaze.lookAtAbsAngles, rule_prefix="gaze_controller")
-            self.http_manager.register(self.gaze.lookAtFixationPoint, rule_prefix="gaze_controller")
-            self.http_manager.register(self.gaze.reset, rule_prefix="gaze_controller")
-            self.http_manager.register(self.gaze.setParams, rule_prefix="gaze_controller")
-            self.http_manager.register(self.gaze.setTrackingMode, rule_prefix="gaze_controller")
-
+            for method in self._getPublicMethods(self.gaze):
+                self.http_manager.register(getattr(self.gaze, method), rule_prefix="gaze_controller")
+        if self.speech:
+            for method in self._getPublicMethods(self.speech):
+                self.http_manager.register(getattr(self.speech, method), rule_prefix="speech_controller")
+        if self.emo:
+            for method in self._getPublicMethods(self.emo):
+                self.http_manager.register(getattr(self.emo, method), rule_prefix="emotions_controller")
 
     def close(self):
         if len(self._monitors_) > 0:
@@ -299,8 +286,7 @@ class iCub:
 
     def movePart(self, limb_motion: LimbMotion):
         for i in range(0, len(limb_motion.checkpoints)):
-            part_name = limb_motion.part_name
-            ctrl = self._icub_controllers_[part_name]
+            ctrl = self.getPositionController(self._icub_parts_[limb_motion.part_name])
             duration = limb_motion.checkpoints[i].duration
             req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move)
             req.run(pose=limb_motion.checkpoints[i].pose, req_time=limb_motion.checkpoints[i].duration)

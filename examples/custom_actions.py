@@ -13,21 +13,27 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubFullbodyAction
+from pyicub.helper import iCub, GazeMotion, iCubFullbodyAction, PyiCubCustomCall
 
-icub = iCub('robot_configuration.yaml')
+icub = iCub()
 
-down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-15.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.5)
-home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.0)
+a = PyiCubCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
+b = PyiCubCustomCall(target="emo.neutral")
 
-example_motion = LimbMotion(ICUB_PARTS.HEAD)
-example_motion.addCheckpoint(down)
-example_motion.addCheckpoint(home)
+c = PyiCubCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 0.0, 0.0,))
+d = PyiCubCustomCall(target="emo.smile")
 
 action = iCubFullbodyAction()
-step = action.addStep()
-step.setLimbMotion(example_motion)
+step1 = action.addStep()
+step2 = action.addStep()
 
-icub.play(action)
+step1.addCustomCall(a)
+step1.addCustomCall(b)
+step2.addCustomCall(c)
+step2.addCustomCall(d)
 
+action.exportJSONFile('json/custom.json')
+
+imported_action = iCubFullbodyAction(JSON_file='json/custom.json')
+icub.play(imported_action)
 icub.close()

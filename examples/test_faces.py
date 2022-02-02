@@ -15,7 +15,7 @@
 
 from pyicub.iCubHelper import iCub
 import time
-icub = iCub(configuration_file="robot_configuration.yaml")
+icub = iCub()
 
 for j in range(100):
     # get number of face detected

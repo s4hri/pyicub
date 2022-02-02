@@ -64,7 +64,6 @@ class LimbMotion:
 
 class PositionController:
 
-    MIN_JOINTS_DIST = 10
     WAITMOTIONDONE_PERIOD = 0.01
 
     def __init__(self, driver, joints_list, iencoders, logger=YarpLogger.getLogger()):
@@ -116,7 +115,7 @@ class PositionController:
             self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
         if waitMotionDone is True:
-            self.waitMotionDone(JointPose(target_joints, joints_list), timeout=2*req_time)
+            self.waitMotionDone(timeout=2*req_time)
         self.__logger__.info("""Moving joints COMPLETED!
                               target_joints:%s
                               req_time:%.2f,
@@ -166,20 +165,11 @@ class PositionController:
                               str(vel_list),
                               str(waitMotionDone)) )
 
-    def waitMotionDone(self, pose: JointPose, timeout: float):
-        target_joints = pose.target_joints
-        joints_list = pose.joints_list
+    def waitMotionDone(self, timeout: float):
         self.__logger__.info("""Waiting for motion done STARTED!""")
-        encs=yarp.Vector(16)
         max_attempts = int(timeout/PositionController.WAITMOTIONDONE_PERIOD)
         for _ in range(0, max_attempts):
-            while not self.__IEncoders__.getEncoders(encs.data()):
-                yarp.delay(0.05)
-            v = []
-            for j in joints_list:
-                v.append(encs[j])
-            dist = utils.vector_distance(v, target_joints)
-            if dist < PositionController.MIN_JOINTS_DIST:
+            if self.__IPositionControl__.checkMotionDone():
                 self.__logger__.info("""Motion done DETECTED!""")
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
