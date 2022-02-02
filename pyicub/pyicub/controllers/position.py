@@ -115,7 +115,7 @@ class PositionController:
             self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
         if waitMotionDone is True:
-            self.waitMotionDone(JointPose(timeout=2*req_time)
+            self.waitMotionDone(timeout=2*req_time)
         self.__logger__.info("""Moving joints COMPLETED!
                               target_joints:%s
                               req_time:%.2f,
