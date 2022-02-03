@@ -113,7 +113,7 @@ class iCubFullbodyAction:
                 lm = LimbMotion(part)
                 for v in pose["checkpoints"]:
                     pose = JointPose(target_joints=v['pose']['target_joints'], joints_list=v['pose']['joints_list'])
-                    check = JointsTrajectoryCheckpoint(pose, duration=v['duration'])
+                    check = JointsTrajectoryCheckpoint(pose, duration=v['duration'], timeout=v['timeout'])
                     lm.addCheckpoint(check)
                 res.setLimbMotion(lm)
             if step["gaze_motion"]:
@@ -289,7 +289,7 @@ class iCub:
             ctrl = self.getPositionController(self._icub_parts_[limb_motion.part_name])
             duration = limb_motion.checkpoints[i].duration
             req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move)
-            req.run(pose=limb_motion.checkpoints[i].pose, req_time=limb_motion.checkpoints[i].duration)
+            req.run(pose=limb_motion.checkpoints[i].pose, req_time=limb_motion.checkpoints[i].duration, timeout=limb_motion.checkpoints[i].timeout)
             req.wait_for_completed()
 
     def execCustomCalls(self, calls):

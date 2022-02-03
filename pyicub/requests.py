@@ -20,6 +20,8 @@ import time
 import concurrent.futures
 import threading
 
+from pyicub.core.logger import YarpLogger
+
 class iCubRequest:
 
     INIT    = 'INIT'
@@ -41,6 +43,7 @@ class iCubRequest:
         self._executor_ = concurrent.futures.ThreadPoolExecutor(max_workers=1)
         self._target_ = target
         self._retval_ = None
+        self.__logger__ = YarpLogger.getLogger()
 
     @staticmethod
     def join(requests):
@@ -83,23 +86,30 @@ class iCubRequest:
         self._future_ = self._executor_.submit(self._target_, *args, **kwargs)
         self._status_ = iCubRequest.RUNNING
         self._future_.add_done_callback(self.on_completed)
+        self.__logger__.debug("iCubRequest %d STARTED!" % self.req_id)
 
     def on_completed(self, future):
         self._end_time_ = time.perf_counter()
         self._duration_ = self._end_time_ - self._start_time_
         self._status_ = iCubRequest.DONE
+        self.__logger__.debug("iCubRequest %d COMPLETED!" % self.req_id)
 
     def wait_for_completed(self):
         res = None
         try:
             res = self._future_.result(self._timeout_)
-        except Exception as e:
-            self._end_time_ = time.perf_counter()
-            self._duration_ = self._end_time_ - self._start_time_
-            self._status_ = iCubRequest.FAILED
+        except concurrent.futures.TimeoutError as e:
             self._exception_ = str(e)
+            self._status_ = iCubRequest.FAILED
+            self.__logger__.warning("iCubRequest %d TIMEOUT!" % self.req_id)
+        except Exception as e:
+            self._exception_ = str(e)
+            self._status_ = iCubRequest.FAILED
+            self.__logger__.error("iCubRequest %d ERROR! %s" % (self.req_id, self._exception_))
             raise(e)
         finally:
+            self._end_time_ = time.perf_counter()
+            self._duration_ = self._end_time_ - self._start_time_
             self._executor_.shutdown(wait=False)
         self._retval_ = res
         return res

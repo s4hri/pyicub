@@ -49,10 +49,12 @@ class JointPoseVel:
         self.joints_list = joints_list
 
 class JointsTrajectoryCheckpoint:
+    DEFAULT_TIMEOUT = 10.0
 
-    def __init__(self, pose: JointPose, duration: float):
+    def __init__(self, pose: JointPose, duration: float, timeout: float=DEFAULT_TIMEOUT):
         self.pose = pose
         self.duration = duration
+        self.timeout = timeout
 
 class LimbMotion:
     def __init__(self, part_name: iCubPart):
@@ -84,7 +86,7 @@ class PositionController:
     def getIEncoders(self):
         return self.__IEncoders__
 
-    def move(self, pose: JointPose, req_time: float, waitMotionDone: bool=True):
+    def move(self, pose: JointPose, req_time: float, timeout: float, waitMotionDone: bool=True):
         target_joints = pose.target_joints
         joints_list = pose.joints_list
         self.__logger__.info("""Moving joints STARTED!
@@ -115,7 +117,7 @@ class PositionController:
             self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
         if waitMotionDone is True:
-            self.waitMotionDone(timeout=2*req_time)
+            self.waitMotionDone(timeout=timeout)
         self.__logger__.info("""Moving joints COMPLETED!
                               target_joints:%s
                               req_time:%.2f,
