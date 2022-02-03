@@ -175,6 +175,13 @@ class iCub:
         else:
             self._robot_ = ROBOT_NAME
 
+        self.gaze
+        self.emo
+        self.speech
+
+        for part_name in self._icub_parts_.keys():
+            self._icub_controllers_[part_name] = self.getPositionController(self._icub_parts_[part_name])
+
         if self._http_manager_:
             self._registerDefaultServices_()
 
@@ -226,19 +233,31 @@ class iCub:
     @property
     def gaze(self):
         if self._gaze_ctrl_ is None:
-            self._gaze_ctrl_ = GazeController(self._robot_)
+            try:
+                self._gaze_ctrl_ = GazeController(self._robot_)
+            except:
+                self._logger_.error('GazeController non correctly initialized!')
+                return None
         return self._gaze_ctrl_
 
     @property
     def face(self):
         if self._face_ is None:
-            self._face_ = facePyCtrl(self._robot_)
+            try:
+                self._face_ = facePyCtrl(self._robot_)
+            except:
+                self._logger_.error('facePyCtrl non correctly initialized!')
+                return None
         return self._face_
 
     @property
     def facelandmarks(self):
         if self._facelandmarks_ is None:
-           self._facelandmarks_ = faceLandmarksPyCtrl()
+            try:
+                self._facelandmarks_ = faceLandmarksPyCtrl()
+            except:
+                self._logger_.error('facePyCtrl non correctly initialized!')
+                return None
         return self._facelandmarks_
 
     @property
@@ -248,13 +267,21 @@ class iCub:
     @property
     def emo(self):
         if self._emo_ is None:
-            self._emo_ = emotionsPyCtrl(self._robot_)
+            try:
+                self._emo_ = emotionsPyCtrl(self._robot_)
+            except: 
+                self._logger_.error('emotionsPyCtrl non correctly initialized!')
+                return None
         return self._emo_
 
     @property
     def speech(self):
         if self._speech_ is None:
-            self._speech_ = iSpeakPyCtrl()
+            try:
+                self._speech_ = iSpeakPyCtrl()
+            except:
+                self._logger_.error('iSpeakPyCtrl non correctly initialized!')
+                return None
         return self._speech_
 
     def portmonitor(self, yarp_src_port, activate_function, callback):
@@ -266,7 +293,11 @@ class iCub:
             iencoders = self._getIEncoders_(robot_part)
             if joints_list is None:
                 joints_list = robot_part.joints_list
-            self._position_controllers_[robot_part.name] = PositionController(driver, joints_list, iencoders)
+            try:
+                self._position_controllers_[robot_part.name] = PositionController(driver, joints_list, iencoders)
+            except:
+                self._logger_.error('PositionController <%s> non callable! Are you sure the robot part is available?' % robot_part.name)
+                return None
         return self._position_controllers_[robot_part.name]
 
     def execCustomCall(self, custom_call: PyiCubCustomCall):
@@ -287,10 +318,13 @@ class iCub:
     def movePart(self, limb_motion: LimbMotion):
         for i in range(0, len(limb_motion.checkpoints)):
             ctrl = self.getPositionController(self._icub_parts_[limb_motion.part_name])
-            duration = limb_motion.checkpoints[i].duration
-            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move)
-            req.run(pose=limb_motion.checkpoints[i].pose, req_time=limb_motion.checkpoints[i].duration, timeout=limb_motion.checkpoints[i].timeout)
-            req.wait_for_completed()
+            if ctrl is None:
+                self._logger_.warning('movePart <%s> ignored!' % limb_motion.part_name)
+            else:
+                duration = limb_motion.checkpoints[i].duration
+                req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move)
+                req.run(pose=limb_motion.checkpoints[i].pose, req_time=limb_motion.checkpoints[i].duration, timeout=limb_motion.checkpoints[i].timeout)
+                req.wait_for_completed()
 
     def execCustomCalls(self, calls):
         for call in calls:

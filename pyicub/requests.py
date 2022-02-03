@@ -118,14 +118,16 @@ class iCubRequestsManager(metaclass=SingletonMeta):
 
     def __init__(self):
         self._requests_ = {}
+        self._lock = threading.Lock()
 
     def create(self, timeout, target):
-        if len(self._requests_) == 0:
-            req_id = 0
-        else:
-            req_id = max(self._requests_.keys()) + 1
-        req = iCubRequest(req_id, timeout, target)
-        self._requests_[req_id] = req
+        with self._lock:
+            if len(self._requests_) == 0:
+                req_id = 0
+            else:
+                req_id = max(self._requests_.keys()) + 1
+            req = iCubRequest(req_id, timeout, target)
+            self._requests_[req_id] = req
         return req
 
     def run(self, req_id, *args, **kwargs):
