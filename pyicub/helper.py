@@ -161,6 +161,7 @@ class iCub:
             self._http_manager_ = None
 
         self._icub_parts_ = {}
+        self._icub_parts_[ICUB_PARTS.FACE] = iCubPart(ICUB_PARTS.FACE, 1)
         self._icub_parts_[ICUB_PARTS.HEAD] = iCubPart(ICUB_PARTS.HEAD, 6)
         self._icub_parts_[ICUB_PARTS.LEFT_ARM] = iCubPart(ICUB_PARTS.LEFT_ARM, 16)
         self._icub_parts_[ICUB_PARTS.RIGHT_ARM] = iCubPart(ICUB_PARTS.RIGHT_ARM, 16)
