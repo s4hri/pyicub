@@ -14,7 +14,6 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-import time
 import pyicub.utils as utils
 
 from pyicub.core.logger import YarpLogger
@@ -64,6 +63,7 @@ class LimbMotion:
     def addCheckpoint(self, checkpoint: JointsTrajectoryCheckpoint):
         self.checkpoints.append(checkpoint)
 
+
 class PositionController:
 
     WAITMOTIONDONE_PERIOD = 0.01
@@ -75,6 +75,7 @@ class PositionController:
         self.__joints_list__ = joints_list
         self.__setPositionControlMode__(self.__joints_list__)
         self.__IPositionControl__ = driver.viewIPositionControl()
+        self.__mot_id__ = 0
 
     def __setPositionControlMode__(self, joints_list):
         for joint in joints_list:
@@ -87,14 +88,16 @@ class PositionController:
         return self.__IEncoders__
 
     def move(self, pose: JointPose, req_time: float, timeout: float, waitMotionDone: bool=True):
+        self.__mot_id__ += 1
         target_joints = pose.target_joints
         joints_list = pose.joints_list
-        self.__logger__.info("""Moving joints STARTED!
+        self.__logger__.info("""Motion <%d> STARTED!
                               target_joints:%s
                               req_time:%.2f,
                               joints_list=%s,
                               waitMotionDone=%s""" %
-                              (str(target_joints),
+                              (self.__mot_id__,
+                              str(target_joints),
                               req_time,
                               str(joints_list),
                               str(waitMotionDone)) )
@@ -117,16 +120,26 @@ class PositionController:
             self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
         if waitMotionDone is True:
-            self.waitMotionDone(timeout=timeout)
-        self.__logger__.info("""Moving joints COMPLETED!
-                              target_joints:%s
-                              req_time:%.2f,
-                              joints_list=%s,
-                              waitMotionDone=%s""" %
-                              (str(target_joints),
-                              req_time,
-                              str(joints_list),
-                              str(waitMotionDone)) )
+            res = self.waitMotionDone(timeout=timeout)
+            if res:
+                self.__logger__.info("""Motion <%d> COMPLETED!
+                                    target_joints:%s
+                                    req_time:%.2f,
+                                    joints_list=%s,
+                                    waitMotionDone=%s""" %
+                                    (self.__mot_id__,
+                                    str(target_joints),
+                                    req_time,
+                                    str(joints_list),
+                                    str(waitMotionDone)) )
+            else:
+                self.__logger__.warning("""Motion <%d> TIMEOUT!
+                                    target_joints:%s
+                                    joints_list=%s""" %
+                                    (self.__mot_id__,
+                                    str(target_joints),
+                                    str(joints_list)) )
+
 
 
     def moveRefVel(self, pose: JointPoseVel, req_time: float, waitMotionDone: bool=True):
@@ -134,12 +147,13 @@ class PositionController:
         vel_list = pose.vel_list
         joints_list = pose.joints_list
 
-        self.__logger__.info("""Moving joints in position control STARTED!
+        self.__logger__.info("""Motion <%d> STARTED!
                               target_joints:%s
                               req_time:%.2f,
                               vel_list=%s,
                               waitMotionDone=%s""" %
-                              (str(target_joints),
+                              (self.__mot_id__,
+                              str(target_joints),
                               req_time,
                               str(vel_list),
                               str(waitMotionDone)) )
@@ -157,23 +171,21 @@ class PositionController:
             i+=1
         if waitMotionDone is True:
             self.waitMotionDone(target_joints, joints_list, timeout=2*req_time)
-        self.__logger__.debug("""Moving joints COMPLETED!
+        self.__logger__.debug("""Motion <%d> COMPLETED!
                               target_joints:%s
                               req_time:%.2f,
                               vel_list=%s,
                               waitMotionDone=%s""" %
-                              (str(target_joints),
+                              (self.__mot_id__,
+                              str(target_joints),
                               req_time,
                               str(vel_list),
                               str(waitMotionDone)) )
 
     def waitMotionDone(self, timeout: float):
-        self.__logger__.info("""Waiting for motion done STARTED!""")
         max_attempts = int(timeout/PositionController.WAITMOTIONDONE_PERIOD)
         for _ in range(0, max_attempts):
             if self.__IPositionControl__.checkMotionDone():
-                self.__logger__.info("""Motion done DETECTED!""")
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
-        self.__logger__.warning("""Motion done TIMEOUT! """)
         return False

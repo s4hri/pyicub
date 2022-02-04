@@ -29,11 +29,9 @@ from pyicub.rest import iCubHTTPManager
 
 from collections import deque
 import threading
-import yaml
 import os
 import time
 import json
-from io import IOBase
 
 class PortMonitor:
     def __init__(self, yarp_src_port, activate_function, callback, period=0.01, autostart=False):
@@ -96,8 +94,9 @@ class iCubFullbodyStep:
 
 class iCubFullbodyAction:
 
-    def __init__(self, JSON_file=None, JSON_dict=None):
+    def __init__(self, JSON_file=None, JSON_dict=None, name='noname'):
         self.steps = []
+        self.name = name
         if JSON_file:
             self.importFromJSONFile(JSON_file)
 
@@ -107,6 +106,7 @@ class iCubFullbodyAction:
         return step
 
     def fromJSON(self, json_dict):
+        self.name = json_dict["name"]
         for step in json_dict["steps"]:
             res = self.addStep()
             for part,pose in step["limb_motions"].items():
@@ -288,7 +288,7 @@ class iCub:
         self._monitors_.append(PortMonitor(yarp_src_port, activate_function, callback, period=0.01, autostart=True))
 
     def getPositionController(self, robot_part, joints_list=None):
-        if not robot_part in self._position_controllers_.keys():
+        if not robot_part.name in self._position_controllers_.keys():
             driver = self._getDriver_(robot_part)
             iencoders = self._getIEncoders_(robot_part)
             if joints_list is None:
@@ -316,12 +316,11 @@ class iCub:
             req.wait_for_completed()
 
     def movePart(self, limb_motion: LimbMotion):
+        ctrl = self.getPositionController(self._icub_parts_[limb_motion.part_name])
         for i in range(0, len(limb_motion.checkpoints)):
-            ctrl = self.getPositionController(self._icub_parts_[limb_motion.part_name])
             if ctrl is None:
                 self._logger_.warning('movePart <%s> ignored!' % limb_motion.part_name)
             else:
-                duration = limb_motion.checkpoints[i].duration
                 req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move)
                 req.run(pose=limb_motion.checkpoints[i].pose, req_time=limb_motion.checkpoints[i].duration, timeout=limb_motion.checkpoints[i].timeout)
                 req.wait_for_completed()
@@ -353,8 +352,14 @@ class iCub:
         self.play(action)
 
     def play(self, action: iCubFullbodyAction):
+        self._logger_.debug('Playing action <%s>' % action.name)
+        i = 1
         for step in action.steps:
+            self._logger_.debug('Step <%d> Action <%s> STARTED!' % (i, action.name))
             if step.offset_ms:
                 time.sleep(step.offset_ms/1000.0)
             requests = self.moveStep(step)
             iCubRequest.join(requests)
+            self._logger_.debug('Step <%d> Action <%s> COMPLETED!' % (i, action.name))
+            i += 1
+        self._logger_.debug('Action <%s> finished!' % action.name)
