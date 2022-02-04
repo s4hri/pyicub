@@ -30,7 +30,7 @@ class GazeMotion:
 class GazeController:
 
     WAITMOTION_PERIOD = 0.01
-    WAITMOTIONDONE_TIMEOUT = 2.0
+    WAITMOTIONDONE_TIMEOUT = 5.0
 
     def __init__(self, robot, logger=YarpLogger.getLogger()):
         self.__logger__ = logger
@@ -49,28 +49,44 @@ class GazeController:
             self.__IGazeControl__.stopControl()
             self.clearNeck()
             self.clearEyes()
+        self.__mot_id__ = 0
 
     @property
     def IGazeControl(self):
         return self.__IGazeControl__
 
-    def __lookAtAbsAngles__(self, angles, waitMotionDone=True):
-        self.__logger__.info("""Looking at angles STARTED!
-                                 angles=%s, waitMotionDone=%s""" % (str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+    def __lookAtAbsAngles__(self, angles, waitMotionDone=True, timeout=WAITMOTIONDONE_TIMEOUT):
+        self.__mot_id__ += 1
+        self.__logger__.info("""Looking at angles <%d> STARTED!
+                                 angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
         self.IGazeControl.lookAtAbsAngles(angles)
+        res = True
         if waitMotionDone is True:
-            self.waitMotionDone(angles)
-        self.__logger__.info("""Looking at angles COMPLETED!
-                                 angles=%s, waitMotionDone=%s""" % (str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+            res = self.waitMotionDone(timeout=timeout)
+        if res:
+            self.__logger__.info("""Looking at angles <%d> COMPLETED!
+                                    angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+        else:
+            self.__logger__.warning("""Looking at angles <%d> TIMEOUT!
+                                       angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
 
-    def __lookAtRelAngles__(self, angles, waitMotionDone=True):
-        self.__logger__.info("""Looking at angles STARTED!
-                                 angles=%s, waitMotionDone=%s""" % (str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
-        self.IGazeControl.lookAtRelAngles(angles)
-        if waitMotionDone is True:
-            self.waitMotionDone(angles)
-        self.__logger__.info("""Looking at angles COMPLETED!
-                                 angles=%s, waitMotionDone=%s""" % (str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+
+    def __lookAtRelAngles__(self, angles, waitMotionDone=True, timeout=WAITMOTIONDONE_TIMEOUT):
+        self.__mot_id__ += 1
+        self.__logger__.info("""Looking at rel angles <%d> STARTED!
+                                 angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+        res = self.checkTargets(angles)
+        if not res:
+            self.IGazeControl.lookAtRelAngles(angles)
+            if waitMotionDone is True:
+                res = self.waitMotionDone(angles, timeout)
+        if res:
+           self.__logger__.info("""Looking at rel angles <%d> COMPLETED!
+                                   angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+        else:
+           self.__logger__.warning("""Looking at rel angles <%d> TIMEOUT!
+                                      angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+
 
     def blockEyes(self, vergence):
         self.IGazeControl.blockEyes(vergence)
@@ -88,28 +104,28 @@ class GazeController:
         self.IGazeControl.clearNeckRoll()
         self.IGazeControl.clearNeckPitch()
 
-    def lookAtAbsAngles(self, azi, ele, ver, waitMotionDone=True):
+    def lookAtAbsAngles(self, azi, ele, ver, waitMotionDone=True, timeout=WAITMOTIONDONE_TIMEOUT):
         angles = yarp.Vector(3)
         angles.set(0, azi)
         angles.set(1, ele)
         angles.set(2, ver)
-        self.__lookAtAbsAngles__(angles, waitMotionDone)
+        self.__lookAtAbsAngles__(angles, waitMotionDone, timeout)
 
-    def lookAtRelAngles(self, azi, ele, ver, waitMotionDone=True):
+    def lookAtRelAngles(self, azi, ele, ver, waitMotionDone=True, timeout=WAITMOTIONDONE_TIMEOUT):
         angles = yarp.Vector(3)
         angles.set(0, azi)
         angles.set(1, ele)
         angles.set(2, ver)
-        self.__lookAtRelAngles__(angles, waitMotionDone)
+        self.__lookAtRelAngles__(angles, waitMotionDone, timeout)
 
-    def lookAtFixationPoint(self, x, y, z, waitMotionDone=True):
+    def lookAtFixationPoint(self, x, y, z, waitMotionDone=True, timeout=WAITMOTIONDONE_TIMEOUT):
         p = yarp.Vector(3)
         p.set(0, x)
         p.set(1, y)
         p.set(2, z)
         angles = yarp.Vector(3)
         self.IGazeControl.getAnglesFrom3DPoint(p, angles)
-        self.__lookAtAbsAngles__(angles, waitMotionDone)
+        self.__lookAtAbsAngles__(angles, waitMotionDone, timeout)
 
     def reset(self):
         self.clearEyes()
@@ -122,11 +138,8 @@ class GazeController:
     def setTrackingMode(self, mode):
         self.IGazeControl.setTrackingMode(mode)
 
-    def waitMotionDone(self, target_angles, period=WAITMOTION_PERIOD, timeout=WAITMOTIONDONE_TIMEOUT):
-        self.__logger__.info("""Waiting for motion done STARTED! target_angles: %s""" % str([target_angles[0], target_angles[1], target_angles[2]]))
-        res = self.IGazeControl.waitMotionDone(period=period, timeout=timeout)
-        self.__logger__.info("""Motion done DETECTED! target_angles: %s""" % str([target_angles[0], target_angles[1], target_angles[2]]))
-        return res
+    def waitMotionDone(self, period=WAITMOTION_PERIOD, timeout=WAITMOTIONDONE_TIMEOUT):
+        return self.IGazeControl.waitMotionDone(period=period, timeout=timeout)
 
     def waitMotionOnset(self, speed_ref=0, period=WAITMOTION_PERIOD, max_attempts=50):
         self.__logger__.info("""Waiting for gaze motion onset STARTED!
