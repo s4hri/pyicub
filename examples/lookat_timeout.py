@@ -22,5 +22,3 @@ icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0)
 icub.gaze.lookAtAbsAngles(10.0, 0.0, 0.0, timeout=1.0)
 icub.gaze.lookAtAbsAngles(-10.0, 0.0, 0.0)
 icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0)
-
-icub.close()

@@ -14,8 +14,7 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-yarp.Network.init()
-
+yarp.Network().init()
 from pyicub.controllers.gaze import GazeMotion, GazeController
 from pyicub.controllers.position import JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubPart, PositionController
 from pyicub.modules.emotions import emotionsPyCtrl
@@ -41,6 +40,7 @@ class PortMonitor:
         self._period_ = period
         self._values_ = deque( int(1000/(period*1000))*[None], maxlen=int(1000/(period*1000))) #Values of the last second
         self._stop_thread_ = False
+        self._worker_thread_ = None
         if autostart:
             self.start()
 
@@ -65,8 +65,6 @@ class PortMonitor:
                     self._callback_()
             yarp.delay(self._period_)
 
-    def __del__(self):
-        self.stop()
 
 class PyiCubCustomCall:
 
@@ -175,13 +173,6 @@ class iCub:
         else:
             self._robot_ = ROBOT_NAME
 
-        self.gaze
-        self.emo
-        self.speech
-
-        for part_name in self._icub_parts_.keys():
-            self._icub_controllers_[part_name] = self.getPositionController(self._icub_parts_[part_name])
-
         if self._http_manager_:
             self._registerDefaultServices_()
 
@@ -225,9 +216,6 @@ class iCub:
         if len(self._monitors_) > 0:
             for v in self._monitors_:
                 v.stop()
-        for driver in self._drivers_.values():
-            driver.close()
-        yarp.Network.fini()
 
 
     @property
@@ -360,6 +348,7 @@ class iCub:
                 time.sleep(step.offset_ms/1000.0)
             requests = self.moveStep(step)
             iCubRequest.join(requests)
+            iCubRequestsManager().flush_requests()
             self._logger_.debug('Step <%d> Action <%s> COMPLETED!' % (i, action.name))
             i += 1
         self._logger_.debug('Action <%s> finished!' % action.name)

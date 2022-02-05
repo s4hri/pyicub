@@ -22,7 +22,8 @@
                 ],
                 "lookat_method": "lookAtFixationPoint"
             },
-            "custom_calls": []
+            "custom_calls": [],
+            "offset_ms": null
         },
         {
             "limb_motions": {},
@@ -36,7 +37,9 @@
                 ],
                 "lookat_method": "lookAtAbsAngles"
             },
-            "custom_calls": []
+            "custom_calls": [],
+            "offset_ms": null
         }
-    ]
+    ],
+    "name": "noname"
 }

@@ -36,4 +36,3 @@ action.exportJSONFile('json/custom.json')
 
 imported_action = iCubFullbodyAction(JSON_file='json/custom.json')
 icub.play(imported_action)
-icub.close()

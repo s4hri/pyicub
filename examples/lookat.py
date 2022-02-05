@@ -22,5 +22,3 @@ icub.gaze.waitMotionOnset()
 icub.gaze.lookAtFixationPoint(-1.0, -0.2, 0.5)
 icub.gaze.lookAtFixationPoint(-1.0, 0.2, 0.1)
 icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0)
-
-icub.close()

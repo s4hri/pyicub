@@ -14,12 +14,10 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 
-from pyicub.utils import SingletonMeta
-
 import time
 import concurrent.futures
 import threading
-
+from pyicub.utils import SingletonMeta
 from pyicub.core.logger import YarpLogger
 
 class iCubRequest:
@@ -43,7 +41,7 @@ class iCubRequest:
         self._executor_ = concurrent.futures.ThreadPoolExecutor(max_workers=1)
         self._target_ = target
         self._retval_ = None
-        self.__logger__ = YarpLogger.getLogger()
+        self._logger_ = YarpLogger.getLogger()
 
     @staticmethod
     def join(requests):
@@ -85,12 +83,13 @@ class iCubRequest:
     def run(self, *args, **kwargs):
         self._future_ = self._executor_.submit(self._target_, *args, **kwargs)
         self._status_ = iCubRequest.RUNNING
-        self.__logger__.debug("iCubRequest <%d> STARTED!" % self.req_id)
+        self._logger_.debug("iCubRequest <%d> STARTED!" % self.req_id)
+        self._future_.add_done_callback(self.on_completed)
 
-    def wait_for_completed(self):
+    def on_completed(self, future):
         res = None
         try:
-            res = self._future_.result(self._timeout_)
+            res = future.result(self._timeout_)
             self._status_ = iCubRequest.DONE
         except concurrent.futures.TimeoutError as e:
             self._exception_ = str(e)
@@ -104,13 +103,18 @@ class iCubRequest:
             self._duration_ = round(self._end_time_ - self._start_time_, 4)
             self._executor_.shutdown(wait=False)
         if self._status_ == iCubRequest.DONE:
-            self.__logger__.debug("iCubRequest <%d> COMPLETED! %s" % (self.req_id, self.info()))
+            self._logger_.debug("iCubRequest <%d> COMPLETED! %s" % (self.req_id, self.info()))
         elif self._status_ == iCubRequest.TIMEOUT:
-            self.__logger__.warning("iCubRequest <%d> TIMEOUT! %s" % (self.req_id, self.info()))
+            self._logger_.warning("iCubRequest <%d> TIMEOUT! %s" % (self.req_id, self.info()))
         elif self._status_ == iCubRequest.FAILED:
-            self.__logger__.error("iCubRequest <%d> ERROR! %s" % (self.req_id, self.info()))
+            self._logger_.error("iCubRequest <%d> ERROR! %s" % (self.req_id, self.info()))
         self._retval_ = res
         return res
+
+
+    def wait_for_completed(self):
+        self._executor_.shutdown(wait=True)
+        return self._retval_
 
     def info(self):
         info = {}
@@ -140,12 +144,11 @@ class iCubRequestsManager(metaclass=SingletonMeta):
             self._requests_[req_id] = req
         return req
 
+    def flush_requests(self):
+        del self._requests_
+        self._requests_ = {}
+
+
     def run(self, req_id, *args, **kwargs):
         self._requests_[req_id].run(*args, **kwargs)
-        threading.Thread(target=self._requests_[req_id].wait_for_completed).start()
         return self.info(req_id)
-
-    def info(self, req_id):
-        info = {}
-        req_id = int(req_id)
-        return self._requests_[req_id].info()

@@ -16,20 +16,18 @@
 from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubFullbodyAction
 
 icub = iCub()
-
-up = JointsTrajectoryCheckpoint(JointPose(target_joints=[30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0, timeout=1.0)
-down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
+up = JointsTrajectoryCheckpoint(JointPose(target_joints=[30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
+down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0, timeout=1.0)
 home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
-
+    
 example_motion = LimbMotion(ICUB_PARTS.HEAD)
 example_motion.addCheckpoint(up)
 example_motion.addCheckpoint(down)
 example_motion.addCheckpoint(home)
-
+    
 action = iCubFullbodyAction(name='moveHeadUpAndDown')
 step = action.addStep()
 step.setLimbMotion(example_motion)
 action.exportJSONFile('json/move_head.json')
-
+    
 icub.play(action)
-icub.close()

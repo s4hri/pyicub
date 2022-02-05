@@ -73,8 +73,10 @@ class PositionController:
         self.__IControlMode__ = driver.viewIControlMode()
         self.__IEncoders__ = iencoders
         self.__joints_list__ = joints_list
-        self.__setPositionControlMode__(self.__joints_list__)
+        if not driver.isValid():
+            raise(Exception)
         self.__IPositionControl__ = driver.viewIPositionControl()
+        self.__setPositionControlMode__(self.__joints_list__)        
         self.__mot_id__ = 0
 
     def __setPositionControlMode__(self, joints_list):

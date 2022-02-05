@@ -18,7 +18,7 @@
                                 "joints_list": null
                             },
                             "duration": 3.0,
-                            "timeout": 1.0
+                            "timeout": 10.0
                         },
                         {
                             "pose": {
@@ -33,7 +33,7 @@
                                 "joints_list": null
                             },
                             "duration": 3.0,
-                            "timeout": 10.0
+                            "timeout": 1.0
                         },
                         {
                             "pose": {
