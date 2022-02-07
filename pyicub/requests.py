@@ -151,4 +151,4 @@ class iCubRequestsManager(metaclass=SingletonMeta):
 
     def run(self, req_id, *args, **kwargs):
         self._requests_[req_id].run(*args, **kwargs)
-        return self.info(req_id)
+        return self._requests_[req_id].info()

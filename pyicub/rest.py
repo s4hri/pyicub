@@ -42,7 +42,7 @@ class iCubHTTPManager(iCubRequestsManager):
             res = []
             for req_id, req in self._requests_.items():
                 if req.target.__name__ == name:
-                    res.append(self.info(req_id))
+                    res.append(self._requests_[req_id].info())
             return jsonify(res)
         elif request.method == 'POST':
             req = self.create(iCubRequest.TIMEOUT_REQUEST, self._services_[rule])
@@ -60,7 +60,7 @@ class iCubHTTPManager(iCubRequestsManager):
             rule = str(request.url_rule).strip()
             target = rule.split('/')[-2]
             if self._requests_[req_id].target.__name__ == target:
-                res = self.info(req_id)
+                res = self._requests_[req_id].info()
         return jsonify(res)
 
     def list(self):
