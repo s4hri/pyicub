@@ -261,11 +261,11 @@ class iCub:
         if not robot_part.name in self._position_controllers_.keys():
             if joints_list is None:
                 joints_list = robot_part.joints_list
-            try:
-                self._position_controllers_[robot_part.name] = PositionController(self._robot_, robot_part, joints_list)
-            except:
-                self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % robot_part.name)
-                return None
+            #try:
+            self._position_controllers_[robot_part.name] = PositionController(self._robot_, robot_part.name, joints_list)
+            #except:
+            #    self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % robot_part.name)
+            #    return None
         return self._position_controllers_[robot_part.name]
 
     def execCustomCall(self, custom_call: PyiCubCustomCall):

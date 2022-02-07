@@ -86,8 +86,8 @@ class PositionController:
     def _getRobotPartProperties_(self):
         props = yarp.Property()
         props.put("device","remote_controlboard")
-        props.put("local","/client/" + self._robot_ + "/" + self._robot_part_.name)
-        props.put("remote","/" + self._robot_ + "/" + self._robot_part_.name)
+        props.put("local","/client/" + self._robot_ + "/" + self._robot_part_)
+        props.put("remote","/" + self._robot_ + "/" + self._robot_part_)
         return props
 
     def _getDriver_(self):
