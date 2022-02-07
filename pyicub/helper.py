@@ -176,24 +176,6 @@ class iCub:
         if self._http_manager_:
             self._registerDefaultServices_()
 
-    def _getDriver_(self, robot_part):
-        if not robot_part.name in self._drivers_.keys():
-            props = self._getRobotPartProperties_(robot_part)
-            self._drivers_[robot_part.name] = yarp.PolyDriver(props)
-        return self._drivers_[robot_part.name]
-
-    def _getIEncoders_(self, robot_part):
-        if not robot_part.name in self._encoders_.keys():
-            driver = self._getDriver_(robot_part)
-            self._encoders_[robot_part.name] = driver.viewIEncoders()
-        return self._encoders_[robot_part.name]
-
-    def _getRobotPartProperties_(self, robot_part):
-        props = yarp.Property()
-        props.put("device","remote_controlboard")
-        props.put("local","/client/" + self._robot_ + "/" + robot_part.name)
-        props.put("remote","/" + self._robot_ + "/" + robot_part.name)
-        return props
 
     def _getPublicMethods(self, obj):
         object_methods = [method_name for method_name in dir(obj) if callable(getattr(obj, method_name))]
@@ -277,12 +259,10 @@ class iCub:
 
     def getPositionController(self, robot_part, joints_list=None):
         if not robot_part.name in self._position_controllers_.keys():
-            driver = self._getDriver_(robot_part)
-            iencoders = self._getIEncoders_(robot_part)
             if joints_list is None:
                 joints_list = robot_part.joints_list
             try:
-                self._position_controllers_[robot_part.name] = PositionController(driver, joints_list, iencoders)
+                self._position_controllers_[robot_part.name] = PositionController(self._robot_, robot_part, joints_list)
             except:
                 self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % robot_part.name)
                 return None

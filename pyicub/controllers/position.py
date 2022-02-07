@@ -68,16 +68,35 @@ class PositionController:
 
     WAITMOTIONDONE_PERIOD = 0.01
 
-    def __init__(self, driver, joints_list, iencoders, logger=YarpLogger.getLogger()):
-        self.__logger__ = logger
-        self.__IControlMode__ = driver.viewIControlMode()
-        self.__IEncoders__ = iencoders
-        self.__joints_list__ = joints_list
-        if not driver.isValid():
-            raise(Exception)
-        self.__IPositionControl__ = driver.viewIPositionControl()
-        self.__setPositionControlMode__(self.__joints_list__)        
-        self.__mot_id__ = 0
+    def __init__(self, robot, robot_part, joints_list, logger=YarpLogger.getLogger()):
+        self.__logger__   = logger
+        self._robot_      = robot
+        self._robot_part_ = robot_part
+        self.__Driver__   = self._getDriver_()
+        if self.__Driver__:
+            self.__IEncoders__        = self.__Driver__.viewIEncoders()
+            self.__IControlMode__     = self.__Driver__.viewIControlMode()
+            self.__IPositionControl__ = self.__Driver__.viewIPositionControl()
+            self.__joints_list__      = joints_list
+            self.__setPositionControlMode__(self.__joints_list__)        
+            self.__mot_id__ = 0
+        else:
+            return False    
+
+    def _getRobotPartProperties_(self):
+        props = yarp.Property()
+        props.put("device","remote_controlboard")
+        props.put("local","/client/" + self._robot_ + "/" + self._robot_part_.name)
+        props.put("remote","/" + self._robot_ + "/" + self._robot_part_.name)
+        return props
+
+    def _getDriver_(self):
+        props  = self._getRobotPartProperties_()
+        driver = yarp.PolyDriver(props)
+        if driver.isValid():
+            return driver
+        else:
+            return False
 
     def __setPositionControlMode__(self, joints_list):
         for joint in joints_list:
@@ -94,11 +113,13 @@ class PositionController:
         target_joints = pose.target_joints
         joints_list = pose.joints_list
         self.__logger__.info("""Motion <%d> STARTED!
+                              robot_part:%s, 
                               target_joints:%s
                               req_time:%.2f,
                               joints_list=%s,
                               waitMotionDone=%s""" %
                               (self.__mot_id__,
+                              self._robot_part_,
                               str(target_joints),
                               req_time,
                               str(joints_list),
