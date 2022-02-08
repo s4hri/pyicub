@@ -68,17 +68,17 @@ class PositionController:
 
     WAITMOTIONDONE_PERIOD = 0.01
 
-    def __init__(self, robot, robot_part, joints_list, logger=YarpLogger.getLogger()):
+    def __init__(self, robot, robot_part, logger=YarpLogger.getLogger()):
         self.__logger__   = logger
-        self._robot_      = robot
-        self._robot_part_ = robot_part
+        self.__robot__      = robot
+        self.__robot_part__ = robot_part
         self.__Driver__   = self._getDriver_()
         if self.__Driver__:
             self.__IEncoders__        = self.__Driver__.viewIEncoders()
             self.__IControlMode__     = self.__Driver__.viewIControlMode()
             self.__IPositionControl__ = self.__Driver__.viewIPositionControl()
-            self.__joints_list__      = joints_list
-            self.__setPositionControlMode__(self.__joints_list__)        
+            self.__joints__           = self.__IPositionControl__.getAxes()
+            self.__setPositionControlMode__(self.__joints__)        
             self.__mot_id__ = 0
         else:
             return False    
@@ -86,8 +86,8 @@ class PositionController:
     def _getRobotPartProperties_(self):
         props = yarp.Property()
         props.put("device","remote_controlboard")
-        props.put("local","/client/" + self._robot_ + "/" + self._robot_part_)
-        props.put("remote","/" + self._robot_ + "/" + self._robot_part_)
+        props.put("local","/client/" + self.__robot__ + "/" + self.__robot_part__.name)
+        props.put("remote","/" + self.__robot__ + "/" + self.__robot_part__.name)
         return props
 
     def _getDriver_(self):
@@ -98,9 +98,9 @@ class PositionController:
         else:
             return False
 
-    def __setPositionControlMode__(self, joints_list):
-        for joint in joints_list:
-            self.__IControlMode__.setControlMode(joint, yarp.VOCAB_CM_POSITION)
+    def __setPositionControlMode__(self, joints):
+        modes = yarp.IVector(joints, yarp.VOCAB_CM_POSITION)
+        self.__IControlMode__.setControlModes(modes)
 
     def getIPositionControl(self):
         return self.__IPositionControl__
@@ -119,17 +119,17 @@ class PositionController:
                               joints_list=%s,
                               waitMotionDone=%s""" %
                               (self.__mot_id__,
-                              self._robot_part_,
+                              self.__robot_part__.name,
                               str(target_joints),
                               req_time,
                               str(joints_list),
                               str(waitMotionDone)) )
         if joints_list is None:
-            joints_list = self.__joints_list__
-        disp = [0]*len(joints_list)
+            joints_list = range(0, self.__joints__)
+        disp  = [0]*len(joints_list)
         speed = [0]*len(joints_list)
-        tmp = yarp.Vector(len(joints_list))
-        encs=yarp.Vector(16)
+        tmp   = yarp.Vector(self.__joints__)
+        encs  = yarp.Vector(self.__joints__)
         while not self.__IEncoders__.getEncoders(encs.data()):
             yarp.delay(0.005)
         i = 0
@@ -146,20 +146,24 @@ class PositionController:
             res = self.waitMotionDone(timeout=timeout)
             if res:
                 self.__logger__.info("""Motion <%d> COMPLETED!
+                                    robot_part:%s, 
                                     target_joints:%s
                                     req_time:%.2f,
                                     joints_list=%s,
                                     waitMotionDone=%s""" %
                                     (self.__mot_id__,
+                                    self.__robot_part__.name,
                                     str(target_joints),
                                     req_time,
                                     str(joints_list),
                                     str(waitMotionDone)) )
             else:
                 self.__logger__.warning("""Motion <%d> TIMEOUT!
+                                    robot_part:%s, 
                                     target_joints:%s
                                     joints_list=%s""" %
                                     (self.__mot_id__,
+                                    self.__robot_part__,
                                     str(target_joints),
                                     str(joints_list)) )
 
@@ -171,18 +175,20 @@ class PositionController:
         joints_list = pose.joints_list
 
         self.__logger__.info("""Motion <%d> STARTED!
+                              robot_part:%s, 
                               target_joints:%s
                               req_time:%.2f,
                               vel_list=%s,
                               waitMotionDone=%s""" %
                               (self.__mot_id__,
+                              self.__robot_part__.name,
                               str(target_joints),
                               req_time,
                               str(vel_list),
                               str(waitMotionDone)) )
 
         if joints_list is None:
-            joints_list = self.__joints_list__
+            joints_list = range(0, self.__joints__)
         jl = yarp.Vector(len(joints_list))
         vl = yarp.Vector(len(vel_list))
         i = 0
@@ -195,11 +201,13 @@ class PositionController:
         if waitMotionDone is True:
             self.waitMotionDone(target_joints, joints_list, timeout=2*req_time)
         self.__logger__.debug("""Motion <%d> COMPLETED!
+                              robot_part:%s, 
                               target_joints:%s
                               req_time:%.2f,
                               vel_list=%s,
                               waitMotionDone=%s""" %
                               (self.__mot_id__,
+                              self.__robot_part__.name,
                               str(target_joints),
                               req_time,
                               str(vel_list),

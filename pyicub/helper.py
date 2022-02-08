@@ -159,13 +159,13 @@ class iCub:
             self._http_manager_ = None
 
         self._icub_parts_ = {}
-        self._icub_parts_[ICUB_PARTS.FACE] = iCubPart(ICUB_PARTS.FACE, 1)
-        self._icub_parts_[ICUB_PARTS.HEAD] = iCubPart(ICUB_PARTS.HEAD, 6)
-        self._icub_parts_[ICUB_PARTS.LEFT_ARM] = iCubPart(ICUB_PARTS.LEFT_ARM, 16)
-        self._icub_parts_[ICUB_PARTS.RIGHT_ARM] = iCubPart(ICUB_PARTS.RIGHT_ARM, 16)
-        self._icub_parts_[ICUB_PARTS.TORSO] = iCubPart(ICUB_PARTS.TORSO, 3)
-        self._icub_parts_[ICUB_PARTS.LEFT_LEG] = iCubPart(ICUB_PARTS.LEFT_LEG, 6)
-        self._icub_parts_[ICUB_PARTS.RIGHT_LEG] = iCubPart(ICUB_PARTS.RIGHT_LEG, 6)
+        self._icub_parts_[ICUB_PARTS.FACE]      = iCubPart(ICUB_PARTS.FACE      , 1)
+        self._icub_parts_[ICUB_PARTS.HEAD]      = iCubPart(ICUB_PARTS.HEAD      , 6)
+        self._icub_parts_[ICUB_PARTS.LEFT_ARM]  = iCubPart(ICUB_PARTS.LEFT_ARM  , 16)
+        self._icub_parts_[ICUB_PARTS.RIGHT_ARM] = iCubPart(ICUB_PARTS.RIGHT_ARM , 16)
+        self._icub_parts_[ICUB_PARTS.TORSO]     = iCubPart(ICUB_PARTS.TORSO     , 3)
+        self._icub_parts_[ICUB_PARTS.LEFT_LEG]  = iCubPart(ICUB_PARTS.LEFT_LEG  , 6)
+        self._icub_parts_[ICUB_PARTS.RIGHT_LEG] = iCubPart(ICUB_PARTS.RIGHT_LEG , 6)
 
         ROBOT_NAME = os.getenv('ICUB_NAME')
         if ROBOT_NAME is None:
@@ -257,15 +257,13 @@ class iCub:
     def portmonitor(self, yarp_src_port, activate_function, callback):
         self._monitors_.append(PortMonitor(yarp_src_port, activate_function, callback, period=0.01, autostart=True))
 
-    def getPositionController(self, robot_part, joints_list=None):
+    def getPositionController(self, robot_part):
         if not robot_part.name in self._position_controllers_.keys():
-            if joints_list is None:
-                joints_list = robot_part.joints_list
-            #try:
-            self._position_controllers_[robot_part.name] = PositionController(self._robot_, robot_part.name, joints_list)
-            #except:
-            #    self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % robot_part.name)
-            #    return None
+            try:
+                self._position_controllers_[robot_part.name] = PositionController(self._robot_, robot_part)
+            except:
+                self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % robot_part.name)
+                return None
         return self._position_controllers_[robot_part.name]
 
     def execCustomCall(self, custom_call: PyiCubCustomCall):
