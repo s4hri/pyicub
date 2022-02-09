@@ -137,17 +137,18 @@ class iCubFullbodyAction:
 
 class iCub:
 
-    def __init__(self, disable_logs=False, http_server=False):
+    def __init__(self, disable_logs=False, http_server=False, debug=False):
         self._position_controllers_ = {}
-        self._drivers_ = {}
-        self._encoders_ = {}
-        self._gaze_ctrl_ = None
-        self._emo_ = None
-        self._speech_ = None
-        self._face_ = None
-        self._facelandmarks_ = None
-        self._monitors_ = []
-        self._logger_ = YarpLogger.getLogger()
+        self._drivers_              = {}
+        self._encoders_             = {}
+        self._gaze_ctrl_            = None
+        self._emo_                  = None
+        self._speech_               = None
+        self._face_                 = None
+        self._facelandmarks_        = None
+        self._monitors_             = []
+        self._logger_               = YarpLogger.getLogger()
+        self._debug_                = debug
 
         if disable_logs:
             self._logger_.disable_logs()
@@ -259,7 +260,7 @@ class iCub:
     def getPositionController(self, robot_part):
         if not robot_part.name in self._position_controllers_.keys():
             try:
-                self._position_controllers_[robot_part.name] = PositionController(self._robot_, robot_part)
+                self._position_controllers_[robot_part.name] = PositionController(self._robot_, robot_part, self._debug_)
             except:
                 self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % robot_part.name)
                 return None

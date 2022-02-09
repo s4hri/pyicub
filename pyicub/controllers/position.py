@@ -14,7 +14,6 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-import pyicub.utils as utils
 
 from pyicub.core.logger import YarpLogger
 
@@ -68,20 +67,26 @@ class PositionController:
 
     WAITMOTIONDONE_PERIOD = 0.01
 
-    def __init__(self, robot, robot_part, logger=YarpLogger.getLogger()):
+    def __init__(self, robot, robot_part, debug, logger=YarpLogger.getLogger()):
         self.__logger__     = logger
         self.__robot__      = robot
         self.__robot_part__ = robot_part
+        self.__debugging__  = debug
         self.__Driver__     = self._getDriver_()
         if self.__Driver__:
             self.__IEncoders__        = self.__Driver__.viewIEncoders()
+            self.__IControlLimits__   = self.__Driver__.viewIControlLimits()
             self.__IControlMode__     = self.__Driver__.viewIControlMode()
             self.__IPositionControl__ = self.__Driver__.viewIPositionControl()
             self.__joints__           = self.__IPositionControl__.getAxes()
             self.__setPositionControlMode__(self.__joints__)
             self.__mot_id__ = 0
         else:
-            return False    
+            return False
+
+        if self.__debugging__:
+            self.__portTarget__ = yarp.BufferedPortVector()
+            self.__portTarget__.open("/" + self.__robot__ + "/" + self.__robot_part__.name + "/target:o")
 
     def _getRobotPartProperties_(self):
         props = yarp.Property()
@@ -101,12 +106,25 @@ class PositionController:
     def __setPositionControlMode__(self, joints):
         modes = yarp.IVector(joints, yarp.VOCAB_CM_POSITION)
         self.__IControlMode__.setControlModes(modes)
+
+    
+    def __exposeTarget__(self):
+        target = yarp.Vector(self.__joints__)
+        self.__IPositionControl__.getTargetPositions(target.data())
+        bot = self.__portTarget__.prepare()
+        bot.clear()
+        for i in range(target.size()):
+            bot.push_back(target[i])
+        self.__portTarget__.write()
         
     def getIPositionControl(self):
         return self.__IPositionControl__
 
     def getIEncoders(self):
         return self.__IEncoders__
+
+    def getIControlLimits(self):
+        return self.__IControlLimits__
 
     def move(self, pose: JointPose, req_time: float, timeout: float, waitMotionDone: bool=True):
         self.__mot_id__ += 1
@@ -142,6 +160,8 @@ class PositionController:
             self.__IPositionControl__.setRefSpeed(j, speed[i])
             self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
+        if self.__debugging__:
+            self.__exposeTarget__()
         if waitMotionDone is True:
             res = self.waitMotionDone(timeout=timeout)
             if res:
@@ -163,7 +183,7 @@ class PositionController:
                                     target_joints:%s
                                     joints_list=%s""" %
                                     (self.__mot_id__,
-                                    self.__robot_part__,
+                                    self.__robot_part__.name,
                                     str(target_joints),
                                     str(joints_list)) )
 
