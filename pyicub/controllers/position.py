@@ -69,16 +69,16 @@ class PositionController:
     WAITMOTIONDONE_PERIOD = 0.01
 
     def __init__(self, robot, robot_part, logger=YarpLogger.getLogger()):
-        self.__logger__   = logger
+        self.__logger__     = logger
         self.__robot__      = robot
         self.__robot_part__ = robot_part
-        self.__Driver__   = self._getDriver_()
+        self.__Driver__     = self._getDriver_()
         if self.__Driver__:
             self.__IEncoders__        = self.__Driver__.viewIEncoders()
             self.__IControlMode__     = self.__Driver__.viewIControlMode()
             self.__IPositionControl__ = self.__Driver__.viewIPositionControl()
             self.__joints__           = self.__IPositionControl__.getAxes()
-            self.__setPositionControlMode__(self.__joints__)        
+            self.__setPositionControlMode__(self.__joints__)
             self.__mot_id__ = 0
         else:
             return False    
@@ -101,7 +101,7 @@ class PositionController:
     def __setPositionControlMode__(self, joints):
         modes = yarp.IVector(joints, yarp.VOCAB_CM_POSITION)
         self.__IControlMode__.setControlModes(modes)
-
+        
     def getIPositionControl(self):
         return self.__IPositionControl__
 

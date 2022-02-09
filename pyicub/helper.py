@@ -138,7 +138,6 @@ class iCubFullbodyAction:
 class iCub:
 
     def __init__(self, disable_logs=False, http_server=False):
-        self._icub_controllers_ = {}
         self._position_controllers_ = {}
         self._drivers_ = {}
         self._encoders_ = {}
