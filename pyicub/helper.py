@@ -137,7 +137,7 @@ class iCubFullbodyAction:
 
 class iCub:
 
-    def __init__(self, disable_logs=False, http_server=False, debug=False):
+    def __init__(self, http_server=False, robot_name="icub", debug=True):
         self._position_controllers_ = {}
         self._drivers_              = {}
         self._encoders_             = {}
@@ -148,15 +148,6 @@ class iCub:
         self._facelandmarks_        = None
         self._monitors_             = []
         self._logger_               = YarpLogger.getLogger()
-        self._debug_                = debug
-
-        if disable_logs:
-            self._logger_.disable_logs()
-
-        if http_server:
-            self._http_manager_ = iCubHTTPManager()
-        else:
-            self._http_manager_ = None
 
         self._icub_parts_ = {}
         self._icub_parts_[ICUB_PARTS.FACE]      = iCubPart(ICUB_PARTS.FACE      , 1)
@@ -167,15 +158,44 @@ class iCub:
         self._icub_parts_[ICUB_PARTS.LEFT_LEG]  = iCubPart(ICUB_PARTS.LEFT_LEG  , 6)
         self._icub_parts_[ICUB_PARTS.RIGHT_LEG] = iCubPart(ICUB_PARTS.RIGHT_LEG , 6)
 
+
+        if http_server:
+            self._http_manager_ = iCubHTTPManager()
+        else:
+            self._http_manager_ = None
+
+
+        DEBUG = os.getenv('PYICUB_DEBUG')
+        if DEBUG is None:
+            self._debug_ = debug
+        else:
+            self._debug_ = DEBUG
+
+        if not self._debug_:
+            self._logger_.disable_logs()
+
+
         ROBOT_NAME = os.getenv('ICUB_NAME')
         if ROBOT_NAME is None:
-            self._robot_ = "icub"
+            self._robot_ = robot_name
         else:
             self._robot_ = ROBOT_NAME
 
         if self._http_manager_:
             self._registerDefaultServices_()
 
+
+        self._getPositionController_()
+
+
+    def _getPositionController_(self):
+        for part_name in self._icub_parts_.keys():
+            port_name = "/" + self._robot_ + "/" + part_name + "/state:o"
+            res = yarp.Network.queryName(port_name)
+            if res.isValid():
+                self._position_controllers_[part_name] = self.getPositionController(self._icub_parts_[part_name])
+            else:
+                self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % part_name)
 
     def _getPublicMethods(self, obj):
         object_methods = [method_name for method_name in dir(obj) if callable(getattr(obj, method_name))]
@@ -259,11 +279,7 @@ class iCub:
 
     def getPositionController(self, robot_part):
         if not robot_part.name in self._position_controllers_.keys():
-            try:
-                self._position_controllers_[robot_part.name] = PositionController(self._robot_, robot_part, self._debug_)
-            except:
-                self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % robot_part.name)
-                return None
+            self._position_controllers_[robot_part.name] = PositionController(self._robot_, robot_part, self._debug_)
         return self._position_controllers_[robot_part.name]
 
     def execCustomCall(self, custom_call: PyiCubCustomCall):

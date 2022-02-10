@@ -87,6 +87,7 @@ class PositionController:
         if self.__debugging__:
             self.__portTarget__ = yarp.BufferedPortVector()
             self.__portTarget__.open("/" + self.__robot__ + "/" + self.__robot_part__.name + "/target:o")
+            #self.__exposeTarget__()
 
     def _getRobotPartProperties_(self):
         props = yarp.Property()
