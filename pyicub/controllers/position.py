@@ -67,11 +67,10 @@ class PositionController:
 
     WAITMOTIONDONE_PERIOD = 0.01
 
-    def __init__(self, robot, robot_part, debug, logger=YarpLogger.getLogger()):
+    def __init__(self, robot, robot_part, logger=YarpLogger.getLogger()):
         self.__logger__     = logger
         self.__robot__      = robot
         self.__robot_part__ = robot_part
-        self.__debugging__  = debug
         self.__Driver__     = self._getDriver_()
         if self.__Driver__:
             self.__IEncoders__        = self.__Driver__.viewIEncoders()
@@ -83,14 +82,6 @@ class PositionController:
             self.__mot_id__ = 0
         else:
             return False
-
-        if self.__debugging__:
-            self.__port_ref_pos__ = yarp.BufferedPortVector()
-            self.__port_ref_vel__ = yarp.BufferedPortVector()
-            self.__port_ref_acc__ = yarp.BufferedPortVector()
-            self.__port_ref_pos__.open("/" + self.__robot__ + "/" + self.__robot_part__.name + "/ref_pos:o")
-            self.__port_ref_vel__.open("/" + self.__robot__ + "/" + self.__robot_part__.name + "/ref_vel:o")
-            self.__port_ref_acc__.open("/" + self.__robot__ + "/" + self.__robot_part__.name + "/ref_acc:o")
 
     def _getRobotPartProperties_(self):
         props = yarp.Property()
@@ -110,28 +101,6 @@ class PositionController:
     def __setPositionControlMode__(self, joints):
         modes = yarp.IVector(joints, yarp.VOCAB_CM_POSITION)
         self.__IControlMode__.setControlModes(modes)
-
-    
-    def __exposeTarget__(self):
-        ref_pos = yarp.Vector(self.__joints__)
-        ref_vel = yarp.Vector(self.__joints__)
-        ref_acc = yarp.Vector(self.__joints__)
-        self.__IPositionControl__.getTargetPositions(ref_pos.data())
-        self.__IPositionControl__.getRefSpeeds(ref_vel.data())
-        self.__IPositionControl__.getRefAccelerations(ref_acc.data())
-        bot_ref_pos = self.__port_ref_pos__.prepare()
-        bot_ref_vel = self.__port_ref_vel__.prepare()
-        bot_ref_acc = self.__port_ref_acc__.prepare()
-        bot_ref_pos.clear()
-        bot_ref_vel.clear()
-        bot_ref_acc.clear()
-        for i in range(self.__joints__):
-            bot_ref_pos.push_back(ref_pos[i])
-            bot_ref_vel.push_back(ref_vel[i])
-            bot_ref_acc.push_back(ref_acc[i])
-        self.__port_ref_pos__.write()
-        self.__port_ref_vel__.write()
-        self.__port_ref_acc__.write()
         
     def getIPositionControl(self):
         return self.__IPositionControl__
@@ -176,8 +145,6 @@ class PositionController:
             self.__IPositionControl__.setRefSpeed(j, speed[i])
             self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
-        if self.__debugging__:
-            self.__exposeTarget__()
         if waitMotionDone is True:
             res = self.waitMotionDone(timeout=timeout)
             if res:
@@ -236,7 +203,7 @@ class PositionController:
             i+=1
         if waitMotionDone is True:
             self.waitMotionDone(target_joints, joints_list, timeout=2*req_time)
-        self.__logger__.debug("""Motion <%d> COMPLETED!
+        self.__logger__.info("""Motion <%d> COMPLETED!
                               robot_part:%s, 
                               target_joints:%s
                               req_time:%.2f,

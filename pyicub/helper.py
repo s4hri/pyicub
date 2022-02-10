@@ -139,8 +139,6 @@ class iCub:
 
     def __init__(self, http_server=False, robot_name="icub", debug=True):
         self._position_controllers_ = {}
-        self._drivers_              = {}
-        self._encoders_             = {}
         self._gaze_ctrl_            = None
         self._emo_                  = None
         self._speech_               = None
@@ -150,12 +148,12 @@ class iCub:
         self._logger_               = YarpLogger.getLogger()
 
         self._icub_parts_ = {}
-        self._icub_parts_[ICUB_PARTS.FACE]      = iCubPart(ICUB_PARTS.FACE      , 1)
-        self._icub_parts_[ICUB_PARTS.HEAD]      = iCubPart(ICUB_PARTS.HEAD      , 6)
-        self._icub_parts_[ICUB_PARTS.LEFT_ARM]  = iCubPart(ICUB_PARTS.LEFT_ARM  , 16)
+        self._icub_parts_[ICUB_PARTS.FACE     ] = iCubPart(ICUB_PARTS.FACE      , 1)
+        self._icub_parts_[ICUB_PARTS.HEAD     ] = iCubPart(ICUB_PARTS.HEAD      , 6)
+        self._icub_parts_[ICUB_PARTS.LEFT_ARM ] = iCubPart(ICUB_PARTS.LEFT_ARM  , 16)
         self._icub_parts_[ICUB_PARTS.RIGHT_ARM] = iCubPart(ICUB_PARTS.RIGHT_ARM , 16)
-        self._icub_parts_[ICUB_PARTS.TORSO]     = iCubPart(ICUB_PARTS.TORSO     , 3)
-        self._icub_parts_[ICUB_PARTS.LEFT_LEG]  = iCubPart(ICUB_PARTS.LEFT_LEG  , 6)
+        self._icub_parts_[ICUB_PARTS.TORSO    ] = iCubPart(ICUB_PARTS.TORSO     , 3)
+        self._icub_parts_[ICUB_PARTS.LEFT_LEG ] = iCubPart(ICUB_PARTS.LEFT_LEG  , 6)
         self._icub_parts_[ICUB_PARTS.RIGHT_LEG] = iCubPart(ICUB_PARTS.RIGHT_LEG , 6)
 
 
@@ -279,7 +277,7 @@ class iCub:
 
     def getPositionController(self, robot_part):
         if not robot_part.name in self._position_controllers_.keys():
-            self._position_controllers_[robot_part.name] = PositionController(self._robot_, robot_part, self._debug_)
+            self._position_controllers_[robot_part.name] = PositionController(self._robot_, robot_part)
         return self._position_controllers_[robot_part.name]
 
     def execCustomCall(self, custom_call: PyiCubCustomCall):
