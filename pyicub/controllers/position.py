@@ -85,9 +85,12 @@ class PositionController:
             return False
 
         if self.__debugging__:
-            self.__portTarget__ = yarp.BufferedPortVector()
-            self.__portTarget__.open("/" + self.__robot__ + "/" + self.__robot_part__.name + "/target:o")
-            #self.__exposeTarget__()
+            self.__port_ref_pos__ = yarp.BufferedPortVector()
+            self.__port_ref_vel__ = yarp.BufferedPortVector()
+            self.__port_ref_acc__ = yarp.BufferedPortVector()
+            self.__port_ref_pos__.open("/" + self.__robot__ + "/" + self.__robot_part__.name + "/ref_pos:o")
+            self.__port_ref_vel__.open("/" + self.__robot__ + "/" + self.__robot_part__.name + "/ref_vel:o")
+            self.__port_ref_acc__.open("/" + self.__robot__ + "/" + self.__robot_part__.name + "/ref_acc:o")
 
     def _getRobotPartProperties_(self):
         props = yarp.Property()
@@ -110,13 +113,25 @@ class PositionController:
 
     
     def __exposeTarget__(self):
-        target = yarp.Vector(self.__joints__)
-        self.__IPositionControl__.getTargetPositions(target.data())
-        bot = self.__portTarget__.prepare()
-        bot.clear()
-        for i in range(target.size()):
-            bot.push_back(target[i])
-        self.__portTarget__.write()
+        ref_pos = yarp.Vector(self.__joints__)
+        ref_vel = yarp.Vector(self.__joints__)
+        ref_acc = yarp.Vector(self.__joints__)
+        self.__IPositionControl__.getTargetPositions(ref_pos.data())
+        self.__IPositionControl__.getRefSpeeds(ref_vel.data())
+        self.__IPositionControl__.getRefAccelerations(ref_acc.data())
+        bot_ref_pos = self.__port_ref_pos__.prepare()
+        bot_ref_vel = self.__port_ref_vel__.prepare()
+        bot_ref_acc = self.__port_ref_acc__.prepare()
+        bot_ref_pos.clear()
+        bot_ref_vel.clear()
+        bot_ref_acc.clear()
+        for i in range(self.__joints__):
+            bot_ref_pos.push_back(ref_pos[i])
+            bot_ref_vel.push_back(ref_vel[i])
+            bot_ref_acc.push_back(ref_acc[i])
+        self.__port_ref_pos__.write()
+        self.__port_ref_vel__.write()
+        self.__port_ref_acc__.write()
         
     def getIPositionControl(self):
         return self.__IPositionControl__
