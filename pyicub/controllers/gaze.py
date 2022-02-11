@@ -29,8 +29,8 @@ class GazeMotion:
 
 class GazeController:
 
-    WAITMOTION_PERIOD = 0.01
-    WAITMOTIONDONE_TIMEOUT = 5.0
+    WAITMOTION_PERIOD = 0.1
+    WAITMOTIONDONE_TIMEOUT = 1.5
 
     def __init__(self, robot, logger=YarpLogger.getLogger()):
         self.__logger__ = logger

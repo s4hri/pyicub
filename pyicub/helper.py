@@ -191,7 +191,7 @@ class iCub:
             port_name = "/" + self._robot_ + "/" + part_name + "/state:o"
             res = yarp.Network.queryName(port_name)
             if res.isValid():
-                self._position_controllers_[part_name] = self.getPositionController(self._icub_parts_[part_name])
+                self._position_controllers_[part_name] = PositionController(self._robot_, self._icub_parts_[part_name])
             else:
                 self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % part_name)
 
@@ -277,8 +277,11 @@ class iCub:
 
     def getPositionController(self, robot_part):
         if not robot_part.name in self._position_controllers_.keys():
-            self._position_controllers_[robot_part.name] = PositionController(self._robot_, robot_part)
-        return self._position_controllers_[robot_part.name]
+            self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % robot_part.name)
+            return None
+        else:
+            return self._position_controllers_[robot_part.name]
+
 
     def execCustomCall(self, custom_call: PyiCubCustomCall):
         calls = custom_call.target.split('.')
