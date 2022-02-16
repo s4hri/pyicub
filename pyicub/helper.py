@@ -183,10 +183,10 @@ class iCub:
             self._registerDefaultServices_()
 
 
-        self._getPositionController_()
+        self._initPositionController_()
 
 
-    def _getPositionController_(self):
+    def _initPositionController_(self):
         for part_name in self._icub_parts_.keys():
             port_name = "/" + self._robot_ + "/" + part_name + "/state:o"
             res = yarp.Network.queryName(port_name)
@@ -271,6 +271,14 @@ class iCub:
                 self._logger_.warning('iSpeakPyCtrl non correctly initialized!')
                 return None
         return self._speech_
+    
+    @property
+    def parts(self):
+        return self._icub_parts_
+
+    @property
+    def robot_name(self):
+        return self._robot_
 
     def portmonitor(self, yarp_src_port, activate_function, callback):
         self._monitors_.append(PortMonitor(yarp_src_port, activate_function, callback, period=0.01, autostart=True))

@@ -13,6 +13,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
+import os
 import yarp
 
 from pyicub.core.logger import YarpLogger
@@ -68,25 +69,23 @@ class PositionController:
     WAITMOTIONDONE_PERIOD = 0.01
 
     def __init__(self, robot, robot_part, logger=YarpLogger.getLogger()):
+        self.__pid__        = str(os.getpid())
         self.__logger__     = logger
         self.__robot__      = robot
         self.__robot_part__ = robot_part
-        self.__Driver__     = self._getDriver_()
-        if self.__Driver__:
-            self.__IEncoders__        = self.__Driver__.viewIEncoders()
-            self.__IControlLimits__   = self.__Driver__.viewIControlLimits()
-            self.__IControlMode__     = self.__Driver__.viewIControlMode()
-            self.__IPositionControl__ = self.__Driver__.viewIPositionControl()
-            self.__joints__           = self.__IPositionControl__.getAxes()
-            self.__setPositionControlMode__(self.__joints__)
-            self.__mot_id__ = 0
-        else:
-            return False
+        self.__driver__     = self._getDriver_()
+        self.__IEncoders__        = self.__driver__.viewIEncoders()
+        self.__IControlLimits__   = self.__driver__.viewIControlLimits()
+        self.__IControlMode__     = self.__driver__.viewIControlMode()
+        self.__IPositionControl__ = self.__driver__.viewIPositionControl()
+        self.__joints__           = self.__IPositionControl__.getAxes()
+        self.__setPositionControlMode__(self.__joints__)
+        self.__mot_id__ = 0
 
     def _getRobotPartProperties_(self):
         props = yarp.Property()
         props.put("device","remote_controlboard")
-        props.put("local","/client/" + self.__robot__ + "/" + self.__robot_part__.name)
+        props.put("local","/client/" + self.__pid__ + self.__robot__ + "/" + self.__robot_part__.name)
         props.put("remote","/" + self.__robot__ + "/" + self.__robot_part__.name)
         return props
 
