@@ -175,9 +175,9 @@ class iCub:
 
         ROBOT_NAME = os.getenv('ICUB_NAME')
         if ROBOT_NAME is None:
-            self._robot_ = robot_name
+            self._robot_name_ = robot_name
         else:
-            self._robot_ = ROBOT_NAME
+            self._robot_name_ = ROBOT_NAME
 
         if self._http_manager_:
             self._registerDefaultServices_()
@@ -188,10 +188,10 @@ class iCub:
 
     def _initPositionController_(self):
         for part_name in self._icub_parts_.keys():
-            port_name = "/" + self._robot_ + "/" + part_name + "/state:o"
+            port_name = "/" + self.robot_name + "/" + part_name + "/state:o"
             res = yarp.Network.queryName(port_name)
             if res.isValid():
-                self._position_controllers_[part_name] = PositionController(self._robot_, self._icub_parts_[part_name])
+                self._position_controllers_[part_name] = PositionController(self.robot_name, self._icub_parts_[part_name])
             else:
                 self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % part_name)
 
@@ -222,7 +222,7 @@ class iCub:
     def gaze(self):
         if self._gaze_ctrl_ is None:
             try:
-                self._gaze_ctrl_ = GazeController(self._robot_)
+                self._gaze_ctrl_ = GazeController(self.robot_name)
             except:
                 self._logger_.warning('GazeController non correctly initialized!')
                 return None
@@ -232,7 +232,7 @@ class iCub:
     def face(self):
         if self._face_ is None:
             try:
-                self._face_ = facePyCtrl(self._robot_)
+                self._face_ = facePyCtrl(self.robot_name)
             except:
                 self._logger_.warning('facePyCtrl non correctly initialized!')
                 return None
@@ -256,7 +256,7 @@ class iCub:
     def emo(self):
         if self._emo_ is None:
             try:
-                self._emo_ = emotionsPyCtrl(self._robot_)
+                self._emo_ = emotionsPyCtrl(self.robot_name)
             except: 
                 self._logger_.warning('emotionsPyCtrl non correctly initialized!')
                 return None
@@ -278,7 +278,7 @@ class iCub:
 
     @property
     def robot_name(self):
-        return self._robot_
+        return self._robot_name_
 
     def portmonitor(self, yarp_src_port, activate_function, callback):
         self._monitors_.append(PortMonitor(yarp_src_port, activate_function, callback, period=0.01, autostart=True))
