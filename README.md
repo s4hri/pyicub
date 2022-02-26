@@ -1,1 +1,2 @@
-![PYICUB logo](media/pyicub-logo.png?raw=true)
+![PYICUB logo](pyicub/media/pyicub-logo.png?raw=true)
+====
