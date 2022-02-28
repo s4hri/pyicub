@@ -28,7 +28,7 @@
                                 "joints_list": null
                             },
                             "duration": 1.0,
-                            "timeout": 2.0
+                            "timeout": 10.0
                         },
                         {
                             "pose": {
@@ -53,7 +53,7 @@
                                 "joints_list": null
                             },
                             "duration": 1.0,
-                            "timeout": 2.0
+                            "timeout": 10.0
                         }
                     ]
                 }
@@ -103,7 +103,7 @@
                                 "joints_list": null
                             },
                             "duration": 1.0,
-                            "timeout": 2.0
+                            "timeout": 10.0
                         },
                         {
                             "pose": {
@@ -128,7 +128,7 @@
                                 "joints_list": null
                             },
                             "duration": 1.0,
-                            "timeout": 2.0
+                            "timeout": 10.0
                         }
                     ]
                 }
@@ -165,7 +165,7 @@
                                 "joints_list": null
                             },
                             "duration": 1.0,
-                            "timeout": 2.0
+                            "timeout": 10.0
                         },
                         {
                             "pose": {
@@ -190,7 +190,7 @@
                                 "joints_list": null
                             },
                             "duration": 1.0,
-                            "timeout": 2.0
+                            "timeout": 10.0
                         }
                     ]
                 },
@@ -220,7 +220,7 @@
                                 "joints_list": null
                             },
                             "duration": 1.0,
-                            "timeout": 2.0
+                            "timeout": 10.0
                         },
                         {
                             "pose": {
@@ -245,7 +245,7 @@
                                 "joints_list": null
                             },
                             "duration": 1.0,
-                            "timeout": 2.0
+                            "timeout": 10.0
                         }
                     ]
                 }
