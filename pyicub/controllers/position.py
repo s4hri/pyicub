@@ -68,8 +68,8 @@ class LimbMotion:
 
 class PositionController:
 
-    WAITMOTIONDONE_PERIOD = 0.01
-    MIN_JOINTS_DIST = 15
+    WAITMOTIONDONE_PERIOD = 0.1
+    MOTION_COMPLETE_AT = 0.9
     DEFAULT_TIMEOUT = 10.0
 
     def __init__(self, robot, robot_part, logger=YarpLogger.getLogger()):
@@ -90,7 +90,7 @@ class PositionController:
     def _getRobotPartProperties_(self):
         props = yarp.Property()
         props.put("device","remote_controlboard")
-        props.put("local","/client/" + self.__pid__ + self.__robot__ + "/" + self.__robot_part__.name)
+        props.put("local","/client/" + self.__pid__ + "/" + self.__robot__ + "/" + self.__robot_part__.name)
         props.put("remote","/" + self.__robot__ + "/" + self.__robot_part__.name)
         return props
 
@@ -225,9 +225,9 @@ class PositionController:
                               str(waitMotionDone)) )
     
 
-    def setCustomWaitMotionDone(self, min_joints_dist=MIN_JOINTS_DIST):
+    def setCustomWaitMotionDone(self, motion_complete_at=MOTION_COMPLETE_AT):
         self.__waitMotionDone__ = self.waitMotionDone2
-        PositionController.MIN_JOINTS_DIST = min_joints_dist
+        PositionController.MOTION_COMPLETE_AT = motion_complete_at
 
     def unsetCustomWaitMotionDone(self):
         self.__waitMotionDone__ = self.waitMotionDone
@@ -245,6 +245,7 @@ class PositionController:
         target_pos = yarp.Vector(self.__joints__)
         encs=yarp.Vector(self.__joints__)
         self.__IPositionControl__.getTargetPositions(target_pos.data())
+        count = 0
         while (time.perf_counter() - t0) < timeout:
             while not self.__IEncoders__.getEncoders(encs.data()):
                 yarp.delay(0.05)
@@ -253,8 +254,11 @@ class PositionController:
             for i in range(0, self.__joints__):
                 v.append(encs[i])
                 w.append(target_pos[i])
+            if count == 0:
+                tot_disp = utils.vector_distance(v, w)
+            count+=1
             dist = utils.vector_distance(v, w)
-            if dist < PositionController.MIN_JOINTS_DIST:
+            if dist <= (1.0 - PositionController.MOTION_COMPLETE_AT)*tot_disp:
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
         return False
