@@ -158,7 +158,7 @@ class iCub:
 
 
         if http_server:
-            self._http_manager_ = iCubHTTPManager()
+            self._http_manager_ = iCubHTTPManager(host=http_server)
         else:
             self._http_manager_ = None
 
