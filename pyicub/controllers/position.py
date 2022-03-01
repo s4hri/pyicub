@@ -118,6 +118,8 @@ class PositionController:
         self.__mot_id__ += 1
         target_joints = pose.target_joints
         joints_list = pose.joints_list
+        if timeout == 0.0:
+            timeout = req_time
         self.__logger__.info("""Motion <%d> STARTED!
                               robot_part:%s, 
                               target_joints:%s
@@ -149,10 +151,7 @@ class PositionController:
             self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
         if waitMotionDone is True:
-            if timeout == 0.0:
-                res = self.__waitMotionDone__(timeout=req_time)
-            else:
-                res = self.__waitMotionDone__(timeout=timeout)
+            res = self.__waitMotionDone__(timeout=timeout)
             if res:
                 self.__logger__.info("""Motion <%d> COMPLETED!
                                     robot_part:%s, 
