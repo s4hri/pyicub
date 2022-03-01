@@ -114,7 +114,7 @@ class PositionController:
     def getIControlLimits(self):
         return self.__IControlLimits__
 
-    def move(self, pose: JointPose, req_time: float, timeout: float, waitMotionDone: bool=True):
+    def move(self, pose: JointPose, req_time: float, timeout: float=0.0, waitMotionDone: bool=True):
         self.__mot_id__ += 1
         target_joints = pose.target_joints
         joints_list = pose.joints_list
@@ -149,7 +149,10 @@ class PositionController:
             self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
         if waitMotionDone is True:
-            res = self.__waitMotionDone__(timeout=timeout)
+            if timeout == 0.0:
+                res = self.__waitMotionDone__(timeout=req_time)
+            else:
+                res = self.__waitMotionDone__(timeout=timeout)
             if res:
                 self.__logger__.info("""Motion <%d> COMPLETED!
                                     robot_part:%s, 
