@@ -14,7 +14,7 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-yarp.Network().init()
+#yarp.Network().init()
 from pyicub.controllers.gaze import GazeMotion, GazeController
 from pyicub.controllers.position import JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubPart, PositionController
 from pyicub.modules.emotions import emotionsPyCtrl
@@ -184,7 +184,6 @@ class iCub:
 
 
         self._initPositionController_()
-
 
     def _initPositionController_(self):
         for part_name in self._icub_parts_.keys():

@@ -52,7 +52,7 @@ class JointPoseVel:
 
 class JointsTrajectoryCheckpoint:
 
-    def __init__(self, pose: JointPose, duration: float, timeout: float=0.0):
+    def __init__(self, pose: JointPose, duration: float=0.0, timeout: float=0.0):
         self.pose = pose
         self.duration = duration
         self.timeout = timeout
@@ -77,7 +77,7 @@ class PositionController:
         self.__logger__     = logger
         self.__robot__      = robot
         self.__robot_part__ = robot_part
-        self.__driver__     = self._getDriver_()
+        self.__driver__ = self._getDriver_()
         self.__IEncoders__        = self.__driver__.viewIEncoders()
         self.__IControlLimits__   = self.__driver__.viewIControlLimits()
         self.__IControlMode__     = self.__driver__.viewIControlMode()
@@ -100,6 +100,7 @@ class PositionController:
         if driver.isValid():
             return driver
         else:
+            self.__logger__.warning("Driver not properly initialized props=%s" % str(props))
             return False
 
     def __setPositionControlMode__(self, joints):

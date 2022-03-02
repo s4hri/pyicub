@@ -21,7 +21,7 @@ head_ctrl = icub.getPositionController(icub.parts[ICUB_PARTS.HEAD])
 up = JointPose(target_joints=[30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
 down = JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
 home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
-
+"""
 t0 = time.perf_counter()
 head_ctrl.move(up, req_time=3.0)
 print("Time: ", time.perf_counter() - t0)
@@ -31,3 +31,4 @@ head_ctrl.move(up)
 print("Time: ", time.perf_counter() - t0)
 head_ctrl.move(home, speed=20.0)
 print("Time: ", time.perf_counter() - t0)
+"""
