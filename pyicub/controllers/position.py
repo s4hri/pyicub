@@ -115,7 +115,7 @@ class PositionController:
     def getIControlLimits(self):
         return self.__IControlLimits__
 
-    def move(self, pose: JointPose, req_time: float, timeout: float=0.0, waitMotionDone: bool=True):
+    def move(self, pose: JointPose, req_time: float=0.0, timeout: float=0.0, speed: float=10.0, waitMotionDone: bool=True):
         self.__mot_id__ += 1
         target_joints = pose.target_joints
         joints_list = pose.joints_list
@@ -135,22 +135,35 @@ class PositionController:
                               str(waitMotionDone)) )
         if joints_list is None:
             joints_list = range(0, self.__joints__)
-        disp  = [0]*len(joints_list)
-        speed = [0]*len(joints_list)
-        tmp   = yarp.Vector(self.__joints__)
-        encs  = yarp.Vector(self.__joints__)
-        while not self.__IEncoders__.getEncoders(encs.data()):
-            yarp.delay(0.005)
-        i = 0
-        for j in joints_list:
-            tmp.set(i, target_joints[i])
-            disp[i] = target_joints[i] - encs[j]
-            if disp[i] < 0.0:
-                disp[i] =- disp[i]
-            speed[i] = disp[i]/req_time
-            self.__IPositionControl__.setRefSpeed(j, speed[i])
-            self.__IPositionControl__.positionMove(j, tmp[i])
-            i+=1
+
+        if req_time > 0.0:
+            disp  = [0]*len(joints_list)
+            speeds = [0]*len(joints_list)
+            tmp   = yarp.Vector(self.__joints__)
+            encs  = yarp.Vector(self.__joints__)
+            while not self.__IEncoders__.getEncoders(encs.data()):
+                yarp.delay(0.005)
+            i = 0
+            for j in joints_list:
+                tmp.set(i, target_joints[i])
+                disp[i] = target_joints[i] - encs[j]
+                if disp[i] < 0.0:
+                    disp[i] =- disp[i]
+                speeds[i] = disp[i]/req_time
+                self.__IPositionControl__.setRefSpeed(j, speeds[i])
+                self.__IPositionControl__.positionMove(j, tmp[i])
+                i+=1
+        else:
+            speeds = [0]*len(joints_list)
+            tmp   = yarp.Vector(self.__joints__)
+            i = 0
+            for j in joints_list:
+                tmp.set(i, target_joints[i])
+                speeds[i] = speed
+                self.__IPositionControl__.setRefSpeed(j, speeds[i])
+                self.__IPositionControl__.positionMove(j, tmp[i])
+                i+=1
+
         if waitMotionDone is True:
             res = self.__waitMotionDone__(timeout=timeout)
             if res:
