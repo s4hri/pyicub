@@ -29,9 +29,6 @@ class GazeMotion:
 
 class GazeController:
 
-    WAITMOTION_PERIOD = 0.1
-    WAITMOTIONDONE_TIMEOUT = 5.0
-
     def __init__(self, robot, logger=YarpLogger.getLogger()):
         self.__logger__ = logger
         self.__props__ = yarp.Property()
@@ -55,7 +52,7 @@ class GazeController:
     def IGazeControl(self):
         return self.__IGazeControl__
 
-    def __lookAtAbsAngles__(self, angles, waitMotionDone=True, timeout=WAITMOTIONDONE_TIMEOUT):
+    def __lookAtAbsAngles__(self, angles, waitMotionDone=True, timeout=0.0):
         self.__mot_id__ += 1
         self.__logger__.info("""Looking at angles <%d> STARTED!
                                  angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
@@ -71,7 +68,7 @@ class GazeController:
                                        angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
 
 
-    def __lookAtRelAngles__(self, angles, waitMotionDone=True, timeout=WAITMOTIONDONE_TIMEOUT):
+    def __lookAtRelAngles__(self, angles, waitMotionDone=True, timeout=0.0):
         self.__mot_id__ += 1
         self.__logger__.info("""Looking at rel angles <%d> STARTED!
                                  angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
@@ -104,21 +101,21 @@ class GazeController:
         self.IGazeControl.clearNeckRoll()
         self.IGazeControl.clearNeckPitch()
 
-    def lookAtAbsAngles(self, azi, ele, ver, waitMotionDone=True, timeout=WAITMOTIONDONE_TIMEOUT):
+    def lookAtAbsAngles(self, azi, ele, ver, waitMotionDone=True, timeout=0.0):
         angles = yarp.Vector(3)
         angles.set(0, azi)
         angles.set(1, ele)
         angles.set(2, ver)
         self.__lookAtAbsAngles__(angles, waitMotionDone, timeout)
 
-    def lookAtRelAngles(self, azi, ele, ver, waitMotionDone=True, timeout=WAITMOTIONDONE_TIMEOUT):
+    def lookAtRelAngles(self, azi, ele, ver, waitMotionDone=True, timeout=0.0):
         angles = yarp.Vector(3)
         angles.set(0, azi)
         angles.set(1, ele)
         angles.set(2, ver)
         self.__lookAtRelAngles__(angles, waitMotionDone, timeout)
 
-    def lookAtFixationPoint(self, x, y, z, waitMotionDone=True, timeout=WAITMOTIONDONE_TIMEOUT):
+    def lookAtFixationPoint(self, x, y, z, waitMotionDone=True, timeout=0.0):
         p = yarp.Vector(3)
         p.set(0, x)
         p.set(1, y)
@@ -138,10 +135,11 @@ class GazeController:
     def setTrackingMode(self, mode):
         self.IGazeControl.setTrackingMode(mode)
 
-    def waitMotionDone(self, period=WAITMOTION_PERIOD, timeout=WAITMOTIONDONE_TIMEOUT):
+    def waitMotionDone(self, period=0.1, timeout=0.0):
+        print(timeout)
         return self.IGazeControl.waitMotionDone(period=period, timeout=timeout)
 
-    def waitMotionOnset(self, speed_ref=0, period=WAITMOTION_PERIOD, max_attempts=50):
+    def waitMotionOnset(self, speed_ref=0, period=0.1, max_attempts=50):
         self.__logger__.info("""Waiting for gaze motion onset STARTED!
                                  speed_ref=%s""" % str(speed_ref))
         q = yarp.Vector(6)
