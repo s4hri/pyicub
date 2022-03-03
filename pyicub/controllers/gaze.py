@@ -136,7 +136,6 @@ class GazeController:
         self.IGazeControl.setTrackingMode(mode)
 
     def waitMotionDone(self, period=0.1, timeout=0.0):
-        print(timeout)
         return self.IGazeControl.waitMotionDone(period=period, timeout=timeout)
 
     def waitMotionOnset(self, speed_ref=0, period=0.1, max_attempts=50):
