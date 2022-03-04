@@ -123,17 +123,22 @@ class PositionController:
         if timeout == 0.0:
             timeout = PositionController.DEFAULT_TIMEOUT
         self.__logger__.info("""Motion <%d> STARTED!
-                              robot_part:%s, 
-                              target_joints:%s
-                              req_time:%.2f,
-                              joints_list=%s,
-                              waitMotionDone=%s""" %
-                              (self.__mot_id__,
-                              self.__robot_part__.name,
-                              str(target_joints),
-                              req_time,
-                              str(joints_list),
-                              str(waitMotionDone)) )
+                                robot_part:%s, 
+                                target_joints:%s,
+                                req_time:%.2f,
+                                joints_list=%s,
+                                waitMotionDone=%s,
+                                timeout=%s""" %
+                                (
+                                  self.__mot_id__         ,
+                                  self.__robot_part__.name,
+                                  str(target_joints)      ,
+                                  req_time                ,
+                                  str(joints_list)        ,
+                                  str(waitMotionDone)     ,
+                                  str(timeout)
+                                )
+                            )
         if joints_list is None:
             joints_list = range(0, self.__joints__)
 
@@ -169,26 +174,38 @@ class PositionController:
             res = self.__waitMotionDone__(timeout=timeout)
             if res:
                 self.__logger__.info("""Motion <%d> COMPLETED!
-                                    robot_part:%s, 
-                                    target_joints:%s
-                                    req_time:%.2f,
-                                    joints_list=%s,
-                                    waitMotionDone=%s""" %
-                                    (self.__mot_id__,
+                                robot_part:%s, 
+                                target_joints:%s
+                                req_time:%.2f,
+                                joints_list=%s,
+                                waitMotionDone=%s,
+                                timeout=%s""" %
+                                (
+                                    self.__mot_id__         ,
                                     self.__robot_part__.name,
-                                    str(target_joints),
-                                    req_time,
-                                    str(joints_list),
-                                    str(waitMotionDone)) )
+                                    str(target_joints)      ,
+                                    req_time                ,
+                                    str(joints_list)        ,
+                                    str(waitMotionDone)     ,
+                                    str(timeout)
+                                ))
             else:
                 self.__logger__.warning("""Motion <%d> TIMEOUT!
-                                    robot_part:%s, 
-                                    target_joints:%s
-                                    joints_list=%s""" %
-                                    (self.__mot_id__,
+                                robot_part:%s, 
+                                target_joints:%s
+                                req_time:%.2f,
+                                joints_list=%s,
+                                waitMotionDone=%s,
+                                timeout=%s""" %
+                                (
+                                    self.__mot_id__         ,
                                     self.__robot_part__.name,
-                                    str(target_joints),
-                                    str(joints_list)) )
+                                    str(target_joints)      ,
+                                    req_time                ,
+                                    str(joints_list)        ,
+                                    str(waitMotionDone)     ,
+                                    str(timeout)
+                                ))
 
 
 
