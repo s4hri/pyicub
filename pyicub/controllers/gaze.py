@@ -55,23 +55,23 @@ class GazeController:
     def __lookAtAbsAngles__(self, angles, waitMotionDone=True, timeout=0.0):
         self.__mot_id__ += 1
         self.__logger__.info("""Looking at angles <%d> STARTED!
-                                 angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+                                 angles=%s, waitMotionDone=%s, timeout=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone), str(timeout)) )
         self.IGazeControl.lookAtAbsAngles(angles)
         res = True
         if waitMotionDone is True:
             res = self.waitMotionDone(timeout=timeout)
         if res:
             self.__logger__.info("""Looking at angles <%d> COMPLETED!
-                                    angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+                                    angles=%s, waitMotionDone=%s, timeout=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone), str(timeout)) )
         else:
             self.__logger__.warning("""Looking at angles <%d> TIMEOUT!
-                                       angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+                                       angles=%s, waitMotionDone=%s, timeout=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone), str(timeout)) )
 
 
     def __lookAtRelAngles__(self, angles, waitMotionDone=True, timeout=0.0):
         self.__mot_id__ += 1
         self.__logger__.info("""Looking at rel angles <%d> STARTED!
-                                 angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+                                 angles=%s, waitMotionDone=%s, timeout=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone), str(timeout)) )
         res = self.checkTargets(angles)
         if not res:
             self.IGazeControl.lookAtRelAngles(angles)
@@ -79,10 +79,10 @@ class GazeController:
                 res = self.waitMotionDone(angles, timeout)
         if res:
            self.__logger__.info("""Looking at rel angles <%d> COMPLETED!
-                                   angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+                                   angles=%s, waitMotionDone=%s, timeout=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone), str(timeout)) )
         else:
            self.__logger__.warning("""Looking at rel angles <%d> TIMEOUT!
-                                      angles=%s, waitMotionDone=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone)) )
+                                      angles=%s, waitMotionDone=%s, timeout=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone), str(timeout)) )
 
 
     def blockEyes(self, vergence):

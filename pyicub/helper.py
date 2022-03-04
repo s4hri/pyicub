@@ -302,7 +302,7 @@ class iCub:
     def moveGaze(self, gaze_motion: GazeMotion):
         for i in range(0, len(gaze_motion.checkpoints)):
             req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=getattr(self.gaze, gaze_motion.lookat_method))
-            req.run(gaze_motion.checkpoints[i][0], gaze_motion.checkpoints[i][1], gaze_motion.checkpoints[i][2])
+            req.run(*gaze_motion.checkpoints[i])
             req.wait_for_completed()
 
     def movePart(self, limb_motion: LimbMotion):
