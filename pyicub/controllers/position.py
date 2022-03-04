@@ -42,14 +42,6 @@ class JointPose:
         self.target_joints = target_joints
         self.joints_list = joints_list
 
-
-class JointPoseVel:
-
-    def __init__(self, target_position, vel_list, joints_list=None):
-        self.target_position = target_position
-        self.vel_list = vel_list
-        self.joints_list = joints_list
-
 class JointsTrajectoryCheckpoint:
 
     def __init__(self, pose: JointPose, duration: float=0.0, timeout: float=0.0):
@@ -207,54 +199,6 @@ class PositionController:
                                     str(timeout)
                                 ))
 
-
-
-    
-    def moveRefVel(self, pose: JointPoseVel, req_time: float, timeout: float=0.0, waitMotionDone: bool=True):
-        target_joints = pose.target_joints
-        vel_list = pose.vel_list
-        joints_list = pose.joints_list
-        if timeout == 0.0:
-            timeout = PositionController.DEFAULT_TIMEOUT
-        self.__logger__.info("""Motion <%d> STARTED!
-                              robot_part:%s, 
-                              target_joints:%s
-                              req_time:%.2f,
-                              vel_list=%s,
-                              waitMotionDone=%s""" %
-                              (self.__mot_id__,
-                              self.__robot_part__.name,
-                              str(target_joints),
-                              req_time,
-                              str(vel_list),
-                              str(waitMotionDone)) )
-
-        if joints_list is None:
-            joints_list = range(0, self.__joints__)
-        jl = yarp.Vector(len(joints_list))
-        vl = yarp.Vector(len(vel_list))
-        i = 0
-        for j in joints_list:
-            jl.set(i, target_joints[i])
-            vl.set(i, vel_list[i])
-            self.__IPositionControl__.setRefSpeed(j, vl[i])
-            self.__IPositionControl__.positionMove(j, jl[i])
-            i+=1
-        if waitMotionDone is True:
-            self.waitMotionDone(target_joints, joints_list, timeout=timeout)
-        self.__logger__.info("""Motion <%d> COMPLETED!
-                              robot_part:%s, 
-                              target_joints:%s
-                              req_time:%.2f,
-                              vel_list=%s,
-                              waitMotionDone=%s""" %
-                              (self.__mot_id__,
-                              self.__robot_part__.name,
-                              str(target_joints),
-                              req_time,
-                              str(vel_list),
-                              str(waitMotionDone)) )
-    
 
     def setCustomWaitMotionDone(self, motion_complete_at=MOTION_COMPLETE_AT):
         self.__waitMotionDone__ = self.waitMotionDone2
