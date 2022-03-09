@@ -14,8 +14,7 @@
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
 import yarp
-yarp.Network.init()
-
+#yarp.Network().init()
 from pyicub.controllers.gaze import GazeMotion, GazeController
 from pyicub.controllers.position import JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubPart, PositionController
 from pyicub.modules.emotions import emotionsPyCtrl
@@ -29,11 +28,9 @@ from pyicub.rest import iCubHTTPManager
 
 from collections import deque
 import threading
-import yaml
 import os
 import time
 import json
-from io import IOBase
 
 class PortMonitor:
     def __init__(self, yarp_src_port, activate_function, callback, period=0.01, autostart=False):
@@ -43,6 +40,7 @@ class PortMonitor:
         self._period_ = period
         self._values_ = deque( int(1000/(period*1000))*[None], maxlen=int(1000/(period*1000))) #Values of the last second
         self._stop_thread_ = False
+        self._worker_thread_ = None
         if autostart:
             self.start()
 
@@ -67,8 +65,6 @@ class PortMonitor:
                     self._callback_()
             yarp.delay(self._period_)
 
-    def __del__(self):
-        self.stop()
 
 class PyiCubCustomCall:
 
@@ -96,8 +92,9 @@ class iCubFullbodyStep:
 
 class iCubFullbodyAction:
 
-    def __init__(self, JSON_file=None, JSON_dict=None):
+    def __init__(self, JSON_file=None, JSON_dict=None, name='noname'):
         self.steps = []
+        self.name = name
         if JSON_file:
             self.importFromJSONFile(JSON_file)
 
@@ -107,6 +104,7 @@ class iCubFullbodyAction:
         return step
 
     def fromJSON(self, json_dict):
+        self.name = json_dict["name"]
         for step in json_dict["steps"]:
             res = self.addStep()
             for part,pose in step["limb_motions"].items():
@@ -139,70 +137,62 @@ class iCubFullbodyAction:
 
 class iCub:
 
-    def __init__(self, disable_logs=False, http_server=False):
-        self._icub_controllers_ = {}
+    def __init__(self, http_server=False, robot_name="icub", debug=True):
         self._position_controllers_ = {}
-        self._drivers_ = {}
-        self._encoders_ = {}
-        self._gaze_ctrl_ = None
-        self._emo_ = None
-        self._speech_ = None
-        self._face_ = None
-        self._facelandmarks_ = None
-        self._monitors_ = []
-        self._logger_ = YarpLogger.getLogger()
+        self._gaze_ctrl_            = None
+        self._emo_                  = None
+        self._speech_               = None
+        self._face_                 = None
+        self._facelandmarks_        = None
+        self._monitors_             = []
+        self._logger_               = YarpLogger.getLogger()
 
-        if disable_logs:
-            self._logger_.disable_logs()
+        self._icub_parts_ = {}
+        self._icub_parts_[ICUB_PARTS.FACE     ] = iCubPart(ICUB_PARTS.FACE      , 1)
+        self._icub_parts_[ICUB_PARTS.HEAD     ] = iCubPart(ICUB_PARTS.HEAD      , 6)
+        self._icub_parts_[ICUB_PARTS.LEFT_ARM ] = iCubPart(ICUB_PARTS.LEFT_ARM  , 16)
+        self._icub_parts_[ICUB_PARTS.RIGHT_ARM] = iCubPart(ICUB_PARTS.RIGHT_ARM , 16)
+        self._icub_parts_[ICUB_PARTS.TORSO    ] = iCubPart(ICUB_PARTS.TORSO     , 3)
+        self._icub_parts_[ICUB_PARTS.LEFT_LEG ] = iCubPart(ICUB_PARTS.LEFT_LEG  , 6)
+        self._icub_parts_[ICUB_PARTS.RIGHT_LEG] = iCubPart(ICUB_PARTS.RIGHT_LEG , 6)
+
 
         if http_server:
-            self._http_manager_ = iCubHTTPManager()
+            self._http_manager_ = iCubHTTPManager(host=http_server)
         else:
             self._http_manager_ = None
 
-        self._icub_parts_ = {}
-        self._icub_parts_[ICUB_PARTS.HEAD] = iCubPart(ICUB_PARTS.HEAD, 6)
-        self._icub_parts_[ICUB_PARTS.FACE] = iCubPart(ICUB_PARTS.FACE, 1)
-        self._icub_parts_[ICUB_PARTS.LEFT_ARM] = iCubPart(ICUB_PARTS.LEFT_ARM, 16)
-        self._icub_parts_[ICUB_PARTS.RIGHT_ARM] = iCubPart(ICUB_PARTS.RIGHT_ARM, 16)
-        self._icub_parts_[ICUB_PARTS.TORSO] = iCubPart(ICUB_PARTS.TORSO, 3)
-        self._icub_parts_[ICUB_PARTS.LEFT_LEG] = iCubPart(ICUB_PARTS.LEFT_LEG, 6)
-        self._icub_parts_[ICUB_PARTS.RIGHT_LEG] = iCubPart(ICUB_PARTS.RIGHT_LEG, 6)
+
+        DEBUG = os.getenv('PYICUB_DEBUG')
+        if DEBUG is None:
+            self._debug_ = debug
+        else:
+            self._debug_ = DEBUG
+
+        if not self._debug_:
+            self._logger_.disable_logs()
+
 
         ROBOT_NAME = os.getenv('ICUB_NAME')
         if ROBOT_NAME is None:
-            self._robot_ = "icub"
+            self._robot_name_ = robot_name
         else:
-            self._robot_ = ROBOT_NAME
-
-        self.gaze
-        self.emo
-        self.speech
-
-        for part_name in self._icub_parts_.keys():
-            self._icub_controllers_[part_name] = self.getPositionController(self._icub_parts_[part_name])
+            self._robot_name_ = ROBOT_NAME
 
         if self._http_manager_:
             self._registerDefaultServices_()
 
-    def _getDriver_(self, robot_part):
-        if not robot_part.name in self._drivers_.keys():
-            props = self._getRobotPartProperties_(robot_part)
-            self._drivers_[robot_part.name] = yarp.PolyDriver(props)
-        return self._drivers_[robot_part.name]
 
-    def _getIEncoders_(self, robot_part):
-        if not robot_part.name in self._encoders_.keys():
-            driver = self._getDriver_(robot_part)
-            self._encoders_[robot_part.name] = driver.viewIEncoders()
-        return self._encoders_[robot_part.name]
+        self._initPositionController_()
 
-    def _getRobotPartProperties_(self, robot_part):
-        props = yarp.Property()
-        props.put("device","remote_controlboard")
-        props.put("local","/client/" + self._robot_ + "/" + robot_part.name)
-        props.put("remote","/" + self._robot_ + "/" + robot_part.name)
-        return props
+    def _initPositionController_(self):
+        for part_name in self._icub_parts_.keys():
+            port_name = "/" + self.robot_name + "/" + part_name + "/state:o"
+            res = yarp.Network.queryName(port_name)
+            if res.isValid():
+                self._position_controllers_[part_name] = PositionController(self.robot_name, self._icub_parts_[part_name])
+            else:
+                self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % part_name)
 
     def _getPublicMethods(self, obj):
         object_methods = [method_name for method_name in dir(obj) if callable(getattr(obj, method_name))]
@@ -225,18 +215,15 @@ class iCub:
         if len(self._monitors_) > 0:
             for v in self._monitors_:
                 v.stop()
-        for driver in self._drivers_.values():
-            driver.close()
-        yarp.Network.fini()
 
 
     @property
     def gaze(self):
         if self._gaze_ctrl_ is None:
             try:
-                self._gaze_ctrl_ = GazeController(self._robot_)
+                self._gaze_ctrl_ = GazeController(self.robot_name)
             except:
-                self._logger_.error('GazeController non correctly initialized!')
+                self._logger_.warning('GazeController non correctly initialized!')
                 return None
         return self._gaze_ctrl_
 
@@ -244,9 +231,9 @@ class iCub:
     def face(self):
         if self._face_ is None:
             try:
-                self._face_ = facePyCtrl(self._robot_)
+                self._face_ = facePyCtrl(self.robot_name)
             except:
-                self._logger_.error('facePyCtrl non correctly initialized!')
+                self._logger_.warning('facePyCtrl non correctly initialized!')
                 return None
         return self._face_
 
@@ -256,7 +243,7 @@ class iCub:
             try:
                 self._facelandmarks_ = faceLandmarksPyCtrl()
             except:
-                self._logger_.error('facePyCtrl non correctly initialized!')
+                self._logger_.warning('facePyCtrl non correctly initialized!')
                 return None
         return self._facelandmarks_
 
@@ -268,9 +255,9 @@ class iCub:
     def emo(self):
         if self._emo_ is None:
             try:
-                self._emo_ = emotionsPyCtrl(self._robot_)
+                self._emo_ = emotionsPyCtrl(self.robot_name)
             except: 
-                self._logger_.error('emotionsPyCtrl non correctly initialized!')
+                self._logger_.warning('emotionsPyCtrl non correctly initialized!')
                 return None
         return self._emo_
 
@@ -280,25 +267,28 @@ class iCub:
             try:
                 self._speech_ = iSpeakPyCtrl()
             except:
-                self._logger_.error('iSpeakPyCtrl non correctly initialized!')
+                self._logger_.warning('iSpeakPyCtrl non correctly initialized!')
                 return None
         return self._speech_
+    
+    @property
+    def parts(self):
+        return self._icub_parts_
+
+    @property
+    def robot_name(self):
+        return self._robot_name_
 
     def portmonitor(self, yarp_src_port, activate_function, callback):
         self._monitors_.append(PortMonitor(yarp_src_port, activate_function, callback, period=0.01, autostart=True))
 
-    def getPositionController(self, robot_part, joints_list=None):
-        if not robot_part in self._position_controllers_.keys():
-            driver = self._getDriver_(robot_part)
-            iencoders = self._getIEncoders_(robot_part)
-            if joints_list is None:
-                joints_list = robot_part.joints_list
-            try:
-                self._position_controllers_[robot_part.name] = PositionController(driver, joints_list, iencoders)
-            except:
-                self._logger_.error('PositionController <%s> non callable! Are you sure the robot part is available?' % robot_part.name)
-                return None
-        return self._position_controllers_[robot_part.name]
+    def getPositionController(self, robot_part):
+        if not robot_part.name in self._position_controllers_.keys():
+            self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % robot_part.name)
+            return None
+        else:
+            return self._position_controllers_[robot_part.name]
+
 
     def execCustomCall(self, custom_call: PyiCubCustomCall):
         calls = custom_call.target.split('.')
@@ -312,16 +302,15 @@ class iCub:
     def moveGaze(self, gaze_motion: GazeMotion):
         for i in range(0, len(gaze_motion.checkpoints)):
             req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=getattr(self.gaze, gaze_motion.lookat_method))
-            req.run(gaze_motion.checkpoints[i][0], gaze_motion.checkpoints[i][1], gaze_motion.checkpoints[i][2])
+            req.run(*gaze_motion.checkpoints[i])
             req.wait_for_completed()
 
     def movePart(self, limb_motion: LimbMotion):
+        ctrl = self.getPositionController(self._icub_parts_[limb_motion.part_name])
         for i in range(0, len(limb_motion.checkpoints)):
-            ctrl = self.getPositionController(self._icub_parts_[limb_motion.part_name])
             if ctrl is None:
                 self._logger_.warning('movePart <%s> ignored!' % limb_motion.part_name)
             else:
-                duration = limb_motion.checkpoints[i].duration
                 req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move)
                 req.run(pose=limb_motion.checkpoints[i].pose, req_time=limb_motion.checkpoints[i].duration, timeout=limb_motion.checkpoints[i].timeout)
                 req.wait_for_completed()
@@ -353,8 +342,15 @@ class iCub:
         self.play(action)
 
     def play(self, action: iCubFullbodyAction):
+        self._logger_.debug('Playing action <%s>' % action.name)
+        i = 1
         for step in action.steps:
+            self._logger_.debug('Step <%d> Action <%s> STARTED!' % (i, action.name))
             if step.offset_ms:
                 time.sleep(step.offset_ms/1000.0)
             requests = self.moveStep(step)
             iCubRequest.join(requests)
+            iCubRequestsManager().flush_requests()
+            self._logger_.debug('Step <%d> Action <%s> COMPLETED!' % (i, action.name))
+            i += 1
+        self._logger_.debug('Action <%s> finished!' % action.name)

@@ -13,12 +13,9 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-from pyicub.helper import iCub
+from pyicub.helper import iCub, iCubFullbodyAction
 
 icub = iCub()
-icub.gaze.lookAtFixationPoint(-1.0, -0.5, 1.0, waitMotionDone=False)
-icub.gaze.waitMotionOnset()
+action = iCubFullbodyAction(JSON_file='json/move_head.json')
+icub.play(action)
 
-icub.gaze.lookAtFixationPoint(-1.0, -0.2, 0.5)
-icub.gaze.lookAtFixationPoint(-1.0, 0.2, 0.1)
-icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0) 

@@ -24,8 +24,8 @@ import json
 arm_down = JointPose(target_joints=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 arm_up = JointPose(target_joints=[-90.0, 20.0, 10.0, 90.0, 0.0, 0.0, 0.0, 60.0, 20.0, 20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0])
 
-up = JointsTrajectoryCheckpoint(arm_up, duration=1.0, timeout=2.0)
-down = JointsTrajectoryCheckpoint(arm_down, duration=1.0, timeout=2.0)
+up = JointsTrajectoryCheckpoint(arm_up, duration=1.0)
+down = JointsTrajectoryCheckpoint(arm_down, duration=1.0)
 
 m1 = LimbMotion(ICUB_PARTS.RIGHT_ARM)
 m1.addCheckpoint(up)
@@ -65,4 +65,3 @@ action.exportJSONFile('json/complete_action.json')
 
 imported_action = iCubFullbodyAction(JSON_file='json/complete_action.json')
 icub.play(imported_action)
-icub.close()

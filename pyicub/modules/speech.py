@@ -13,6 +13,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
+from multiprocessing.connection import wait
 import yarp
 from pyicub.core.ports import BufferedWritePort
 from pyicub.core.rpc import RpcClient
@@ -40,15 +41,17 @@ class iSpeakPyCtrl:
          self.__port__ = BufferedWritePort("/pyicub/speech:o", "/iSpeak")
          self.__rpcPort__ = RpcClient("/iSpeak/rpc")
 
-    def say(self, something):
+    def say(self, something, waitActionDone=True):
         self.__port__.write("\"%s\"" % something)
         btl = yarp.Bottle()
         btl.clear()
         btl.addString("stat")
         res = self.__rpcPort__.execute(btl)
-        while res.toString() == "speaking":
-            res = self.__rpcPort__.execute(btl)
-            yarp.delay(0.01)
+        if waitActionDone:
+            while res.toString() == "speaking":
+                res = self.__rpcPort__.execute(btl)
+                yarp.delay(0.01)
+        return res
 
     def close(self):
         self.__port__.close()

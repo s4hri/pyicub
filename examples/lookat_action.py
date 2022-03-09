@@ -23,7 +23,7 @@ g1.addCheckpoint([-1.0, -0.2, 0.5])
 g1.addCheckpoint([-1.0, 0.2, 0.1])
 
 g2 = GazeMotion(lookat_method="lookAtAbsAngles")
-g2.addCheckpoint([0.0, 0.0, 0.0])
+g2.addCheckpoint([0.0, 0.0, 0.0, False, 1.5])
 
 action = iCubFullbodyAction()
 step1 = action.addStep()
@@ -35,4 +35,3 @@ action.exportJSONFile('json/lookat.json')
 
 imported_action = iCubFullbodyAction(JSON_file='json/lookat.json')
 icub.play(imported_action)
-icub.close()

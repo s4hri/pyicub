@@ -16,6 +16,8 @@
 from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubFullbodyAction
 
 icub = iCub()
+
+icub.getPositionController(icub.parts['head']).setCustomWaitMotionDone(min_joints_dist=20)
 up = JointsTrajectoryCheckpoint(JointPose(target_joints=[30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
 down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0, timeout=1.0)
 home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
@@ -30,4 +32,6 @@ step = action.addStep()
 step.setLimbMotion(example_motion)
 action.exportJSONFile('json/move_head.json')
     
+icub.play(action)
+icub.getPositionController(icub.parts['head']).unsetCustomWaitMotionDone()
 icub.play(action)

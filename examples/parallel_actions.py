@@ -50,4 +50,3 @@ step3.setLimbMotion(m1)
 step3.setLimbMotion(m2)
 
 icub.play(action)
-icub.close()

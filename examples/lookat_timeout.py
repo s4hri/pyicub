@@ -13,12 +13,12 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
+from socket import timeout
 from pyicub.helper import iCub
 
 icub = iCub()
-icub.gaze.lookAtFixationPoint(-1.0, -0.5, 1.0, waitMotionDone=False)
-icub.gaze.waitMotionOnset()
 
-icub.gaze.lookAtFixationPoint(-1.0, -0.2, 0.5)
-icub.gaze.lookAtFixationPoint(-1.0, 0.2, 0.1)
-icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0) 
+icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0)
+icub.gaze.lookAtAbsAngles(10.0, 0.0, 0.0, timeout=1.0)
+icub.gaze.lookAtAbsAngles(-10.0, 0.0, 0.0)
+icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0)

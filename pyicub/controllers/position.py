@@ -13,11 +13,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <https://www.gnu.org/licenses/>
 
-import yarp
+import os
 import time
-import pyicub.utils as utils
+import yarp
 
+import pyicub.utils as utils
 from pyicub.core.logger import YarpLogger
+
 
 class ICUB_PARTS:
     HEAD       = 'head'
@@ -40,18 +42,9 @@ class JointPose:
         self.target_joints = target_joints
         self.joints_list = joints_list
 
-
-class JointPoseVel:
-
-    def __init__(self, target_position, vel_list, joints_list=None):
-        self.target_position = target_position
-        self.vel_list = vel_list
-        self.joints_list = joints_list
-
 class JointsTrajectoryCheckpoint:
-    DEFAULT_TIMEOUT = 10.0
 
-    def __init__(self, pose: JointPose, duration: float, timeout: float=DEFAULT_TIMEOUT):
+    def __init__(self, pose: JointPose, duration: float=0.0, timeout: float=0.0):
         self.pose = pose
         self.duration = duration
         self.timeout = timeout
@@ -64,116 +57,183 @@ class LimbMotion:
     def addCheckpoint(self, checkpoint: JointsTrajectoryCheckpoint):
         self.checkpoints.append(checkpoint)
 
+
 class PositionController:
 
-    WAITMOTIONDONE_PERIOD = 0.01
+    WAITMOTIONDONE_PERIOD = 0.1
+    MOTION_COMPLETE_AT = 0.9
+    DEFAULT_TIMEOUT = 10.0
 
-    def __init__(self, driver, joints_list, iencoders, logger=YarpLogger.getLogger()):
-        self.__logger__ = logger
-        self.__IControlMode__ = driver.viewIControlMode()
-        self.__IEncoders__ = iencoders
-        self.__joints_list__ = joints_list
-        self.__setPositionControlMode__(self.__joints_list__)
-        self.__IPositionControl__ = driver.viewIPositionControl()
+    def __init__(self, robot, robot_part, logger=YarpLogger.getLogger()):
+        self.__pid__        = str(os.getpid())
+        self.__logger__     = logger
+        self.__robot__      = robot
+        self.__robot_part__ = robot_part
+        self.__driver__ = self._getDriver_()
+        self.__IEncoders__        = self.__driver__.viewIEncoders()
+        self.__IControlLimits__   = self.__driver__.viewIControlLimits()
+        self.__IControlMode__     = self.__driver__.viewIControlMode()
+        self.__IPositionControl__ = self.__driver__.viewIPositionControl()
+        self.__joints__           = self.__IPositionControl__.getAxes()
+        self.__setPositionControlMode__(self.__joints__)
+        self.__mot_id__ = 0
+        self.__waitMotionDone__ = self.waitMotionDone
 
-    def __setPositionControlMode__(self, joints_list):
-        for joint in joints_list:
-            self.__IControlMode__.setControlMode(joint, yarp.VOCAB_CM_POSITION)
+    def _getRobotPartProperties_(self):
+        props = yarp.Property()
+        props.put("device","remote_controlboard")
+        props.put("local","/client/" + self.__pid__ + "/" + self.__robot__ + "/" + self.__robot_part__.name)
+        props.put("remote","/" + self.__robot__ + "/" + self.__robot_part__.name)
+        return props
 
+    def _getDriver_(self):
+        props  = self._getRobotPartProperties_()
+        driver = yarp.PolyDriver(props)
+        if driver.isValid():
+            return driver
+        else:
+            self.__logger__.warning("Driver not properly initialized props=%s" % str(props))
+            return False
+
+    def __setPositionControlMode__(self, joints):
+        modes = yarp.IVector(joints, yarp.VOCAB_CM_POSITION)
+        self.__IControlMode__.setControlModes(modes)
+        
     def getIPositionControl(self):
         return self.__IPositionControl__
 
     def getIEncoders(self):
         return self.__IEncoders__
 
-    def move(self, pose: JointPose, req_time: float, timeout: float, waitMotionDone: bool=True):
+    def getIControlLimits(self):
+        return self.__IControlLimits__
+
+    def move(self, pose: JointPose, req_time: float=0.0, timeout: float=0.0, speed: float=10.0, waitMotionDone: bool=True):
+        self.__mot_id__ += 1
         target_joints = pose.target_joints
         joints_list = pose.joints_list
-        self.__logger__.info("""Moving joints STARTED!
-                              target_joints:%s
-                              req_time:%.2f,
-                              joints_list=%s,
-                              waitMotionDone=%s""" %
-                              (str(target_joints),
-                              req_time,
-                              str(joints_list),
-                              str(waitMotionDone)) )
+        if timeout == 0.0:
+            timeout = PositionController.DEFAULT_TIMEOUT
+        self.__logger__.info("""Motion <%d> STARTED!
+                                robot_part:%s, 
+                                target_joints:%s,
+                                req_time:%.2f,
+                                joints_list=%s,
+                                waitMotionDone=%s,
+                                timeout=%s""" %
+                                (
+                                  self.__mot_id__         ,
+                                  self.__robot_part__.name,
+                                  str(target_joints)      ,
+                                  req_time                ,
+                                  str(joints_list)        ,
+                                  str(waitMotionDone)     ,
+                                  str(timeout)
+                                )
+                            )
         if joints_list is None:
-            joints_list = self.__joints_list__
-        disp = [0]*len(joints_list)
-        speed = [0]*len(joints_list)
-        tmp = yarp.Vector(len(joints_list))
-        encs=yarp.Vector(16)
-        while not self.__IEncoders__.getEncoders(encs.data()):
-            yarp.delay(0.005)
-        i = 0
-        for j in joints_list:
-            tmp.set(i, target_joints[i])
-            disp[i] = target_joints[i] - encs[j]
-            if disp[i] < 0.0:
-                disp[i] =- disp[i]
-            speed[i] = disp[i]/req_time
-            self.__IPositionControl__.setRefSpeed(j, speed[i])
-            self.__IPositionControl__.positionMove(j, tmp[i])
-            i+=1
+            joints_list = range(0, self.__joints__)
+
+        if req_time > 0.0:
+            disp  = [0]*len(joints_list)
+            speeds = [0]*len(joints_list)
+            tmp   = yarp.Vector(self.__joints__)
+            encs  = yarp.Vector(self.__joints__)
+            while not self.__IEncoders__.getEncoders(encs.data()):
+                yarp.delay(0.005)
+            i = 0
+            for j in joints_list:
+                tmp.set(i, target_joints[i])
+                disp[i] = target_joints[i] - encs[j]
+                if disp[i] < 0.0:
+                    disp[i] =- disp[i]
+                speeds[i] = disp[i]/req_time
+                self.__IPositionControl__.setRefSpeed(j, speeds[i])
+                self.__IPositionControl__.positionMove(j, tmp[i])
+                i+=1
+        else:
+            speeds = [0]*len(joints_list)
+            tmp   = yarp.Vector(self.__joints__)
+            i = 0
+            for j in joints_list:
+                tmp.set(i, target_joints[i])
+                speeds[i] = speed
+                self.__IPositionControl__.setRefSpeed(j, speeds[i])
+                self.__IPositionControl__.positionMove(j, tmp[i])
+                i+=1
+
         if waitMotionDone is True:
-            self.waitMotionDone(timeout=timeout)
-        self.__logger__.info("""Moving joints COMPLETED!
-                              target_joints:%s
-                              req_time:%.2f,
-                              joints_list=%s,
-                              waitMotionDone=%s""" %
-                              (str(target_joints),
-                              req_time,
-                              str(joints_list),
-                              str(waitMotionDone)) )
+            res = self.__waitMotionDone__(timeout=timeout)
+            if res:
+                self.__logger__.info("""Motion <%d> COMPLETED!
+                                robot_part:%s, 
+                                target_joints:%s
+                                req_time:%.2f,
+                                joints_list=%s,
+                                waitMotionDone=%s,
+                                timeout=%s""" %
+                                (
+                                    self.__mot_id__         ,
+                                    self.__robot_part__.name,
+                                    str(target_joints)      ,
+                                    req_time                ,
+                                    str(joints_list)        ,
+                                    str(waitMotionDone)     ,
+                                    str(timeout)
+                                ))
+            else:
+                self.__logger__.warning("""Motion <%d> TIMEOUT!
+                                robot_part:%s, 
+                                target_joints:%s
+                                req_time:%.2f,
+                                joints_list=%s,
+                                waitMotionDone=%s,
+                                timeout=%s""" %
+                                (
+                                    self.__mot_id__         ,
+                                    self.__robot_part__.name,
+                                    str(target_joints)      ,
+                                    req_time                ,
+                                    str(joints_list)        ,
+                                    str(waitMotionDone)     ,
+                                    str(timeout)
+                                ))
 
 
-    def moveRefVel(self, pose: JointPoseVel, req_time: float, waitMotionDone: bool=True):
-        target_joints = pose.target_joints
-        vel_list = pose.vel_list
-        joints_list = pose.joints_list
+    def setCustomWaitMotionDone(self, motion_complete_at=MOTION_COMPLETE_AT):
+        self.__waitMotionDone__ = self.waitMotionDone2
+        PositionController.MOTION_COMPLETE_AT = motion_complete_at
 
-        self.__logger__.info("""Moving joints in position control STARTED!
-                              target_joints:%s
-                              req_time:%.2f,
-                              vel_list=%s,
-                              waitMotionDone=%s""" %
-                              (str(target_joints),
-                              req_time,
-                              str(vel_list),
-                              str(waitMotionDone)) )
-
-        if joints_list is None:
-            joints_list = self.__joints_list__
-        jl = yarp.Vector(len(joints_list))
-        vl = yarp.Vector(len(vel_list))
-        i = 0
-        for j in joints_list:
-            jl.set(i, target_joints[i])
-            vl.set(i, vel_list[i])
-            self.__IPositionControl__.setRefSpeed(j, vl[i])
-            self.__IPositionControl__.positionMove(j, jl[i])
-            i+=1
-        if waitMotionDone is True:
-            self.waitMotionDone(target_joints, joints_list, timeout=2*req_time)
-        self.__logger__.debug("""Moving joints COMPLETED!
-                              target_joints:%s
-                              req_time:%.2f,
-                              vel_list=%s,
-                              waitMotionDone=%s""" %
-                              (str(target_joints),
-                              req_time,
-                              str(vel_list),
-                              str(waitMotionDone)) )
+    def unsetCustomWaitMotionDone(self):
+        self.__waitMotionDone__ = self.waitMotionDone
 
     def waitMotionDone(self, timeout: float):
-        self.__logger__.info("""Waiting for motion done STARTED!""")
-        max_attempts = int(timeout/PositionController.WAITMOTIONDONE_PERIOD)
-        for _ in range(0, max_attempts):
+        t0 = time.perf_counter()
+        while (time.perf_counter() - t0) < timeout:
             if self.__IPositionControl__.checkMotionDone():
-                self.__logger__.info("""Motion done DETECTED!""")
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
-        self.__logger__.warning("""Motion done TIMEOUT! """)
+        return False
+
+    def waitMotionDone2(self, timeout: float):
+        t0 = time.perf_counter()
+        target_pos = yarp.Vector(self.__joints__)
+        encs=yarp.Vector(self.__joints__)
+        self.__IPositionControl__.getTargetPositions(target_pos.data())
+        count = 0
+        while (time.perf_counter() - t0) < timeout:
+            while not self.__IEncoders__.getEncoders(encs.data()):
+                yarp.delay(0.05)
+            v = []
+            w = []
+            for i in range(0, self.__joints__):
+                v.append(encs[i])
+                w.append(target_pos[i])
+            if count == 0:
+                tot_disp = utils.vector_distance(v, w)
+            count+=1
+            dist = utils.vector_distance(v, w)
+            if dist <= (1.0 - PositionController.MOTION_COMPLETE_AT)*tot_disp:
+                return True
+            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
         return False

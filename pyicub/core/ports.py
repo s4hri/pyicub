@@ -68,10 +68,6 @@ class BufferedPort:
         btl.clear()
         return btl
 
-    def __del__(self):
-        self.__port__.interrupt()
-        self.__port__.close()
-
 class BufferedReadPort(BufferedPort):
 
     def __init__(self, port_name, port_src, callback=None):
@@ -84,9 +80,6 @@ class BufferedReadPort(BufferedPort):
         self.open(self.__port_name__)
         yarp.Network.connect(self.__port_src__, self.__port_name__)
 
-    def __del__(self):
-        yarp.Network.disconnect(self.__port_src__, self.__port_name__)
-
 
 class BufferedWritePort(BufferedPort):
 
@@ -96,6 +89,3 @@ class BufferedWritePort(BufferedPort):
         self.__port_dst__ = port_dst
         self.__port__.open(self.__port_name__)
         yarp.Network.connect(self.__port_name__, self.__port_dst__)
-
-    def __del__(self):
-        yarp.Network.disconnect(self.__port_name__, self.__port_dst__)

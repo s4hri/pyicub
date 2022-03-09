@@ -18,7 +18,7 @@ from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotio
 class WebApp:
 
     def __init__(self):
-        self.icub = iCub(http_server=True)
+        self.icub = iCub(http_server="0.0.0.0")
 
         down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-15.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.5)
         home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.0)
