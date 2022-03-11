@@ -88,7 +88,7 @@ class GazeController:
         self.IGazeControl.lookAtRelAngles(angles)
         res = True
         if waitMotionDone is True:
-            res = self.waitMotionDone(angles, timeout)
+            res = self.waitMotionDone(timeout=timeout)
         if res:
             self.__logger__.info("""Looking at rel angles <%d> COMPLETED!
                                     angles=%s, waitMotionDone=%s, timeout=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone), str(timeout)) )

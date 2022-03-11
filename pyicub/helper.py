@@ -27,7 +27,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import yarp
-#yarp.Network().init()
+yarp.Network().init()
+
 from pyicub.controllers.gaze import GazeMotion, GazeController
 from pyicub.controllers.position import JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubPart, PositionController
 from pyicub.modules.emotions import emotionsPyCtrl
