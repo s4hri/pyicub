@@ -61,6 +61,10 @@ class iSpeakPyCtrl:
         btl.addString("stat")
         res = self.__rpcPort__.execute(btl)
         if waitActionDone:
+            if res.toString() == "quiet":
+                while res.toString() != "speaking":
+                    res = self.__rpcPort__.execute(btl)
+                    yarp.delay(0.01)
             while res.toString() == "speaking":
                 res = self.__rpcPort__.execute(btl)
                 yarp.delay(0.01)
