@@ -39,27 +39,43 @@ class GazeMotion:
     def addCheckpoint(self, value: list):
         self.checkpoints.append(value)
 
+class GazeControllerPolyDriver:
+
+    def __init__(self, robot):
+        self.__props__ = yarp.Property()
+        self.__props__.put("robot", robot)
+        self.__props__.put("device","gazecontrollerclient")
+        self.__props__.put("local","/gaze_client")
+        self.__props__.put("remote","/iKinGazeCtrl")
+        self.__driver__ = yarp.PolyDriver(self.__props__)
+    
+    @property
+    def properties(self):
+        return self.__props__
+
+    def getDriver(self):
+        return self.__driver__
 
 class GazeController:
 
     def __init__(self, robot, logger=YarpLogger.getLogger()):
         self.__logger__ = logger
-        self.__props__ = yarp.Property()
-        self.__driver__ = yarp.PolyDriver()
-        self.__props__.put("robot", robot)
-        self.__props__.put("device","gazecontrollerclient")
-        self.__props__.put("local","/gaze_client")
-        self.__props__.put("remote","/iKinGazeCtrl")
-        self.__driver__.open(self.__props__)
-        if not self.__driver__.isValid():
-            self.__logger__.error('Cannot open GazeController driver!')
-        else:
-            self.__IGazeControl__ = self.__driver__.viewIGazeControl()
-            self.__IGazeControl__.setTrackingMode(False)
-            self.__IGazeControl__.stopControl()
-            self.clearNeck()
-            self.clearEyes()
+        self.__driver__ = GazeControllerPolyDriver(robot)
+    
+    def isValid(self):
+        return self.PolyDriver.isValid()
+
+    def init(self):
+        self.__IGazeControl__ = self.PolyDriver.viewIGazeControl()
+        self.__IGazeControl__.setTrackingMode(False)
+        self.__IGazeControl__.stopControl()
+        self.clearNeck()
+        self.clearEyes()
         self.__mot_id__ = 0
+
+    @property
+    def PolyDriver(self):
+        return self.__driver__.getDriver()
 
     @property
     def IGazeControl(self):
