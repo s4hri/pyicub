@@ -70,6 +70,25 @@ class LimbMotion:
     def addCheckpoint(self, checkpoint: JointsTrajectoryCheckpoint):
         self.checkpoints.append(checkpoint)
 
+class RemoteControlboard:
+
+    def __init__(self, port_name):
+        self.__pid__ = str(os.getpid())
+        self.__port_name__ = port_name
+        self.__driver__ = None
+        props  = self._getRobotPartProperties_()
+        self.__driver__ = yarp.PolyDriver(props)
+
+    def _getRobotPartProperties_(self):
+        props = yarp.Property()
+        props.put("device","remote_controlboard")
+        props.put("local","/client/" + self.__pid__ + self.__port_name__)
+        props.put("remote", self.__port_name__)
+        return props
+
+    def getDriver(self):
+        return self.__driver__
+
 
 class PositionController:
 
@@ -77,40 +96,30 @@ class PositionController:
     MOTION_COMPLETE_AT = 0.9
     DEFAULT_TIMEOUT = 10.0
 
-    def __init__(self, robot, robot_part, logger=YarpLogger.getLogger()):
-        self.__pid__        = str(os.getpid())
+    def __init__(self, port_name, logger=YarpLogger.getLogger()):
         self.__logger__     = logger
-        self.__robot__      = robot
-        self.__robot_part__ = robot_part
-        self.__driver__ = self._getDriver_()
-        self.__IEncoders__        = self.__driver__.viewIEncoders()
-        self.__IControlLimits__   = self.__driver__.viewIControlLimits()
-        self.__IControlMode__     = self.__driver__.viewIControlMode()
-        self.__IPositionControl__ = self.__driver__.viewIPositionControl()
+        self.__driver__ = RemoteControlboard(port_name)
+
+    def isValid(self):
+        return self.PolyDriver.isValid()
+
+    def init(self):
+        self.__IEncoders__        = self.PolyDriver.viewIEncoders()
+        self.__IControlLimits__   = self.PolyDriver.viewIControlLimits()
+        self.__IControlMode__     = self.PolyDriver.viewIControlMode()
+        self.__IPositionControl__ = self.PolyDriver.viewIPositionControl()
         self.__joints__           = self.__IPositionControl__.getAxes()
         self.__setPositionControlMode__(self.__joints__)
         self.__mot_id__ = 0
         self.__waitMotionDone__ = self.waitMotionDone
 
-    def _getRobotPartProperties_(self):
-        props = yarp.Property()
-        props.put("device","remote_controlboard")
-        props.put("local","/client/" + self.__pid__ + "/" + self.__robot__ + "/" + self.__robot_part__.name)
-        props.put("remote","/" + self.__robot__ + "/" + self.__robot_part__.name)
-        return props
-
-    def _getDriver_(self):
-        props  = self._getRobotPartProperties_()
-        driver = yarp.PolyDriver(props)
-        if driver.isValid():
-            return driver
-        else:
-            self.__logger__.warning("Driver not properly initialized props=%s" % str(props))
-            return False
-
     def __setPositionControlMode__(self, joints):
         modes = yarp.IVector(joints, yarp.VOCAB_CM_POSITION)
         self.__IControlMode__.setControlModes(modes)
+
+    @property
+    def PolyDriver(self):
+        return self.__driver__.getDriver()
 
     def getIPositionControl(self):
         return self.__IPositionControl__
