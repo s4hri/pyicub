@@ -153,6 +153,7 @@ class iCub:
 
     def __init__(self, http_server=False, robot_name="icub", debug=True):
         self._position_controllers_ = {}
+        self._services_ = {}
         self._gaze_ctrl_            = None
         self._emo_                  = None
         self._speech_               = None
@@ -186,27 +187,39 @@ class iCub:
         if not self._debug_:
             self._logger_.disable_logs()
 
+        self._robot_name_ = robot_name
 
-        ROBOT_NAME = os.getenv('ICUB_NAME')
-        if ROBOT_NAME is None:
-            self._robot_name_ = robot_name
-        else:
-            self._robot_name_ = ROBOT_NAME
+        self._initPositionControllers_()
+        self._initGazeController_()
 
         if self._http_manager_:
             self._registerDefaultServices_()
+    
+    def __del__(self):
+        self.close()
+        yarp.Network().init()
+        yarp.Network().fini()
 
-
-        self._initPositionController_()
-
-    def _initPositionController_(self):
+    def _initPositionControllers_(self):
         for part_name in self._icub_parts_.keys():
-            port_name = "/" + self.robot_name + "/" + part_name + "/state:o"
-            res = yarp.Network.queryName(port_name)
-            if res.isValid():
-                self._position_controllers_[part_name] = PositionController(self.robot_name, self._icub_parts_[part_name])
-            else:
-                self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % part_name)
+            self._initPositionController_(part_name)
+
+    def _initPositionController_(self, part_name):
+        port_name = "/" + self._robot_name_ + "/" + part_name
+        ctrl = PositionController(port_name)
+        if ctrl.isValid():
+            self._position_controllers_[part_name] = ctrl
+        else:
+            self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % part_name)
+
+    def _initGazeController_(self):
+        gaze_ctrl = GazeController(self._robot_name_)
+        if gaze_ctrl.isValid():
+            gaze_ctrl.init()
+            self._gaze_ctrl_ = gaze_ctrl
+        else:
+            self._logger_.warning('GazeController non correctly initialized! Are you sure the controller is available?')
+            self._gaze_ctrl_ = None
 
     def _getPublicMethods(self, obj):
         object_methods = [method_name for method_name in dir(obj) if callable(getattr(obj, method_name))]
@@ -234,12 +247,9 @@ class iCub:
     @property
     def gaze(self):
         if self._gaze_ctrl_ is None:
-            try:
-                self._gaze_ctrl_ = GazeController(self.robot_name)
-            except:
-                self._logger_.warning('GazeController non correctly initialized!')
-                return None
+            self._initGazeController_()
         return self._gaze_ctrl_
+        
 
     @property
     def face(self):
