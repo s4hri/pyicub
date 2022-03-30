@@ -34,21 +34,6 @@ import pyicub.utils as utils
 from pyicub.core.logger import YarpLogger
 
 
-class ICUB_PARTS:
-    HEAD       = 'head'
-    FACE       = 'face'
-    TORSO      = 'torso'
-    LEFT_ARM   = 'left_arm'
-    RIGHT_ARM  = 'right_arm'
-    LEFT_LEG   = 'left_leg'
-    RIGHT_LEG  = 'right_leg'
-
-class iCubPart:
-    def __init__(self, name, joints_n):
-        self.name = name
-        self.joints_n = joints_n
-        self.joints_list = range(0, joints_n)
-
 class JointPose:
 
     def __init__(self, target_joints, joints_list=None):
@@ -61,14 +46,6 @@ class JointsTrajectoryCheckpoint:
         self.pose = pose
         self.duration = duration
         self.timeout = timeout
-
-class LimbMotion:
-    def __init__(self, part_name: iCubPart):
-        self.part_name = part_name
-        self.checkpoints = []
-
-    def addCheckpoint(self, checkpoint: JointsTrajectoryCheckpoint):
-        self.checkpoints.append(checkpoint)
 
 class RemoteControlboard:
 
@@ -96,8 +73,10 @@ class PositionController:
     MOTION_COMPLETE_AT = 0.9
     DEFAULT_TIMEOUT = 10.0
 
-    def __init__(self, port_name, logger=YarpLogger.getLogger()):
+    def __init__(self, robot_name, part_name, logger=YarpLogger.getLogger()):
+        self.__part_name__ = part_name
         self.__logger__     = logger
+        port_name = "/" + robot_name + "/" + part_name
         self.__driver__ = RemoteControlboard(port_name)
 
     def isValid(self):
@@ -130,6 +109,9 @@ class PositionController:
     def getIControlLimits(self):
         return self.__IControlLimits__
 
+    def isMoving(self):
+        return self.__IPositionControl__.checkMotionDone()
+
     def move(self, pose: JointPose, req_time: float=0.0, timeout: float=0.0, speed: float=10.0, waitMotionDone: bool=True):
         self.__mot_id__ += 1
         target_joints = pose.target_joints
@@ -145,7 +127,7 @@ class PositionController:
                                 timeout=%s""" %
                                 (
                                   self.__mot_id__         ,
-                                  self.__robot_part__.name,
+                                  self.__part_name__,
                                   str(target_joints)      ,
                                   req_time                ,
                                   str(joints_list)        ,
@@ -196,7 +178,7 @@ class PositionController:
                                 timeout=%s""" %
                                 (
                                     self.__mot_id__         ,
-                                    self.__robot_part__.name,
+                                    self.__part_name__,
                                     str(target_joints)      ,
                                     req_time                ,
                                     str(joints_list)        ,
@@ -213,7 +195,7 @@ class PositionController:
                                 timeout=%s""" %
                                 (
                                     self.__mot_id__         ,
-                                    self.__robot_part__.name,
+                                    self.__part_name__,
                                     str(target_joints)      ,
                                     req_time                ,
                                     str(joints_list)        ,

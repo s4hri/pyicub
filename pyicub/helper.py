@@ -29,8 +29,9 @@
 import yarp
 yarp.Network().init()
 
-from pyicub.controllers.gaze import GazeMotion, GazeController
-from pyicub.controllers.position import JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubPart, PositionController
+from pyicub.controllers.gaze import GazeController
+from pyicub.controllers.position import JointPose, JointsTrajectoryCheckpoint, PositionController
+from pyicub.actions import PyiCubCustomCall, LimbMotion, GazeMotion, iCubFullbodyStep, iCubFullbodyAction
 from pyicub.modules.emotions import emotionsPyCtrl
 from pyicub.modules.speech import iSpeakPyCtrl
 from pyicub.modules.face import facePyCtrl
@@ -79,75 +80,22 @@ class PortMonitor:
                     self._callback_()
             yarp.delay(self._period_)
 
+class ICUB_PARTS:
+    HEAD       = 'head'
+    FACE       = 'face'
+    TORSO      = 'torso'
+    LEFT_ARM   = 'left_arm'
+    RIGHT_ARM  = 'right_arm'
+    LEFT_LEG   = 'left_leg'
+    RIGHT_LEG  = 'right_leg'
 
-class PyiCubCustomCall:
-
-    def __init__(self, target, args=()):
-        self.target = target
-        self.args = args
-
-class iCubFullbodyStep:
-
-    def __init__(self, offset_ms=None):
-        self.limb_motions = {}
-        self.gaze_motion = None
-        self.custom_calls = []
-        self.offset_ms = offset_ms
-
-    def setGazeMotion(self, gaze_motion: GazeMotion):
-        self.gaze_motion = gaze_motion
-
-    def setLimbMotion(self, limb_motion: LimbMotion):
-        self.limb_motions[limb_motion.part_name] = limb_motion
-
-    def addCustomCall(self, custom_call: PyiCubCustomCall):
-        self.custom_calls.append(custom_call)
-
-
-class iCubFullbodyAction:
-
-    def __init__(self, JSON_file=None, JSON_dict=None, name='noname'):
-        self.steps = []
+class iCubPart:
+    def __init__(self, name, joints_n):
         self.name = name
-        if JSON_file:
-            self.importFromJSONFile(JSON_file)
+        self.joints_n = joints_n
+        self.joints_list = range(0, joints_n)
 
-    def addStep(self, offset_ms=None):
-        step = iCubFullbodyStep(offset_ms)
-        self.steps.append(step)
-        return step
 
-    def fromJSON(self, json_dict):
-        self.name = json_dict["name"]
-        for step in json_dict["steps"]:
-            res = self.addStep()
-            for part,pose in step["limb_motions"].items():
-                lm = LimbMotion(part)
-                for v in pose["checkpoints"]:
-                    pose = JointPose(target_joints=v['pose']['target_joints'], joints_list=v['pose']['joints_list'])
-                    check = JointsTrajectoryCheckpoint(pose, duration=v['duration'], timeout=v['timeout'])
-                    lm.addCheckpoint(check)
-                res.setLimbMotion(lm)
-            if step["gaze_motion"]:
-                gaze = GazeMotion(lookat_method=step["gaze_motion"]["lookat_method"])
-                for v in step["gaze_motion"]["checkpoints"]:
-                    gaze.addCheckpoint(v)
-                res.setGazeMotion(gaze)
-            if step["custom_calls"]:
-                for v in step["custom_calls"]:
-                    cc = PyiCubCustomCall(target=v["target"], args=v["args"])
-                    res.addCustomCall(cc)
-
-    def importFromJSONFile(self, JSON_file):
-        with open(JSON_file) as f:
-            data = f.read()
-        res = json.loads(data)
-        self.fromJSON(res)
-
-    def exportJSONFile(self, filepath):
-        res = json.dumps(self, default=lambda o: o.__dict__, indent=4)
-        with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(res)
 
 class iCub:
 
@@ -161,15 +109,17 @@ class iCub:
         self._facelandmarks_        = None
         self._monitors_             = []
         self._logger_               = YarpLogger.getLogger()
+        self._steps_uid_            = 0
+        self._actions_uid_          = 0
 
         self._icub_parts_ = {}
-        self._icub_parts_[ICUB_PARTS.FACE     ] = iCubPart(ICUB_PARTS.FACE      , 1)
-        self._icub_parts_[ICUB_PARTS.HEAD     ] = iCubPart(ICUB_PARTS.HEAD      , 6)
-        self._icub_parts_[ICUB_PARTS.LEFT_ARM ] = iCubPart(ICUB_PARTS.LEFT_ARM  , 16)
-        self._icub_parts_[ICUB_PARTS.RIGHT_ARM] = iCubPart(ICUB_PARTS.RIGHT_ARM , 16)
-        self._icub_parts_[ICUB_PARTS.TORSO    ] = iCubPart(ICUB_PARTS.TORSO     , 3)
-        self._icub_parts_[ICUB_PARTS.LEFT_LEG ] = iCubPart(ICUB_PARTS.LEFT_LEG  , 6)
-        self._icub_parts_[ICUB_PARTS.RIGHT_LEG] = iCubPart(ICUB_PARTS.RIGHT_LEG , 6)
+        self._icub_parts_[ICUB_PARTS.FACE       ]   = iCubPart(ICUB_PARTS.FACE      , 1)
+        self._icub_parts_[ICUB_PARTS.HEAD       ]   = iCubPart(ICUB_PARTS.HEAD      , 6)
+        self._icub_parts_[ICUB_PARTS.LEFT_ARM   ]   = iCubPart(ICUB_PARTS.LEFT_ARM  , 16)
+        self._icub_parts_[ICUB_PARTS.RIGHT_ARM  ]   = iCubPart(ICUB_PARTS.RIGHT_ARM , 16)
+        self._icub_parts_[ICUB_PARTS.TORSO      ]   = iCubPart(ICUB_PARTS.TORSO     , 3)
+        self._icub_parts_[ICUB_PARTS.LEFT_LEG   ]   = iCubPart(ICUB_PARTS.LEFT_LEG  , 6)
+        self._icub_parts_[ICUB_PARTS.RIGHT_LEG  ]   = iCubPart(ICUB_PARTS.RIGHT_LEG , 6)
 
 
         if http_server:
@@ -186,6 +136,11 @@ class iCub:
 
         if not self._debug_:
             self._logger_.disable_logs()
+
+        SIMULATION = os.getenv('ICUB_SIMULATION')
+        if not SIMULATION is None:
+            if SIMULATION:
+                robot_name = "icubSim" 
 
         self._robot_name_ = robot_name
 
@@ -205,10 +160,10 @@ class iCub:
             self._initPositionController_(part_name)
 
     def _initPositionController_(self, part_name):
-        port_name = "/" + self._robot_name_ + "/" + part_name
-        ctrl = PositionController(port_name)
+        ctrl = PositionController(self._robot_name_,part_name)
         if ctrl.isValid():
             self._position_controllers_[part_name] = ctrl
+            self._position_controllers_[part_name].init()
         else:
             self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % part_name)
 
@@ -242,7 +197,6 @@ class iCub:
         if len(self._monitors_) > 0:
             for v in self._monitors_:
                 v.stop()
-
 
     @property
     def gaze(self):
@@ -303,61 +257,83 @@ class iCub:
     def robot_name(self):
         return self._robot_name_
 
-    def portmonitor(self, yarp_src_port, activate_function, callback):
-        self._monitors_.append(PortMonitor(yarp_src_port, activate_function, callback, period=0.01, autostart=True))
+    def createStep(self, name=None, offset_ms=None):
+        if name is None:
+            name = 'step/' + str(self._steps_uid_)
+            self._steps_uid_+=1
+        return iCubFullbodyStep(name, offset_ms)
 
-    def getPositionController(self, robot_part):
-        if not robot_part.name in self._position_controllers_.keys():
-            self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % robot_part.name)
-            return None
-        else:
-            return self._position_controllers_[robot_part.name]
+    def createAction(self, action_name=None, JSON_file=None):
+        if action_name is None:
+            action_name = 'action/' + str(self._actions_uid_)
+            self._actions_uid_+=1
+        return iCubFullbodyAction(action_name, JSON_file)
 
-
-    def execCustomCall(self, custom_call: PyiCubCustomCall):
+    def execCustomCall(self, custom_call: PyiCubCustomCall, prefix=''):
         calls = custom_call.target.split('.')
         foo = self
         for call in calls:
             foo = getattr(foo, call)
-        req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=foo)
+        req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=foo, name=prefix + '/%s' % str(custom_call.target))
         req.run(*custom_call.args)
         req.wait_for_completed()
 
-    def moveGaze(self, gaze_motion: GazeMotion):
+    def execCustomCalls(self, calls, prefix=''):
+        for call in calls:
+            self.execCustomCall(call, prefix)
+
+    def getPositionController(self, part_name):
+        if part_name in self._position_controllers_.keys():
+            return self._position_controllers_[part_name]
+        self._logger_.error('PositionController <%s> non callable! Are you sure the robot part is available?' % part_name)
+        return None
+
+    def join_pending_requests(self, csv_output_filename=None):
+        iCubRequestsManager().join(csv_output_filename=csv_output_filename)
+
+    def moveGaze(self, gaze_motion: GazeMotion, prefix=''):
+        requests = []
+
         for i in range(0, len(gaze_motion.checkpoints)):
-            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=getattr(self.gaze, gaze_motion.lookat_method))
+            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=getattr(self.gaze, gaze_motion.lookat_method), name=prefix + '/%s' % str(gaze_motion.lookat_method))
             req.run(*gaze_motion.checkpoints[i])
             req.wait_for_completed()
+            requests.append(req)
 
-    def movePart(self, limb_motion: LimbMotion):
-        ctrl = self.getPositionController(self._icub_parts_[limb_motion.part_name])
+        return requests
+
+    def movePart(self, limb_motion: LimbMotion, prefix=''):
+        requests = []
+
+        ctrl = self.getPositionController(limb_motion.part_name)
         for i in range(0, len(limb_motion.checkpoints)):
             if ctrl is None:
                 self._logger_.warning('movePart <%s> ignored!' % limb_motion.part_name)
             else:
-                req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move)
+                req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move, name=prefix + '/' + limb_motion.part_name)
                 req.run(pose=limb_motion.checkpoints[i].pose, req_time=limb_motion.checkpoints[i].duration, timeout=limb_motion.checkpoints[i].timeout)
                 req.wait_for_completed()
+                requests.append(req)
 
-    def execCustomCalls(self, calls):
-        for call in calls:
-            self.execCustomCall(call)
+        return requests
 
-    def moveStep(self, step):
+
+    def moveStep(self, step, prefix=''):
         requests = []
-        if step.gaze_motion:
-            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.moveGaze)
-            requests.append(req)
-            req.run(step.gaze_motion)
-        if step.custom_calls:
-            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.execCustomCalls)
-            requests.append(req)
-            req.run(step.custom_calls)
-        for part, limb_motion in step.limb_motions.items():
-            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.movePart)
-            requests.append(req)
-            req.run(limb_motion)
 
+        if step.gaze_motion:
+            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.moveGaze, name='/%s' % step.name + '/gaze')
+            requests.append(req)
+            req.run(step.gaze_motion, req.req_id)
+        if step.custom_calls:
+            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.execCustomCalls, name='/%s' % step.name + '/custom')
+            requests.append(req)
+            req.run(step.custom_calls, req.req_id)
+        for part, limb_motion in step.limb_motions.items():
+            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.movePart, name='/%s' % step.name + '/limb')
+            requests.append(req)
+            req.run(limb_motion, req.req_id)
+        iCubRequest.join(requests)
         return requests
 
     def playActionFromJSON(self, action_json):
@@ -365,16 +341,19 @@ class iCub:
         action.fromJSON(action_json)
         self.play(action)
 
-    def play(self, action: iCubFullbodyAction):
+    def play(self, action: iCubFullbodyAction, csv_output_filename=None):
+        manager = iCubRequestsManager()
         self._logger_.debug('Playing action <%s>' % action.name)
         i = 1
         for step in action.steps:
             self._logger_.debug('Step <%d> Action <%s> STARTED!' % (i, action.name))
             if step.offset_ms:
                 time.sleep(step.offset_ms/1000.0)
-            requests = self.moveStep(step)
-            iCubRequest.join(requests)
-            iCubRequestsManager().flush_requests()
+            requests = self.moveStep(step, prefix=action.name)
+            manager.join(csv_output_filename=csv_output_filename)
             self._logger_.debug('Step <%d> Action <%s> COMPLETED!' % (i, action.name))
             i += 1
         self._logger_.debug('Action <%s> finished!' % action.name)
+
+    def portmonitor(self, yarp_src_port, activate_function, callback):
+        self._monitors_.append(PortMonitor(yarp_src_port, activate_function, callback, period=0.01, autostart=True))

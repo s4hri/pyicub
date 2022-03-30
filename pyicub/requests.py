@@ -30,6 +30,8 @@
 import time
 import concurrent.futures
 import threading
+import csv
+
 from pyicub.utils import SingletonMeta
 from pyicub.core.logger import YarpLogger
 
@@ -55,12 +57,7 @@ class iCubRequest:
         self._target_ = target
         self._retval_ = None
         self._logger_ = YarpLogger.getLogger()
-
-    @staticmethod
-    def join(requests):
-        for req in requests:
-            req.wait_for_completed()
-
+        
     @property
     def duration(self):
         return self._duration_
@@ -93,10 +90,18 @@ class iCubRequest:
     def target(self):
         return self._target_
 
+    @staticmethod
+    def join(requests):
+        for req in requests:
+            req.wait_for_completed()
+    
+    def __str__(self):
+        return str(self.info())
+
     def run(self, *args, **kwargs):
         self._future_ = self._executor_.submit(self._target_, *args, **kwargs)
         self._status_ = iCubRequest.RUNNING
-        self._logger_.debug("iCubRequest <%d> STARTED!" % self.req_id)
+        self._logger_.debug("iCubRequest %s STARTED!" % self.req_id)
         self._future_.add_done_callback(self.on_completed)
 
     def on_completed(self, future):
@@ -116,14 +121,14 @@ class iCubRequest:
             self._duration_ = round(self._end_time_ - self._start_time_, 4)
             self._executor_.shutdown(wait=False)
         if self._status_ == iCubRequest.DONE:
-            self._logger_.debug("iCubRequest <%d> COMPLETED! %s" % (self.req_id, self.info()))
+            self._logger_.debug("iCubRequest %s COMPLETED! %s" % (self.req_id, self.info()))
         elif self._status_ == iCubRequest.TIMEOUT:
-            self._logger_.warning("iCubRequest <%d> TIMEOUT! %s" % (self.req_id, self.info()))
+            self._logger_.warning("iCubRequest %s TIMEOUT! %s" % (self.req_id, self.info()))
         elif self._status_ == iCubRequest.FAILED:
-            self._logger_.error("iCubRequest <%d> ERROR! %s" % (self.req_id, self.info()))
+            self._logger_.error("iCubRequest %s ERROR! %s" % (self.req_id, self.info()))
+        
         self._retval_ = res
         return res
-
 
     def wait_for_completed(self):
         self._executor_.shutdown(wait=True)
@@ -132,7 +137,7 @@ class iCubRequest:
     def info(self):
         info = {}
         info['target'] = self.target.__name__
-        info['id'] = self.req_id
+        info['req_id'] = self.req_id
         info['status'] = self.status
         info['start_time'] = self.start_time
         info['end_time'] = self.end_time
@@ -143,25 +148,59 @@ class iCubRequest:
 
 class iCubRequestsManager(metaclass=SingletonMeta):
 
+    CSV_COLUMNS = ['req_id','target','status', 'start_time', 'end_time', 'duration', 'exception', 'retval']
+
     def __init__(self):
-        self._requests_ = {}
+        self._pending_requests_ = {}
+        self._completed_requests_ = {}
+        self._req_topics_ = {}
         self._lock = threading.Lock()
 
-    def create(self, timeout, target):
+    @property
+    def pending_requests(self):
+        return self._pending_requests_
+
+    @property
+    def completed_requests(self):
+        return self._completed_requests_
+
+    def create(self, timeout, target, name=''):
         with self._lock:
-            if len(self._requests_) == 0:
-                req_id = 0
+            if not name in self._req_topics_.keys():
+                self._req_topics_[name] = 0
             else:
-                req_id = max(self._requests_.keys()) + 1
+                self._req_topics_[name] += 1
+            req_id = name + '/' + str(self._req_topics_[name])
             req = iCubRequest(req_id, timeout, target)
-            self._requests_[req_id] = req
+            self._pending_requests_[req_id] = req
         return req
 
+    def join(self, csv_output_filename=None):
+        while True:
+            if len(self._pending_requests_.values()) > 0:
+                request = list(self._pending_requests_.values())[0]
+                request.wait_for_completed()
+                with self._lock:
+                    self._completed_requests_[request.req_id] = request
+                    del self._pending_requests_[request.req_id]
+            else:
+                break
+        if not csv_output_filename is None:
+            self.save_requests(filename=csv_output_filename)
+        self.flush_requests()
+
     def flush_requests(self):
-        del self._requests_
-        self._requests_ = {}
+        del self._completed_requests_
+        self._completed_requests_ = {}
 
 
     def run(self, req_id, *args, **kwargs):
-        self._requests_[req_id].run(*args, **kwargs)
-        return self._requests_[req_id].info()
+        self._pending_requests_[req_id].run(*args, **kwargs)
+        return self._pending_requests_[req_id].info()
+    
+    def save_requests(self, filename, mode='w'):
+        with open(filename, mode) as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=iCubRequestsManager.CSV_COLUMNS)
+            writer.writeheader()
+            for req in self._completed_requests_.values():
+                writer.writerow(req.info())

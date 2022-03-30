@@ -26,26 +26,20 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import yarp
 import pyicub.utils as utils
 
 from pyicub.core.logger import YarpLogger
 
-class GazeMotion:
-    def __init__(self, lookat_method: str):
-        self.checkpoints = []
-        self.lookat_method = lookat_method
-
-    def addCheckpoint(self, value: list):
-        self.checkpoints.append(value)
-
 class GazeControllerPolyDriver:
 
     def __init__(self, robot):
+        self.__pid__ = str(os.getpid())
         self.__props__ = yarp.Property()
         self.__props__.put("robot", robot)
         self.__props__.put("device","gazecontrollerclient")
-        self.__props__.put("local","/gaze_client")
+        self.__props__.put("local","/gaze_client/" + self.__pid__)
         self.__props__.put("remote","/iKinGazeCtrl")
         self.__driver__ = yarp.PolyDriver(self.__props__)
     
