@@ -34,21 +34,6 @@ import pyicub.utils as utils
 from pyicub.core.logger import YarpLogger
 
 
-class ICUB_PARTS:
-    HEAD       = 'head'
-    FACE       = 'face'
-    TORSO      = 'torso'
-    LEFT_ARM   = 'left_arm'
-    RIGHT_ARM  = 'right_arm'
-    LEFT_LEG   = 'left_leg'
-    RIGHT_LEG  = 'right_leg'
-
-class iCubPart:
-    def __init__(self, name, joints_n):
-        self.name = name
-        self.joints_n = joints_n
-        self.joints_list = range(0, joints_n)
-
 class JointPose:
 
     def __init__(self, target_joints, joints_list=None):
@@ -62,13 +47,24 @@ class JointsTrajectoryCheckpoint:
         self.duration = duration
         self.timeout = timeout
 
-class LimbMotion:
-    def __init__(self, part_name: iCubPart):
-        self.part_name = part_name
-        self.checkpoints = []
+class RemoteControlboard:
 
-    def addCheckpoint(self, checkpoint: JointsTrajectoryCheckpoint):
-        self.checkpoints.append(checkpoint)
+    def __init__(self, port_name):
+        self.__pid__ = str(os.getpid())
+        self.__port_name__ = port_name
+        self.__driver__ = None
+        props  = self._getRobotPartProperties_()
+        self.__driver__ = yarp.PolyDriver(props)
+
+    def _getRobotPartProperties_(self):
+        props = yarp.Property()
+        props.put("device","remote_controlboard")
+        props.put("local","/client/" + self.__pid__ + self.__port_name__)
+        props.put("remote", self.__port_name__)
+        return props
+
+    def getDriver(self):
+        return self.__driver__
 
 
 class PositionController:
@@ -77,40 +73,37 @@ class PositionController:
     MOTION_COMPLETE_AT = 0.9
     DEFAULT_TIMEOUT = 10.0
 
-    def __init__(self, robot, robot_part, logger=YarpLogger.getLogger()):
-        self.__pid__        = str(os.getpid())
+    def __init__(self, robot_name, part_name, logger=YarpLogger.getLogger()):
+        self.__part_name__ = part_name
         self.__logger__     = logger
-        self.__robot__      = robot
-        self.__robot_part__ = robot_part
-        self.__driver__ = self._getDriver_()
-        self.__IEncoders__        = self.__driver__.viewIEncoders()
-        self.__IControlLimits__   = self.__driver__.viewIControlLimits()
-        self.__IControlMode__     = self.__driver__.viewIControlMode()
-        self.__IPositionControl__ = self.__driver__.viewIPositionControl()
-        self.__joints__           = self.__IPositionControl__.getAxes()
-        self.__setPositionControlMode__(self.__joints__)
+        port_name = "/" + robot_name + "/" + part_name
+        self.__driver__ = RemoteControlboard(port_name)
+        self.__IEncoders__        = None
+        self.__IControlLimits__   = None
+        self.__IControlMode__   = None
+        self.__IPositionControl__   = None
+        self.__joints__   = None
         self.__mot_id__ = 0
         self.__waitMotionDone__ = self.waitMotionDone
 
-    def _getRobotPartProperties_(self):
-        props = yarp.Property()
-        props.put("device","remote_controlboard")
-        props.put("local","/client/" + self.__pid__ + "/" + self.__robot__ + "/" + self.__robot_part__.name)
-        props.put("remote","/" + self.__robot__ + "/" + self.__robot_part__.name)
-        return props
+    def isValid(self):
+        return self.PolyDriver.isValid()
 
-    def _getDriver_(self):
-        props  = self._getRobotPartProperties_()
-        driver = yarp.PolyDriver(props)
-        if driver.isValid():
-            return driver
-        else:
-            self.__logger__.warning("Driver not properly initialized props=%s" % str(props))
-            return False
+    def init(self):
+        self.__IEncoders__        = self.PolyDriver.viewIEncoders()
+        self.__IControlLimits__   = self.PolyDriver.viewIControlLimits()
+        self.__IControlMode__     = self.PolyDriver.viewIControlMode()
+        self.__IPositionControl__ = self.PolyDriver.viewIPositionControl()
+        self.__joints__           = self.__IPositionControl__.getAxes()
+        self.__setPositionControlMode__(self.__joints__)
 
     def __setPositionControlMode__(self, joints):
         modes = yarp.IVector(joints, yarp.VOCAB_CM_POSITION)
         self.__IControlMode__.setControlModes(modes)
+
+    @property
+    def PolyDriver(self):
+        return self.__driver__.getDriver()
 
     def getIPositionControl(self):
         return self.__IPositionControl__
@@ -120,6 +113,9 @@ class PositionController:
 
     def getIControlLimits(self):
         return self.__IControlLimits__
+
+    def isMoving(self):
+        return self.__IPositionControl__.checkMotionDone()
 
     def move(self, pose: JointPose, req_time: float=0.0, timeout: float=0.0, speed: float=10.0, waitMotionDone: bool=True):
         self.__mot_id__ += 1
@@ -136,7 +132,7 @@ class PositionController:
                                 timeout=%s""" %
                                 (
                                   self.__mot_id__         ,
-                                  self.__robot_part__.name,
+                                  self.__part_name__,
                                   str(target_joints)      ,
                                   req_time                ,
                                   str(joints_list)        ,
@@ -187,7 +183,7 @@ class PositionController:
                                 timeout=%s""" %
                                 (
                                     self.__mot_id__         ,
-                                    self.__robot_part__.name,
+                                    self.__part_name__,
                                     str(target_joints)      ,
                                     req_time                ,
                                     str(joints_list)        ,
@@ -204,7 +200,7 @@ class PositionController:
                                 timeout=%s""" %
                                 (
                                     self.__mot_id__         ,
-                                    self.__robot_part__.name,
+                                    self.__part_name__,
                                     str(target_joints)      ,
                                     req_time                ,
                                     str(joints_list)        ,

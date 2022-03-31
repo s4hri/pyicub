@@ -44,7 +44,7 @@ class YarpLogger:
         else:
             YarpLogger._instance = self
         self.__yarp_logger__ = yarp.Log("",0,"") #FIXME: without params I get segfault
-        self.enable_logs()
+        self.__logging__ = True
 
     def disable_logs(self):
         self.__logging__ = False

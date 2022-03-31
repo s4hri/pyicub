@@ -46,3 +46,7 @@ class RpcClient:
         self.__rpc_client__.write(cmd, ans)
         self.__logger__.debug("Result: %s" % ans.toString())
         return ans
+
+    def __del__(self):
+        self.__rpc_client__.interrupt()
+        self.__rpc_client__.close()

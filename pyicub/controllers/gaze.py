@@ -26,40 +26,51 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import yarp
 import pyicub.utils as utils
 
 from pyicub.core.logger import YarpLogger
 
-class GazeMotion:
-    def __init__(self, lookat_method: str):
-        self.checkpoints = []
-        self.lookat_method = lookat_method
+class GazeControllerPolyDriver:
 
-    def addCheckpoint(self, value: list):
-        self.checkpoints.append(value)
+    def __init__(self, robot):
+        self.__pid__ = str(os.getpid())
+        self.__props__ = yarp.Property()
+        self.__props__.put("robot", robot)
+        self.__props__.put("device","gazecontrollerclient")
+        self.__props__.put("local","/gaze_client/" + self.__pid__)
+        self.__props__.put("remote","/iKinGazeCtrl")
+        self.__driver__ = yarp.PolyDriver(self.__props__)
 
+    @property
+    def properties(self):
+        return self.__props__
+
+    def getDriver(self):
+        return self.__driver__
 
 class GazeController:
 
     def __init__(self, robot, logger=YarpLogger.getLogger()):
         self.__logger__ = logger
-        self.__props__ = yarp.Property()
-        self.__driver__ = yarp.PolyDriver()
-        self.__props__.put("robot", robot)
-        self.__props__.put("device","gazecontrollerclient")
-        self.__props__.put("local","/gaze_client")
-        self.__props__.put("remote","/iKinGazeCtrl")
-        self.__driver__.open(self.__props__)
-        if not self.__driver__.isValid():
-            self.__logger__.error('Cannot open GazeController driver!')
-        else:
-            self.__IGazeControl__ = self.__driver__.viewIGazeControl()
-            self.__IGazeControl__.setTrackingMode(False)
-            self.__IGazeControl__.stopControl()
-            self.clearNeck()
-            self.clearEyes()
+        self.__driver__ = GazeControllerPolyDriver(robot)
         self.__mot_id__ = 0
+        self.__IGazeControl__ = None
+
+    def isValid(self):
+        return self.PolyDriver.isValid()
+
+    def init(self):
+        self.__IGazeControl__ = self.PolyDriver.viewIGazeControl()
+        self.__IGazeControl__.setTrackingMode(False)
+        self.__IGazeControl__.stopControl()
+        self.clearNeck()
+        self.clearEyes()
+
+    @property
+    def PolyDriver(self):
+        return self.__driver__.getDriver()
 
     @property
     def IGazeControl(self):
