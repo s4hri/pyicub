@@ -42,7 +42,7 @@ class GazeControllerPolyDriver:
         self.__props__.put("local","/gaze_client/" + self.__pid__)
         self.__props__.put("remote","/iKinGazeCtrl")
         self.__driver__ = yarp.PolyDriver(self.__props__)
-    
+
     @property
     def properties(self):
         return self.__props__
@@ -55,7 +55,9 @@ class GazeController:
     def __init__(self, robot, logger=YarpLogger.getLogger()):
         self.__logger__ = logger
         self.__driver__ = GazeControllerPolyDriver(robot)
-    
+        self.__mot_id__ = 0
+        self.__IGazeControl__ = None
+
     def isValid(self):
         return self.PolyDriver.isValid()
 
@@ -65,7 +67,6 @@ class GazeController:
         self.__IGazeControl__.stopControl()
         self.clearNeck()
         self.clearEyes()
-        self.__mot_id__ = 0
 
     @property
     def PolyDriver(self):

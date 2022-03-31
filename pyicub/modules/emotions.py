@@ -87,6 +87,3 @@ class emotionsPyCtrl:
 
     def sendCmd(self, part, emo):
         return self.__emoCmd__(part, emo)
-
-    def close(self):
-        self.__rpc__.close()

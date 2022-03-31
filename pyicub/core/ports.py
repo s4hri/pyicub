@@ -35,7 +35,7 @@ class CustomCallback(yarp.BottleCallback):
         yarp.BottleCallback.__init__(self)
         self.__user_callback__ = user_callback
 
-    def onRead(self, bottle, reader):
+    def onRead(self, bottle):
         self.__user_callback__(bottle)
 
 class BufferedPort:
@@ -43,10 +43,11 @@ class BufferedPort:
     def __init__(self):
         self.__logger__ = YarpLogger.getLogger()
         self.__port__ = yarp.BufferedPortBottle()
+        self.__port_name__ = ''
 
     @property
     def name(self):
-        return self.__portname__
+        return self.__port_name__
 
     def open(self, port):
         self.__logger__.debug("Opening BufferedPort: %s" % port)

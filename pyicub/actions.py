@@ -26,7 +26,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import csv
 import json
 
 class JointPose:
@@ -117,7 +116,7 @@ class iCubFullbodyAction:
             self.addStep(res)
 
     def importFromJSONFile(self, JSON_file):
-        with open(JSON_file) as f:
+        with open(JSON_file, encoding='UTF-8') as f:
             data = f.read()
         res = json.loads(data)
         print(res)

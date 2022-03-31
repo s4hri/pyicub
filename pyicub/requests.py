@@ -56,6 +56,7 @@ class iCubRequest:
         self._executor_ = concurrent.futures.ThreadPoolExecutor(max_workers=1)
         self._target_ = target
         self._retval_ = None
+        self._future_ = None
         self._logger_ = YarpLogger.getLogger()
         
     @property
@@ -199,7 +200,7 @@ class iCubRequestsManager(metaclass=SingletonMeta):
         return self._pending_requests_[req_id].info()
     
     def save_requests(self, filename, mode='w'):
-        with open(filename, mode) as csv_file:
+        with open(filename, mode, encoding='UTF-8') as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=iCubRequestsManager.CSV_COLUMNS)
             writer.writeheader()
             for req in self._completed_requests_.values():

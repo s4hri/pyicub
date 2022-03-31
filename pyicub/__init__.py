@@ -29,5 +29,5 @@
 __authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
 __emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
 __license__ = 'BSD-2'
-__version__ = '6.0'
+__version__ = '6.1'
 __description__ = 'Developing iCub applications using Python'

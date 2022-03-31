@@ -61,7 +61,7 @@ class PortMonitor:
 
     def start(self):
         if self._stop_thread_:
-           self.stop()
+            self.stop()
         self._worker_thread_ = threading.Thread(target=self.worker)
         self._worker_thread_.start()
 

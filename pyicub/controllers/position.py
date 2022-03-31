@@ -78,6 +78,13 @@ class PositionController:
         self.__logger__     = logger
         port_name = "/" + robot_name + "/" + part_name
         self.__driver__ = RemoteControlboard(port_name)
+        self.__IEncoders__        = None
+        self.__IControlLimits__   = None
+        self.__IControlMode__   = None
+        self.__IPositionControl__   = None
+        self.__joints__   = None
+        self.__mot_id__ = 0
+        self.__waitMotionDone__ = self.waitMotionDone
 
     def isValid(self):
         return self.PolyDriver.isValid()
@@ -89,8 +96,6 @@ class PositionController:
         self.__IPositionControl__ = self.PolyDriver.viewIPositionControl()
         self.__joints__           = self.__IPositionControl__.getAxes()
         self.__setPositionControlMode__(self.__joints__)
-        self.__mot_id__ = 0
-        self.__waitMotionDone__ = self.waitMotionDone
 
     def __setPositionControlMode__(self, joints):
         modes = yarp.IVector(joints, yarp.VOCAB_CM_POSITION)
