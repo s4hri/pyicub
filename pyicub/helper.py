@@ -139,7 +139,7 @@ class iCub:
 
         SIMULATION = os.getenv('ICUB_SIMULATION')
         if not SIMULATION is None:
-            if SIMULATION:
+            if SIMULATION == 'true':
                 robot_name = "icubSim" 
 
         self._robot_name_ = robot_name
@@ -165,7 +165,7 @@ class iCub:
             self._position_controllers_[part_name] = ctrl
             self._position_controllers_[part_name].init()
         else:
-            self._logger_.warning('PositionController <%s> non callable! Are you sure the robot part is available?' % part_name)
+            self._logger_.warning('PositionController <%s> not callable! Are you sure the robot part is available?' % part_name)
 
     def _initGazeController_(self):
         gaze_ctrl = GazeController(self._robot_name_)
@@ -173,7 +173,7 @@ class iCub:
             gaze_ctrl.init()
             self._gaze_ctrl_ = gaze_ctrl
         else:
-            self._logger_.warning('GazeController non correctly initialized! Are you sure the controller is available?')
+            self._logger_.warning('GazeController not correctly initialized! Are you sure the controller is available?')
             self._gaze_ctrl_ = None
 
     def _getPublicMethods(self, obj):
@@ -211,7 +211,7 @@ class iCub:
             try:
                 self._face_ = facePyCtrl(self.robot_name)
             except:
-                self._logger_.warning('facePyCtrl non correctly initialized!')
+                self._logger_.warning('facePyCtrl not correctly initialized!')
                 return None
         return self._face_
 
@@ -221,7 +221,7 @@ class iCub:
             try:
                 self._facelandmarks_ = faceLandmarksPyCtrl()
             except:
-                self._logger_.warning('facePyCtrl non correctly initialized!')
+                self._logger_.warning('facePyCtrl not correctly initialized!')
                 return None
         return self._facelandmarks_
 
@@ -235,7 +235,7 @@ class iCub:
             try:
                 self._emo_ = emotionsPyCtrl(self.robot_name)
             except:
-                self._logger_.warning('emotionsPyCtrl non correctly initialized!')
+                self._logger_.warning('emotionsPyCtrl not correctly initialized!')
                 return None
         return self._emo_
 
@@ -245,7 +245,7 @@ class iCub:
             try:
                 self._speech_ = iSpeakPyCtrl()
             except:
-                self._logger_.warning('iSpeakPyCtrl non correctly initialized!')
+                self._logger_.warning('iSpeakPyCtrl not correctly initialized!')
                 return None
         return self._speech_
 
