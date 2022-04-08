@@ -121,7 +121,6 @@ class iCubFullbodyAction:
         with open(JSON_file, encoding='UTF-8') as f:
             data = f.read()
         res = json.loads(data)
-        print(res)
         self.fromJSON(res)
 
     def exportJSONFile(self, filepath):
