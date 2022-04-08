@@ -274,7 +274,7 @@ class iCub:
         foo = self
         for call in calls:
             foo = getattr(foo, call)
-        req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=foo, name=prefix + '/%s' % str(custom_call.target))
+        req = iCubRequestsManager().create(timeout=custom_call.timeout, target=foo, name=prefix + '/%s' % str(custom_call.target))
         req.run(*custom_call.args)
         req.wait_for_completed()
 
