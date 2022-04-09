@@ -27,6 +27,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import json
+from pyicub.requests import iCubRequest
 
 class JointPose:
 
@@ -51,9 +52,10 @@ class LimbMotion:
 
 class PyiCubCustomCall:
 
-    def __init__(self, target, args=()):
+    def __init__(self, target, args=(), timeout=iCubRequest.TIMEOUT_REQUEST):
         self.target = target
         self.args = args
+        self.timeout = timeout
 
 class GazeMotion:
     def __init__(self, lookat_method: str):
@@ -119,7 +121,6 @@ class iCubFullbodyAction:
         with open(JSON_file, encoding='UTF-8') as f:
             data = f.read()
         res = json.loads(data)
-        print(res)
         self.fromJSON(res)
 
     def exportJSONFile(self, filepath):

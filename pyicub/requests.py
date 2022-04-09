@@ -31,9 +31,16 @@ import time
 import concurrent.futures
 import threading
 import csv
+import ctypes
+import sys
 
 from pyicub.utils import SingletonMeta
 from pyicub.core.logger import YarpLogger
+
+import atexit
+from concurrent.futures import thread as thf
+atexit.unregister(thf._python_exit)
+
 
 class iCubRequest:
 
@@ -53,7 +60,8 @@ class iCubRequest:
         self._timeout_ = timeout
         self._duration_ = None
         self._exception_ = None
-        self._executor_ = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+        self._task_executor_ = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+        self._timeout_executor_ = concurrent.futures.ThreadPoolExecutor(max_workers=1)
         self._target_ = target
         self._retval_ = None
         self._future_ = None
@@ -100,39 +108,59 @@ class iCubRequest:
         return str(self.info())
 
     def run(self, *args, **kwargs):
-        self._future_ = self._executor_.submit(self._target_, *args, **kwargs)
+        self._future_ = self._task_executor_.submit(self._target_, *args, **kwargs)
         self._status_ = iCubRequest.RUNNING
         self._logger_.debug("iCubRequest %s STARTED!" % self.req_id)
-        self._future_.add_done_callback(self.on_completed)
+        self._timeout_executor_.submit(self._run_process_, self._future_)
 
-    def on_completed(self, future):
+    def _run_process_(self, future):
         res = None
         try:
             res = future.result(self._timeout_)
             self._status_ = iCubRequest.DONE
         except concurrent.futures.TimeoutError as e:
-            self._exception_ = str(e)
+            self._exception_ = repr(e)
             self._status_ = iCubRequest.TIMEOUT
+            raise(concurrent.futures.TimeoutError)
         except Exception as e:
-            self._exception_ = str(e)
+            self._exception_ = repr(e)
             self._status_ = iCubRequest.FAILED
             raise(e)
         finally:
             self._end_time_ = round(time.perf_counter(), 4)
             self._duration_ = round(self._end_time_ - self._start_time_, 4)
-            self._executor_.shutdown(wait=False)
-        if self._status_ == iCubRequest.DONE:
-            self._logger_.debug("iCubRequest %s COMPLETED! %s" % (self.req_id, self.info()))
-        elif self._status_ == iCubRequest.TIMEOUT:
-            self._logger_.warning("iCubRequest %s TIMEOUT! %s" % (self.req_id, self.info()))
-        elif self._status_ == iCubRequest.FAILED:
-            self._logger_.error("iCubRequest %s ERROR! %s" % (self.req_id, self.info()))
-        
+            if self._status_ == iCubRequest.DONE:
+                self._logger_.debug("iCubRequest %s COMPLETED! %s" % (self.req_id, self.info()))
+            elif self._status_ == iCubRequest.TIMEOUT:
+                self._logger_.warning("iCubRequest %s TIMEOUT! %s" % (self.req_id, self.info()))
+            elif self._status_ == iCubRequest.FAILED:
+                self._logger_.error("iCubRequest %s ERROR! %s" % (self.req_id, self.info()))
+        if self._status_ == iCubRequest.TIMEOUT:
+            future.cancel()
+            self._stop_request_()
+        self._task_executor_.shutdown(wait=False)
+        self._timeout_executor_.shutdown(wait=False)        
         self._retval_ = res
         return res
 
+    def _stop_request_(self):
+        self._task_executor_.shutdown(wait=False)
+        for t in self._task_executor_._threads:
+            self.terminate_thread(t)
+
+    def terminate_thread(self, thread):
+        if not thread.isAlive():
+           return
+        exc = ctypes.py_object(SystemError)
+        res = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread.ident), exc)
+        if res == 0:
+            raise ValueError("nonexistent thread id")
+        elif res > 1:
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(thread.ident, None)
+            raise SystemError("PyThreadState_SetAsyncExc failed")
+
     def wait_for_completed(self):
-        self._executor_.shutdown(wait=True)
+        self._timeout_executor_.shutdown(wait=True)
         return self._retval_
 
     def info(self):
