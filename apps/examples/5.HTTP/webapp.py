@@ -26,8 +26,29 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'latest'
-__description__ = 'Developing iCub applications using Python'
+from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS
+
+class WebApp:
+
+    def __init__(self):
+        self.icub = iCub(http_server="0.0.0.0")
+
+        down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-15.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.5)
+        home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.0)
+
+        example_motion = LimbMotion(ICUB_PARTS.HEAD)
+        example_motion.addCheckpoint(down)
+        example_motion.addCheckpoint(home)
+
+        self.action = self.icub.createAction()
+        step = self.icub.createStep()
+        step.setLimbMotion(example_motion)
+        self.action.addStep(step)
+
+        self.icub.http_manager.register(target=self.foo, rule_prefix="mywebapp")
+
+    def foo(self, value):
+        self.icub.play(self.action)
+        return value
+
+WebApp()

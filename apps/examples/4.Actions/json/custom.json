@@ -1,0 +1,45 @@
+{
+    "steps": [
+        {
+            "name": "step/0",
+            "limb_motions": {},
+            "gaze_motion": null,
+            "custom_calls": [
+                {
+                    "target": "gaze.lookAtAbsAngles",
+                    "args": [
+                        0.0,
+                        15.0,
+                        0.0
+                    ]
+                },
+                {
+                    "target": "emo.neutral",
+                    "args": []
+                }
+            ],
+            "offset_ms": null
+        },
+        {
+            "name": "step/1",
+            "limb_motions": {},
+            "gaze_motion": null,
+            "custom_calls": [
+                {
+                    "target": "gaze.lookAtAbsAngles",
+                    "args": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "target": "emo.smile",
+                    "args": []
+                }
+            ],
+            "offset_ms": null
+        }
+    ],
+    "name": "action/0"
+}

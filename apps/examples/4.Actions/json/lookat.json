@@ -1,0 +1,49 @@
+{
+    "steps": [
+        {
+            "name": "step/1",
+            "limb_motions": {},
+            "gaze_motion": {
+                "checkpoints": [
+                    [
+                        -1.0,
+                        -0.5,
+                        1.0
+                    ],
+                    [
+                        -1.0,
+                        -0.2,
+                        0.5
+                    ],
+                    [
+                        -1.0,
+                        0.2,
+                        0.1
+                    ]
+                ],
+                "lookat_method": "lookAtFixationPoint"
+            },
+            "custom_calls": [],
+            "offset_ms": null
+        },
+        {
+            "name": "step/2",
+            "limb_motions": {},
+            "gaze_motion": {
+                "checkpoints": [
+                    [
+                        0.0,
+                        0.0,
+                        0.0,
+                        true,
+                        1.5
+                    ]
+                ],
+                "lookat_method": "lookAtAbsAngles"
+            },
+            "custom_calls": [],
+            "offset_ms": null
+        }
+    ],
+    "name": "default"
+}

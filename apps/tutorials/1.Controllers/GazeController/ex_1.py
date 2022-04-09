@@ -3,6 +3,9 @@
 # Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
+#                     Nicola Severino Russi (nicola.russi@iit.it)
+#                     Davide De Tommaso (davide.detommaso@iit.it)
+#
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,8 +29,23 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'latest'
-__description__ = 'Developing iCub applications using Python'
+from pyicub.helper import iCub
+
+# initialize icub
+icub = iCub()
+
+icub.gaze.lookAtAbsAngles(-15.0, -0.5, 2.0)
+icub.gaze.lookAtAbsAngles( 15.0, -0.5, 2.0)
+icub.gaze.lookAtAbsAngles(-15.0, -0.5, 2.0, timeout=1.0)
+icub.gaze.lookAtAbsAngles( 15.0, -0.5, 2.0, timeout=1.0)
+icub.gaze.lookAtAbsAngles( 0.0, 0.0, 0.0)
+
+icub.gaze.blockNeck()
+icub.gaze.lookAtAbsAngles(-15.0, -0.5, 2.0)
+icub.gaze.lookAtAbsAngles( 15.0, -0.5, 2.0)
+
+icub.gaze.clearNeck()
+icub.gaze.lookAtFixationPoint(-1, 0.0, 0.0)
+icub.gaze.lookAtFixationPoint(-2, 0.0, 0.0, waitMotionDone=False)
+icub.gaze.lookAtFixationPoint(-5, 0.0, 0.0)
+

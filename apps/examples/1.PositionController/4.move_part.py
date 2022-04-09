@@ -26,8 +26,18 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'latest'
-__description__ = 'Developing iCub applications using Python'
+from pyicub.helper import iCub, JointPose, LimbMotion, JointsTrajectoryCheckpoint, ICUB_PARTS
+
+up = JointsTrajectoryCheckpoint(JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
+down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
+home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
+
+icub = iCub()
+
+motion = LimbMotion(ICUB_PARTS.HEAD)
+motion.addCheckpoint(up)
+motion.addCheckpoint(down)
+motion.addCheckpoint(home)
+
+
+icub.movePart(motion)

@@ -26,8 +26,33 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'latest'
-__description__ = 'Developing iCub applications using Python'
+from pyicub.helper import iCub, GazeMotion, iCubFullbodyAction, iCubFullbodyStep
+
+icub = iCub()
+
+def my_action():
+    action = iCubFullbodyAction()
+
+    g1 = GazeMotion(lookat_method="lookAtFixationPoint")
+    g1.addCheckpoint([-1.0, -0.5, 1.0])
+    g1.addCheckpoint([-1.0, -0.2, 0.5])
+    g1.addCheckpoint([-1.0, 0.2, 0.1])
+
+    g2 = GazeMotion(lookat_method="lookAtAbsAngles")
+    g2.addCheckpoint([0.0, 0.0, 0.0, True, 1.5])
+    
+    step1 = iCubFullbodyStep("step/1")
+    step2 = iCubFullbodyStep("step/2")
+
+    step1.setGazeMotion(g1)
+    step2.setGazeMotion(g2)
+
+    action.addStep(step1)
+    action.addStep(step2)
+
+    return action
+
+a = my_action()
+icub.play(a)
+a.exportJSONFile('json/lookat.json')
+

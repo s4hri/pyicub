@@ -1,0 +1,63 @@
+{
+    "steps": [
+        {
+            "name": "mystep",
+            "limb_motions": {
+                "head": {
+                    "part_name": "head",
+                    "checkpoints": [
+                        {
+                            "pose": {
+                                "target_joints": [
+                                    30.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    5.0
+                                ],
+                                "joints_list": null
+                            },
+                            "duration": 3.0,
+                            "timeout": 0.0
+                        },
+                        {
+                            "pose": {
+                                "target_joints": [
+                                    -30.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    5.0
+                                ],
+                                "joints_list": null
+                            },
+                            "duration": 3.0,
+                            "timeout": 1.0
+                        },
+                        {
+                            "pose": {
+                                "target_joints": [
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    5.0
+                                ],
+                                "joints_list": null
+                            },
+                            "duration": 3.0,
+                            "timeout": 0.0
+                        }
+                    ]
+                }
+            },
+            "gaze_motion": null,
+            "custom_calls": [],
+            "offset_ms": null
+        }
+    ],
+    "name": "default"
+}

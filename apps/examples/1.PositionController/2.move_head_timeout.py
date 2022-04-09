@@ -26,8 +26,13 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'latest'
-__description__ = 'Developing iCub applications using Python'
+from pyicub.helper import iCub, JointPose, ICUB_PARTS
+
+icub = iCub()
+head_ctrl = icub.getPositionController(ICUB_PARTS.HEAD)
+
+up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+
+head_ctrl.move(up, timeout=1.0)
+head_ctrl.move(home)

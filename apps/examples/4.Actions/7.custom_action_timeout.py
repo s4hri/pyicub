@@ -26,8 +26,25 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'latest'
-__description__ = 'Developing iCub applications using Python'
+hamlet="""
+To be, or not to be, that is the question:
+Whether 'tis nobler in the mind to suffer
+The slings and arrows of outrageous fortune,
+Or to take arms against a sea of troubles
+And by opposing end them. To die—to sleep
+...
+"""
+
+
+from pyicub.helper import iCub, PyiCubCustomCall
+
+icub = iCub()
+
+speak = PyiCubCustomCall(target="speech.say", args=(hamlet,), timeout=5.0)
+
+action = icub.createAction()
+step = icub.createStep()
+step.addCustomCall(speak)
+action.addStep(step)
+
+icub.play(action)

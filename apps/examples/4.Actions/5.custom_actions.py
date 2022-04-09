@@ -26,8 +26,29 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'latest'
-__description__ = 'Developing iCub applications using Python'
+from pyicub.helper import iCub, iCubFullbodyAction, PyiCubCustomCall
+
+icub = iCub()
+
+a = PyiCubCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
+b = PyiCubCustomCall(target="emo.neutral")
+
+c = PyiCubCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 0.0, 0.0,))
+d = PyiCubCustomCall(target="emo.smile")
+
+action = icub.createAction()
+step1 = icub.createStep()
+step2 = icub.createStep()
+
+step1.addCustomCall(a)
+step1.addCustomCall(b)
+step2.addCustomCall(c)
+step2.addCustomCall(d)
+
+action.addStep(step1)
+action.addStep(step2)
+
+action.exportJSONFile('json/custom.json')
+
+imported_action = iCubFullbodyAction(JSON_file='json/custom.json')
+icub.play(action)

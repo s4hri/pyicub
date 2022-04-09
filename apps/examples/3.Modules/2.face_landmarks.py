@@ -26,8 +26,20 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'latest'
-__description__ = 'Developing iCub applications using Python'
+from pyicub.helper import iCub
+import time
+icub = iCub()
+
+for j in range(100):
+    # get number of face detected
+    faces     = icub.facelandmarks.getFaces()
+    if faces > 0:
+        for i in range(faces):
+            # for each face get center eyes
+            center_eye = icub.facelandmarks.getCenterEyes(i)
+            print("face %i - [x: %s , y: %s ]" % (i+1, center_eye[0], center_eye[1]))
+    else:
+        # no face detected
+        print("no face detected")
+
+    time.sleep(0.1)
