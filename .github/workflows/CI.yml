@@ -42,12 +42,14 @@ jobs:
      - name: Build and Push
        run: |
             export icub_distro=$(cut -d'_' -f3 <<<"${{ steps.tag.outputs.tag }}")
+            echo $icub_distro
             git pull origin ${{ steps.extract_branch.outputs.branch }}
             git checkout ${{ steps.extract_branch.outputs.branch }}
             sed -i -r 's/^(__version__ =).*/\1${{ steps.tag.outputs.tag }}/' pyicub/__init__.py
             sed -i -r 's/^(RELEASE=).*/\1${{ steps.tag.outputs.tag }}/' docker/.env
             sed -i -r 's/^(PYICUB_BRANCH=).*/\1${{ steps.extract_branch.outputs.branch }}/' docker/.env
             sed -i -r 's/^(ICUB_DISTRO=).*/\1$icub_distro/' docker/.env
+            cat docker/.env
             bash docker/.dockyman/build.sh base
             bash docker/.dockyman/build.sh distro
        env:
