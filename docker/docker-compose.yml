@@ -26,7 +26,7 @@ version: '3.8'
 
 services:
 
-  pyicub-lab:
+  pyicub.local:
     image: ${PJT_DOCKER_IMAGE}.local
     container_name: pyicub-lab.${RELEASE}
 
