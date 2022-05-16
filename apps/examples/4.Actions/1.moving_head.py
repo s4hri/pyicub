@@ -28,24 +28,20 @@
 
 from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, iCubFullbodyAction, iCubFullbodyStep, ICUB_PARTS
 
-def my_action():
-    action = iCubFullbodyAction()
-    up = JointsTrajectoryCheckpoint(JointPose(target_joints=[30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
-    down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0, timeout=1.0)
-    home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
-    
-    example_motion = LimbMotion(ICUB_PARTS.HEAD)
-    example_motion.addCheckpoint(up)
-    example_motion.addCheckpoint(down)
-    example_motion.addCheckpoint(home)
-    
-    step = iCubFullbodyStep("mystep")
-    step.setLimbMotion(example_motion)
-
-    action.addStep(step)
-    return action
-    
-
 icub = iCub()
-icub.play(my_action())
+action = icub.createAction()
+up = JointsTrajectoryCheckpoint(JointPose(target_joints=[30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
+down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0, timeout=1.0)
+home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
+    
+example_motion = LimbMotion(ICUB_PARTS.HEAD)
+example_motion.addCheckpoint(up)
+example_motion.addCheckpoint(down)
+example_motion.addCheckpoint(home)
+    
+step = icub.createStep()
+step.setLimbMotion(example_motion)
+action.addStep(step)
+
+icub.play(action)
 

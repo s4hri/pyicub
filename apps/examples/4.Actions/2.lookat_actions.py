@@ -29,30 +29,25 @@
 from pyicub.helper import iCub, GazeMotion, iCubFullbodyAction, iCubFullbodyStep
 
 icub = iCub()
+action = icub.createAction()
+action = iCubFullbodyAction()
 
-def my_action():
-    action = iCubFullbodyAction()
+g1 = GazeMotion(lookat_method="lookAtFixationPoint")
+g1.addCheckpoint([-1.0, -0.5, 1.0])
+g1.addCheckpoint([-1.0, -0.2, 0.5])
+g1.addCheckpoint([-1.0, 0.2, 0.1])
 
-    g1 = GazeMotion(lookat_method="lookAtFixationPoint")
-    g1.addCheckpoint([-1.0, -0.5, 1.0])
-    g1.addCheckpoint([-1.0, -0.2, 0.5])
-    g1.addCheckpoint([-1.0, 0.2, 0.1])
-
-    g2 = GazeMotion(lookat_method="lookAtAbsAngles")
-    g2.addCheckpoint([0.0, 0.0, 0.0, True, 1.5])
+g2 = GazeMotion(lookat_method="lookAtAbsAngles")
+g2.addCheckpoint([0.0, 0.0, 0.0, True, 1.5])
     
-    step1 = iCubFullbodyStep("step/1")
-    step2 = iCubFullbodyStep("step/2")
+step1 = icub.createStep()
+step2 = icub.createStep()
 
-    step1.setGazeMotion(g1)
-    step2.setGazeMotion(g2)
+step1.setGazeMotion(g1)
+step2.setGazeMotion(g2)
 
-    action.addStep(step1)
-    action.addStep(step2)
+action.addStep(step1)
+action.addStep(step2)
 
-    return action
-
-a = my_action()
-icub.play(a)
-a.exportJSONFile('json/lookat.json')
-
+icub.play(action)
+action.exportJSONFile('json/lookat.json')

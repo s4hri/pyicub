@@ -29,5 +29,4 @@
 from pyicub.helper import iCub
 
 icub = iCub()
-action = icub.createAction(JSON_file="json/lookat.json")
-icub.play(action)
+icub.playActionFromJSON("json/lookat.json")

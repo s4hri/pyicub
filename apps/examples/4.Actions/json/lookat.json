@@ -1,7 +1,7 @@
 {
     "steps": [
         {
-            "name": "step/1",
+            "name": "step",
             "limb_motions": {},
             "gaze_motion": {
                 "checkpoints": [
@@ -24,10 +24,11 @@
                 "lookat_method": "lookAtFixationPoint"
             },
             "custom_calls": [],
-            "offset_ms": null
+            "offset_ms": null,
+            "timeout": 60.0
         },
         {
-            "name": "step/2",
+            "name": "step",
             "limb_motions": {},
             "gaze_motion": {
                 "checkpoints": [
@@ -42,8 +43,9 @@
                 "lookat_method": "lookAtAbsAngles"
             },
             "custom_calls": [],
-            "offset_ms": null
+            "offset_ms": null,
+            "timeout": 60.0
         }
     ],
-    "name": "default"
+    "name": "action"
 }
