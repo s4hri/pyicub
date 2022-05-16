@@ -52,4 +52,3 @@ step.setLimbMotion(torso_motion)
 
 [head_req, torso_req] = icub.moveStep(step)
 print(head_req, torso_req)
-icub.join_pending_requests(csv_output_filename='step.csv')

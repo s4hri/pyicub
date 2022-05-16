@@ -1,7 +1,7 @@
 {
     "steps": [
         {
-            "name": "step/0",
+            "name": "step",
             "limb_motions": {},
             "gaze_motion": null,
             "custom_calls": [
@@ -11,17 +11,20 @@
                         0.0,
                         15.0,
                         0.0
-                    ]
+                    ],
+                    "timeout": 60.0
                 },
                 {
                     "target": "emo.neutral",
-                    "args": []
+                    "args": [],
+                    "timeout": 60.0
                 }
             ],
-            "offset_ms": null
+            "offset_ms": null,
+            "timeout": 60.0
         },
         {
-            "name": "step/1",
+            "name": "step",
             "limb_motions": {},
             "gaze_motion": null,
             "custom_calls": [
@@ -31,15 +34,18 @@
                         0.0,
                         0.0,
                         0.0
-                    ]
+                    ],
+                    "timeout": 60.0
                 },
                 {
                     "target": "emo.smile",
-                    "args": []
+                    "args": [],
+                    "timeout": 60.0
                 }
             ],
-            "offset_ms": null
+            "offset_ms": null,
+            "timeout": 60.0
         }
     ],
-    "name": "action/0"
+    "name": "action"
 }

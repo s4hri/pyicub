@@ -37,7 +37,7 @@ from pyicub.modules.speech import iSpeakPyCtrl
 from pyicub.modules.face import facePyCtrl
 from pyicub.modules.faceLandmarks import faceLandmarksPyCtrl
 from pyicub.core.ports import BufferedReadPort
-from pyicub.core.logger import YarpLogger
+from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequestsManager, iCubRequest
 from pyicub.rest import iCubHTTPManager
 
@@ -99,7 +99,7 @@ class iCubPart:
 
 class iCub:
 
-    def __init__(self, http_server=False, robot_name="icub", debug=True):
+    def __init__(self, http_server=False, robot_name="icub", logging=True, logging_file=True, logging_path=None):
         self._position_controllers_ = {}
         self._services_ = {}
         self._gaze_ctrl_            = None
@@ -108,7 +108,7 @@ class iCub:
         self._face_                 = None
         self._facelandmarks_        = None
         self._monitors_             = []
-        self._logger_               = YarpLogger.getLogger()
+        self._logger_               = PyicubLogger.getLogger() #YarpLogger.getLogger()
         self._steps_uid_            = 0
         self._actions_uid_          = 0
 
@@ -121,21 +121,41 @@ class iCub:
         self._icub_parts_[ICUB_PARTS.LEFT_LEG   ]   = iCubPart(ICUB_PARTS.LEFT_LEG  , 6)
         self._icub_parts_[ICUB_PARTS.RIGHT_LEG  ]   = iCubPart(ICUB_PARTS.RIGHT_LEG , 6)
 
-
         if http_server:
             self._http_manager_ = iCubHTTPManager(host=http_server)
         else:
             self._http_manager_ = None
 
 
-        DEBUG = os.getenv('PYICUB_DEBUG')
-        if DEBUG is None:
-            self._debug_ = debug
-        else:
-            self._debug_ = DEBUG
+        PYICUB_LOGGING = os.getenv('PYICUB_LOGGING')
+        if not PYICUB_LOGGING is None:
+            if PYICUB_LOGGING == 'true':
+                logging = True 
+        self._logging_ = logging
 
-        if not self._debug_:
+        if self._logging_:
+            PYICUB_LOGGING_PATH = os.getenv('PYICUB_LOGGING_PATH')
+            if PYICUB_LOGGING_PATH is None:
+                if logging_path and logging_file:
+                    self._logging_path_ = logging_path
+                    if isinstance(self._logger_, PyicubLogger):
+                        self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT, True, self._logging_path_)
+                else:
+                    if isinstance(self._logger_, PyicubLogger):
+                        self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT)
+            else:
+                self._logging_path_ = PYICUB_LOGGING_PATH
+                if isinstance(self._logger_, PyicubLogger):
+                    if logging_file:
+                        self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT, True, self._logging_path_)
+                    else:
+                        self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT)
+
+        else:
             self._logger_.disable_logs()
+
+        self.request_manager = iCubRequestsManager(self._logger_, self._logging_, self._logging_path_)
+
 
         SIMULATION = os.getenv('ICUB_SIMULATION')
         if not SIMULATION is None:
@@ -160,7 +180,7 @@ class iCub:
             self._initPositionController_(part_name)
 
     def _initPositionController_(self, part_name):
-        ctrl = PositionController(self._robot_name_,part_name)
+        ctrl = PositionController(self._robot_name_, part_name, self._logger_)
         if ctrl.isValid():
             self._position_controllers_[part_name] = ctrl
             self._position_controllers_[part_name].init()
@@ -168,7 +188,7 @@ class iCub:
             self._logger_.warning('PositionController <%s> not callable! Are you sure the robot part is available?' % part_name)
 
     def _initGazeController_(self):
-        gaze_ctrl = GazeController(self._robot_name_)
+        gaze_ctrl = GazeController(self._robot_name_, self._logger_)
         if gaze_ctrl.isValid():
             gaze_ctrl.init()
             self._gaze_ctrl_ = gaze_ctrl
@@ -257,30 +277,24 @@ class iCub:
     def robot_name(self):
         return self._robot_name_
 
-    def createStep(self, name=None, offset_ms=None):
-        if name is None:
-            name = 'step/' + str(self._steps_uid_)
-            self._steps_uid_+=1
-        return iCubFullbodyStep(name, offset_ms)
+    def createStep(self, name='step', offset_ms=None, timeout=iCubRequest.TIMEOUT_REQUEST):
+        return iCubFullbodyStep(name, offset_ms, timeout)
 
-    def createAction(self, action_name=None, JSON_file=None):
-        if action_name is None:
-            action_name = 'action/' + str(self._actions_uid_)
-            self._actions_uid_+=1
-        return iCubFullbodyAction(action_name, JSON_file)
+    def createAction(self, name='action', JSON_file=None):
+        return iCubFullbodyAction(name, JSON_file)
 
-    def execCustomCall(self, custom_call: PyiCubCustomCall, prefix=''):
+    def execCustomCall(self, custom_call: PyiCubCustomCall, prefix='', ts_ref=0.0):
         calls = custom_call.target.split('.')
         foo = self
         for call in calls:
             foo = getattr(foo, call)
-        req = iCubRequestsManager().create(timeout=custom_call.timeout, target=foo, name=prefix + '/%s' % str(custom_call.target))
-        req.run(*custom_call.args)
+        req = self.request_manager.create(timeout=custom_call.timeout, target=foo, name=prefix + '/%s' % str(custom_call.target), ts_ref=ts_ref)
+        self.request_manager.run_request(req, True, *custom_call.args)
         req.wait_for_completed()
 
-    def execCustomCalls(self, calls, prefix=''):
+    def execCustomCalls(self, calls, prefix='', ts_ref=0.0):
         for call in calls:
-            self.execCustomCall(call, prefix)
+            self.execCustomCall(call, prefix, ts_ref)
 
     def getPositionController(self, part_name):
         if part_name in self._position_controllers_.keys():
@@ -288,71 +302,89 @@ class iCub:
         self._logger_.error('PositionController <%s> non callable! Are you sure the robot part is available?' % part_name)
         return None
 
-    def join_pending_requests(self, csv_output_filename=None):
-        iCubRequestsManager().join(csv_output_filename=csv_output_filename)
-
-    def moveGaze(self, gaze_motion: GazeMotion, prefix=''):
+    def moveGaze(self, gaze_motion: GazeMotion, prefix='', ts_ref=0.0):
         requests = []
 
         for i in range(0, len(gaze_motion.checkpoints)):
-            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=getattr(self.gaze, gaze_motion.lookat_method), name=prefix + '/%s' % str(gaze_motion.lookat_method))
-            req.run(*gaze_motion.checkpoints[i])
-            req.wait_for_completed()
+            req = self.request_manager.create(timeout=iCubRequest.TIMEOUT_REQUEST, target=getattr(self.gaze, gaze_motion.lookat_method), name=prefix + '/%s' % str(gaze_motion.lookat_method), ts_ref=ts_ref)
+            self.request_manager.run_request(req, True, *gaze_motion.checkpoints[i])
             requests.append(req)
-
+        
+        self.request_manager.join_requests(requests)
+        
         return requests
 
-    def movePart(self, limb_motion: LimbMotion, prefix=''):
+    def movePart(self, limb_motion: LimbMotion, prefix='', ts_ref=0.0):
         requests = []
-
         ctrl = self.getPositionController(limb_motion.part_name)
         for i in range(0, len(limb_motion.checkpoints)):
             if ctrl is None:
                 self._logger_.warning('movePart <%s> ignored!' % limb_motion.part_name)
             else:
-                req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=ctrl.move, name=prefix + '/' + limb_motion.part_name)
-                req.run(pose=limb_motion.checkpoints[i].pose, req_time=limb_motion.checkpoints[i].duration, timeout=limb_motion.checkpoints[i].timeout)
-                req.wait_for_completed()
+                req = self.request_manager.create(timeout=limb_motion.checkpoints[i].timeout, target=ctrl.move, name=prefix + '/' + limb_motion.part_name, ts_ref=ts_ref)
+                self.request_manager.run_request(req, 
+                                                 wait_for_completed=True, 
+                                                 pose=limb_motion.checkpoints[i].pose, 
+                                                 req_time=limb_motion.checkpoints[i].duration,
+                                                 tag=req.req_id)
+                
                 requests.append(req)
 
+        self.request_manager.join_requests(requests)       
         return requests
 
 
-    def moveStep(self, step, prefix=''):
+    def moveStep(self, step, prefix='', ts_ref=0.0):
+        if ts_ref == 0.0:
+            ts_ref = round(time.perf_counter(), 4)
         requests = []
-
+        self._logger_.debug('Step <%s> STARTED!' % step.name)
+        if step.offset_ms:
+            time.sleep(step.offset_ms/1000.0)
         if step.gaze_motion:
-            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.moveGaze, name='/%s' % step.name + '/gaze')
+            req = self.request_manager.create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.moveGaze, name=prefix + '/gaze', ts_ref=ts_ref)
             requests.append(req)
-            req.run(step.gaze_motion, req.req_id)
+            self.request_manager.run_request(req,
+                                             False,
+                                             step.gaze_motion,
+                                             req.req_id,
+                                             ts_ref)
         if step.custom_calls:
-            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.execCustomCalls, name='/%s' % step.name + '/custom')
+            req = self.request_manager.create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.execCustomCalls, name= prefix + '/custom', ts_ref=ts_ref)
             requests.append(req)
-            req.run(step.custom_calls, req.req_id)
+            self.request_manager.run_request(req,
+                                             False,
+                                             step.custom_calls,
+                                             req.req_id,
+                                             ts_ref)
         for part, limb_motion in step.limb_motions.items():
-            req = iCubRequestsManager().create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.movePart, name='/%s' % step.name + '/limb')
+            req = self.request_manager.create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self.movePart, name=prefix + '/limb', ts_ref=ts_ref)
             requests.append(req)
-            req.run(limb_motion, req.req_id)
-        iCubRequest.join(requests)
+            self.request_manager.run_request(req,
+                                             False,
+                                             limb_motion,
+                                             req.req_id,
+                                             ts_ref)
+        self.request_manager.join_requests(requests)
+        self._logger_.debug('Step <%s> COMPLETED!' % step.name)
         return requests
 
     def playActionFromJSON(self, action_json):
-        action = iCubFullbodyAction()
-        action.fromJSON(action_json)
+        action = iCubFullbodyAction(JSON_file=action_json)
         self.play(action)
 
-    def play(self, action: iCubFullbodyAction, csv_output_filename=None):
-        manager = iCubRequestsManager()
+    def play(self, action: iCubFullbodyAction):
+        t0 = round(time.perf_counter(), 4)
         self._logger_.debug('Playing action <%s>' % action.name)
-        i = 1
         for step in action.steps:
-            self._logger_.debug('Step <%d> Action <%s> STARTED!' % (i, action.name))
-            if step.offset_ms:
-                time.sleep(step.offset_ms/1000.0)
-            requests = self.moveStep(step, prefix=action.name)
-            manager.join(csv_output_filename=csv_output_filename)
-            self._logger_.debug('Step <%d> Action <%s> COMPLETED!' % (i, action.name))
-            i += 1
+            prefix = "/%s/%s" % (action.name, step.name)
+            req = self.request_manager.create(timeout=step.timeout, target=self.moveStep, name=prefix, ts_ref=t0)
+            self.request_manager.run_request(req,
+                                             True,
+                                             step,
+                                             req.req_id,
+                                             t0)
+            self.request_manager.join_pending_requests()
         self._logger_.debug('Action <%s> finished!' % action.name)
 
     def portmonitor(self, yarp_src_port, activate_function, callback):

@@ -26,6 +26,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from pyicub.helper import iCub, JointPose, LimbMotion, JointsTrajectoryCheckpoint, iCubFullbodyAction, ICUB_PARTS, PyiCubCustomCall
+
 hamlet="""
 To be, or not to be, that is the question:
 Whether 'tis nobler in the mind to suffer
@@ -35,16 +37,23 @@ And by opposing end them. To die—to sleep
 ...
 """
 
-
-from pyicub.helper import iCub, PyiCubCustomCall
-
 icub = iCub()
 
-speak = PyiCubCustomCall(target="speech.say", args=(hamlet,), timeout=5.0)
+speak = PyiCubCustomCall(target="speech.say", args=(hamlet,))
+
+head_up = JointsTrajectoryCheckpoint(JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
+head_down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
+head_home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
+
+head_motion = LimbMotion(ICUB_PARTS.HEAD)
+head_motion.addCheckpoint(head_up)
+head_motion.addCheckpoint(head_down)
+head_motion.addCheckpoint(head_home)
+
+step = icub.createStep(timeout=2.0)
+step.addCustomCall(speak)
+step.setLimbMotion(head_motion)
 
 action = icub.createAction()
-step = icub.createStep()
-step.addCustomCall(speak)
 action.addStep(step)
-
 icub.play(action)

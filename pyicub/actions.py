@@ -67,12 +67,13 @@ class GazeMotion:
 
 class iCubFullbodyStep:
 
-    def __init__(self, name, offset_ms=None):
+    def __init__(self, name='step', offset_ms=None, timeout=iCubRequest.TIMEOUT_REQUEST):
         self.name = name
         self.limb_motions = {}
         self.gaze_motion = None
         self.custom_calls = []
         self.offset_ms = offset_ms
+        self.timeout = timeout
 
     def setGazeMotion(self, gaze_motion: GazeMotion):
         self.gaze_motion = gaze_motion
@@ -86,7 +87,7 @@ class iCubFullbodyStep:
 
 class iCubFullbodyAction:
 
-    def __init__(self, name='default', JSON_file=None):
+    def __init__(self, name='action', JSON_file=None):
         self.steps = []
         self.name = name
         if JSON_file:

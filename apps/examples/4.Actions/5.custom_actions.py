@@ -26,7 +26,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, iCubFullbodyAction, PyiCubCustomCall
+from pyicub.helper import iCub, iCubFullbodyAction, PyiCubCustomCall, iCubFullbodyStep
 
 icub = iCub()
 
@@ -51,4 +51,4 @@ action.addStep(step2)
 action.exportJSONFile('json/custom.json')
 
 imported_action = iCubFullbodyAction(JSON_file='json/custom.json')
-icub.play(action)
+icub.play(imported_action)

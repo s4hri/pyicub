@@ -29,10 +29,12 @@
 import os
 import time
 import yarp
+import concurrent.futures
 
 import pyicub.utils as utils
-from pyicub.core.logger import YarpLogger
 
+
+DEFAULT_TIMEOUT = 30.0
 
 class JointPose:
 
@@ -42,7 +44,7 @@ class JointPose:
 
 class JointsTrajectoryCheckpoint:
 
-    def __init__(self, pose: JointPose, duration: float=0.0, timeout: float=0.0):
+    def __init__(self, pose: JointPose, duration: float=0.0, timeout: float=DEFAULT_TIMEOUT):
         self.pose = pose
         self.duration = duration
         self.timeout = timeout
@@ -71,9 +73,8 @@ class PositionController:
 
     WAITMOTIONDONE_PERIOD = 0.1
     MOTION_COMPLETE_AT = 0.9
-    DEFAULT_TIMEOUT = 10.0
 
-    def __init__(self, robot_name, part_name, logger=YarpLogger.getLogger()):
+    def __init__(self, robot_name, part_name, logger):
         self.__part_name__ = part_name
         self.__logger__     = logger
         port_name = "/" + robot_name + "/" + part_name
@@ -83,7 +84,6 @@ class PositionController:
         self.__IControlMode__   = None
         self.__IPositionControl__   = None
         self.__joints__   = None
-        self.__mot_id__ = 0
         self.__waitMotionDone__ = self.waitMotionDone
 
     def isValid(self):
@@ -117,13 +117,11 @@ class PositionController:
     def isMoving(self):
         return self.__IPositionControl__.checkMotionDone()
 
-    def move(self, pose: JointPose, req_time: float=0.0, timeout: float=0.0, speed: float=10.0, waitMotionDone: bool=True):
-        self.__mot_id__ += 1
+    def move(self, pose: JointPose, req_time: float=0.0, timeout: float=DEFAULT_TIMEOUT, speed: float=10.0, waitMotionDone: bool=True, tag: str='default'):
         target_joints = pose.target_joints
         joints_list = pose.joints_list
-        if timeout == 0.0:
-            timeout = PositionController.DEFAULT_TIMEOUT
-        self.__logger__.info("""Motion <%d> STARTED!
+        self.__logger__.info("""Motion STARTED!
+                                tag: %s,
                                 robot_part:%s,
                                 target_joints:%s,
                                 req_time:%.2f,
@@ -131,7 +129,7 @@ class PositionController:
                                 waitMotionDone=%s,
                                 timeout=%s""" %
                                 (
-                                  self.__mot_id__         ,
+                                  tag,
                                   self.__part_name__,
                                   str(target_joints)      ,
                                   req_time                ,
@@ -149,7 +147,7 @@ class PositionController:
             tmp   = yarp.Vector(self.__joints__)
             encs  = yarp.Vector(self.__joints__)
             while not self.__IEncoders__.getEncoders(encs.data()):
-                yarp.delay(0.005)
+                yarp.delay(0.1)
             i = 0
             for j in joints_list:
                 tmp.set(i, target_joints[i])
@@ -174,7 +172,8 @@ class PositionController:
         if waitMotionDone is True:
             res = self.__waitMotionDone__(timeout=timeout)
             if res:
-                self.__logger__.info("""Motion <%d> COMPLETED!
+                self.__logger__.info("""Motion COMPLETED!
+                                tag: %s,
                                 robot_part:%s,
                                 target_joints:%s
                                 req_time:%.2f,
@@ -182,7 +181,7 @@ class PositionController:
                                 waitMotionDone=%s,
                                 timeout=%s""" %
                                 (
-                                    self.__mot_id__         ,
+                                    tag,
                                     self.__part_name__,
                                     str(target_joints)      ,
                                     req_time                ,
@@ -191,7 +190,8 @@ class PositionController:
                                     str(timeout)
                                 ))
             else:
-                self.__logger__.warning("""Motion <%d> TIMEOUT!
+                self.__logger__.warning("""Motion TIMEOUT!
+                                tag: %s,
                                 robot_part:%s,
                                 target_joints:%s
                                 req_time:%.2f,
@@ -199,7 +199,7 @@ class PositionController:
                                 waitMotionDone=%s,
                                 timeout=%s""" %
                                 (
-                                    self.__mot_id__         ,
+                                    tag,
                                     self.__part_name__,
                                     str(target_joints)      ,
                                     req_time                ,
@@ -207,6 +207,8 @@ class PositionController:
                                     str(waitMotionDone)     ,
                                     str(timeout)
                                 ))
+            return res
+                
 
 
     def setCustomWaitMotionDone(self, motion_complete_at=MOTION_COMPLETE_AT):
