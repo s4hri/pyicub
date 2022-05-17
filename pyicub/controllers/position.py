@@ -58,6 +58,9 @@ class RemoteControlboard:
         props  = self._getRobotPartProperties_()
         self.__driver__ = yarp.PolyDriver(props)
 
+    def __del__(self):
+        self.__driver__.close()
+
     def _getRobotPartProperties_(self):
         props = yarp.Property()
         props.put("device","remote_controlboard")

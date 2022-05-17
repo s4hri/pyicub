@@ -41,12 +41,17 @@ class GazeControllerPolyDriver:
         self.__props__.put("remote","/iKinGazeCtrl")
         self.__driver__ = yarp.PolyDriver(self.__props__)
 
+    def __del__(self):
+        self.__driver__.close()
+
     @property
     def properties(self):
         return self.__props__
 
     def getDriver(self):
         return self.__driver__
+
+        
 
 class GazeController:
 
