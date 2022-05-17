@@ -45,6 +45,9 @@ class BufferedPort:
         self.__port__ = yarp.BufferedPortBottle()
         self.__port_name__ = ''
 
+    def __del__(self):
+        self.__port__.close()
+
     @property
     def name(self):
         return self.__port_name__
