@@ -67,17 +67,14 @@
                         0.0,
                         15.0,
                         0.0
-                    ],
-                    "timeout": 60.0
+                    ]
                 },
                 {
                     "target": "emo.neutral",
-                    "args": [],
-                    "timeout": 60.0
+                    "args": []
                 }
             ],
-            "offset_ms": null,
-            "timeout": 60.0
+            "offset_ms": null
         },
         {
             "name": "step",
@@ -140,8 +137,7 @@
             },
             "gaze_motion": null,
             "custom_calls": [],
-            "offset_ms": null,
-            "timeout": 60.0
+            "offset_ms": null
         },
         {
             "name": "step",
@@ -280,13 +276,12 @@
             "custom_calls": [
                 {
                     "target": "emo.smile",
-                    "args": [],
-                    "timeout": 60.0
+                    "args": []
                 }
             ],
-            "offset_ms": 500,
-            "timeout": 60.0
+            "offset_ms": 500
         }
     ],
-    "name": "action"
+    "name": "action",
+    "description": null
 }
