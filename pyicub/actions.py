@@ -52,10 +52,9 @@ class LimbMotion:
 
 class PyiCubCustomCall:
 
-    def __init__(self, target, args=(), timeout=iCubRequest.TIMEOUT_REQUEST):
+    def __init__(self, target, args=()):
         self.target = target
         self.args = args
-        self.timeout = timeout
 
 class GazeMotion:
     def __init__(self, lookat_method: str):
@@ -67,7 +66,7 @@ class GazeMotion:
 
 class iCubFullbodyStep:
 
-    def __init__(self, name, offset_ms=None):
+    def __init__(self, name='step', offset_ms=None):
         self.name = name
         self.limb_motions = {}
         self.gaze_motion = None
@@ -86,9 +85,10 @@ class iCubFullbodyStep:
 
 class iCubFullbodyAction:
 
-    def __init__(self, name='default', JSON_file=None):
+    def __init__(self, name='action', description='empty', JSON_file=None):
         self.steps = []
         self.name = name
+        self.description = description
         if JSON_file:
             self.importFromJSONFile(JSON_file)
     

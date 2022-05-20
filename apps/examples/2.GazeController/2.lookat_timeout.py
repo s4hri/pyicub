@@ -26,8 +26,11 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'v6.2-rc1_distro_v2022.02.0-ubuntu20.04'
-__description__ = 'Developing iCub applications using Python'
+from pyicub.helper import iCub
+
+icub = iCub()
+
+icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0)
+icub.gaze.lookAtAbsAngles(10.0, 0.0, 0.0, timeout=1.0)
+icub.gaze.lookAtAbsAngles(-10.0, 0.0, 0.0)
+icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0)

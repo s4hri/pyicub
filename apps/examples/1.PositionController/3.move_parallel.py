@@ -26,8 +26,24 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'v6.2-rc1_distro_v2022.02.0-ubuntu20.04'
-__description__ = 'Developing iCub applications using Python'
+from pyicub.helper import iCub, JointPose, ICUB_PARTS
+
+icub = iCub()
+head_ctrl = icub.getPositionController(ICUB_PARTS.HEAD)
+torso_ctrl = icub.getPositionController(ICUB_PARTS.TORSO)
+
+head_up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+head_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+
+torso_down = JointPose(target_joints=[0.0, 0.0, 20.0])
+torso_home = JointPose(target_joints=[0.0, 0.0, 0.0])
+
+head_ctrl.move(head_up, waitMotionDone=False)
+torso_ctrl.move(torso_down, waitMotionDone=False)
+
+head_ctrl.waitMotionDone(timeout=10.0)
+torso_ctrl.waitMotionDone(timeout=10.0)
+
+head_ctrl.move(head_home)
+torso_ctrl.move(torso_home)
+

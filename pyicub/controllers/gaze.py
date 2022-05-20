@@ -30,8 +30,6 @@ import os
 import yarp
 import pyicub.utils as utils
 
-from pyicub.core.logger import YarpLogger
-
 class GazeControllerPolyDriver:
 
     def __init__(self, robot):
@@ -43,6 +41,9 @@ class GazeControllerPolyDriver:
         self.__props__.put("remote","/iKinGazeCtrl")
         self.__driver__ = yarp.PolyDriver(self.__props__)
 
+    def __del__(self):
+        self.__driver__.close()
+
     @property
     def properties(self):
         return self.__props__
@@ -50,9 +51,11 @@ class GazeControllerPolyDriver:
     def getDriver(self):
         return self.__driver__
 
+        
+
 class GazeController:
 
-    def __init__(self, robot, logger=YarpLogger.getLogger()):
+    def __init__(self, robot, logger):
         self.__logger__ = logger
         self.__driver__ = GazeControllerPolyDriver(robot)
         self.__mot_id__ = 0

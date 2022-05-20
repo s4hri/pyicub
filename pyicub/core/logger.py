@@ -27,10 +27,48 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import yarp
+import logging
+import datetime
+import os
 
-class YarpLogger:
+
+class _Logger:
 
     _instance = None
+
+    def __init__(self):
+        if _Logger._instance != None:
+            raise Exception("This class is a singleton!")
+        else:
+            _Logger._instance = self
+
+        self._logging = True
+        self._logger = None
+
+    def disable_logs(self):
+        self._logging = False
+
+    def enable_logs(self):
+        self._logging = True
+
+    def error(self, msg):
+        if self._logging:
+            self._logger.error(msg)
+
+    def warning(self, msg):
+        if self._logging:
+            self._logger.warning(msg)
+
+    def debug(self, msg):
+        if self._logging:
+            self._logger.debug(msg)
+
+    def info(self, msg):
+        if self._logging:
+            self._logger.info(msg)
+
+
+class YarpLogger(_Logger):
 
     @staticmethod
     def getLogger():
@@ -39,31 +77,51 @@ class YarpLogger:
         return YarpLogger._instance
 
     def __init__(self):
-        if YarpLogger._instance != None:
-            raise Exception("This class is a singleton!")
-        else:
-            YarpLogger._instance = self
-        self.__yarp_logger__ = yarp.Log("",0,"") #FIXME: without params I get segfault
-        self.__logging__ = True
+        _Logger.__init__(self)
+        self._yarp_logger = yarp.Log("",0,"") #FIXME: without params I get segfault
+        self._logger = self._yarp_logger
 
-    def disable_logs(self):
-        self.__logging__ = False
+class PyicubLogger(_Logger):
 
-    def enable_logs(self):
-        self.__logging__ = True
+    @staticmethod
+    def getLogger():
+        if PyicubLogger._instance == None:
+            PyicubLogger()
+        return PyicubLogger._instance
 
-    def error(self, msg):
-        if self.__logging__:
-            self.__yarp_logger__.error(msg)
+    FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+    FORMAT_VERBOSE = '%(asctime)s - %(levelname)s - %(module)s - %(process)d - %(thread)d - %(message)s'
+    FORMAT_JSON = '{"asctime": "%(asctime)-15s", "created": %(created)f, "relativeCreated": %(relativeCreated)f, "levelname": "%(levelname)s", "module": "%(module)s", "process": %(process)d, "processName": "%(processName)s", "thread": %(thread)d, "threadName": "%(threadName)s", "message": "%(message)s"}'
+    LOGGING_LEVEL = logging.DEBUG
 
-    def warning(self, msg):
-        if self.__logging__:
-            self.__yarp_logger__.warning(msg)
+    def __init__(self):
+        _Logger.__init__(self)
 
-    def debug(self, msg):
-        if self.__logging__:
-            self.__yarp_logger__.debug(msg)
+    def configure(self, logging_level, logging_format, logging_file=False, logging_path='.'):
+        self._logging_level = logging_level
+        self._logging_path = logging_path
+        self._logging_format = logging_format
+        self._logger = logging.getLogger('pyicub')
+        self._logger.setLevel(logging_level)
+        self.addStreamHandler()
+        if logging_file is True:
+            self.addFileHandler(logging_path)
 
-    def info(self, msg):
-        if self.__logging__:
-            self.__yarp_logger__.info(msg)
+    def addFileHandler(self, path):
+        datetimestr = datetime.datetime.now().strftime('%d.%m.%Y_%H:%M')
+        main_name = 'pyicub'
+        filename = "%s_%s.log" % (main_name, datetimestr)
+        filepath = os.path.join(path, filename)
+        ch = logging.FileHandler(filepath, mode='w')
+        ch.setLevel(self._logging_level)
+        formatter = logging.Formatter(self._logging_format)
+        ch.setFormatter(formatter)
+        self._logger.addHandler(ch)
+
+    def addStreamHandler(self, stream=None):
+        ch = logging.StreamHandler(stream) # None defaults to sys.stderr
+        ch.setLevel(self._logging_level)
+        formatter = logging.Formatter(self._logging_format)
+        ch.setFormatter(formatter)
+        self._logger.addHandler(ch)
+

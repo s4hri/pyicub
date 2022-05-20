@@ -26,8 +26,30 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'v6.2-rc1_distro_v2022.02.0-ubuntu20.04'
-__description__ = 'Developing iCub applications using Python'
+from pyicub.helper import iCub
+
+DOWN = [0.0, -15.0, 3.0]
+ZERO = [0.0, 0.0, 3.0]
+UP = [0.0, 15.0, 3.0]
+
+def af1(values):
+    lastread = values[-1].split(' ')
+    if abs(ZERO[1] - float(lastread[1])) < 2:
+        return True
+    return False
+
+def cb1():
+    print("Watching at ZERO detected!")
+
+icub = iCub()
+
+icub.portmonitor("/iKinGazeCtrl/angles:o", activate_function=af1, callback=cb1)
+
+icub.gaze.lookAtAbsAngles(UP[0], UP[1], UP[2])
+
+for _ in range(0,3):
+    icub.gaze.lookAtAbsAngles(DOWN[0], DOWN[1], DOWN[2])
+    icub.gaze.lookAtAbsAngles(UP[0], UP[1], UP[2])
+
+icub.gaze.lookAtAbsAngles(0.0, 0.0, 0.0)
+icub.close()

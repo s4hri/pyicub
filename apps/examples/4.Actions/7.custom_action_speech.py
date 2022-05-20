@@ -26,8 +26,32 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'v6.2-rc1_distro_v2022.02.0-ubuntu20.04'
-__description__ = 'Developing iCub applications using Python'
+from pyicub.helper import iCub, JointPose, LimbMotion, JointsTrajectoryCheckpoint, iCubFullbodyAction, ICUB_PARTS, PyiCubCustomCall
+
+hamlet="""
+To be, or not to be, that is the question:
+Whether 'tis nobler in the mind to suffer
+The slings and arrows of outrageous fortune,
+...
+"""
+
+icub = iCub()
+
+speak = PyiCubCustomCall(target="speech.say", args=(hamlet,))
+
+head_up = JointsTrajectoryCheckpoint(JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
+head_down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
+head_home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
+
+head_motion = LimbMotion(ICUB_PARTS.HEAD)
+head_motion.addCheckpoint(head_up)
+head_motion.addCheckpoint(head_down)
+head_motion.addCheckpoint(head_home)
+
+step = icub.createStep()
+step.addCustomCall(speak)
+step.setLimbMotion(head_motion)
+
+action = icub.createAction()
+action.addStep(step)
+icub.play(action)
