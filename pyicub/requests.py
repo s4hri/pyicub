@@ -196,7 +196,7 @@ class iCubRequestsManager(metaclass=SingletonMeta):
 
     CSV_COLUMNS = ['req_id', 'target', 'tag', 'status', 'creation_time', 'start_time', 'end_time', 'duration', 'exception']
 
-    def __init__(self, logger, logging, logging_path):
+    def __init__(self, logger, logging=False, logging_path=None):
         self._pending_futures_ = {}
         self._req_topics_ = {}
         self._last_req_id_ = 0
@@ -204,11 +204,14 @@ class iCubRequestsManager(metaclass=SingletonMeta):
         self._logger_ = logger
         self._logging_ = logging
         self._logging_path_ = logging_path
-        if self._logging_:
+        if self._logging_ and self._logging_path_:
             self._logfile_ = os.path.join(self._logging_path_, "pyicub_requests.csv")
             with open(self._logfile_, mode='w', encoding='UTF-8') as csv_file:
                 writer = csv.DictWriter(csv_file, fieldnames=iCubRequestsManager.CSV_COLUMNS)
                 writer.writeheader()
+        else:
+            self._logging_ = False
+
 
     @property
     def pending_futures(self):
@@ -223,7 +226,6 @@ class iCubRequestsManager(metaclass=SingletonMeta):
             self._last_req_id_ += 1
             req_id = self._last_req_id_
             tag = name + '/' + str(self._req_topics_[name])
-            print(tag, req_id)
             req = iCubRequest(req_id, timeout, target, self._logger_, ts_ref, tag)
             if self._logging_:
                 self._log_request_(req)
@@ -250,7 +252,6 @@ class iCubRequestsManager(metaclass=SingletonMeta):
 
     def _finalize_(self, future):
         req = future.result()
-        print(req.status)
         if self._logging_:
             self._log_request_(future.result())
         del self._pending_futures_[req.req_id]
