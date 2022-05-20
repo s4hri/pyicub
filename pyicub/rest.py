@@ -27,19 +27,35 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from pyicub.requests import iCubRequest, iCubRequestsManager
+from pyicub.requests import iCubRequest
 
 from flask import Flask, jsonify, request
 import threading
+import json
+import inspect
 
-class iCubHTTPManager(iCubRequestsManager):
+class iCubRESTService:
 
-    def __init__(self, rule_prefix="/pyicub", host=None, port=None):
-        iCubRequestsManager.__init__(self)
+    def __init__(self, name, url, target, doc, signature):
+
+        self.name = name
+        self.url = url
+        self.target = target
+        self.doc = doc
+        self.signature = signature
+
+class iCubRESTManager:
+
+    def __init__(self, icubrequestmanager, rule_prefix="/pyicub", host=None, port=None):
+        self.request_manager = icubrequestmanager
         self._services_ = {}
+        self._requests_ = {}
         self._flaskapp_ = Flask(__name__)
         self._rule_prefix_ = rule_prefix
         self._flaskapp_.add_url_rule(self._rule_prefix_, methods=['GET'], view_func=self.list)
+        self._flaskapp_.add_url_rule("%s/requests/<req_id>" % self._rule_prefix_, methods=['GET'], view_func=self.req_info)
+        self._flaskapp_.add_url_rule("%s/requests/pending" % self._rule_prefix_, methods=['GET'], view_func=self.pending_requests)
+        self._flaskapp_.add_url_rule("%s/requests/all" % self._rule_prefix_, methods=['GET'], view_func=self.all_requests)
         threading.Thread(target=self._flaskapp_.run, args=(host, port,)).start()
 
     def shutdown(self):
@@ -51,33 +67,36 @@ class iCubHTTPManager(iCubRequestsManager):
     def wrapper_target(self, *args, **kwargs):
         rule = str(request.url_rule).strip()
         if request.method == 'GET':
-            name = self._services_[rule].__name__
-            res = []
-            for req_id, req in self._requests_.items():
-                if req.target.__name__ == name:
-                    res.append(self._requests_[req_id].info())
-            return jsonify(res)
+            res = json.dumps(self._services_[rule], default=lambda o: o.__dict__, indent=4)
+            return res
         elif request.method == 'POST':
-            req = self.create(iCubRequest.TIMEOUT_REQUEST, self._services_[rule])
+            req = self.request_manager.create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self._services_[rule].target, name=rule)
             self._requests_[req.req_id] = req
             res = request.get_json(force=True)
             args = tuple(res.values())
             kwargs =  res
-            self.run(req.req_id, **kwargs)
+            self.request_manager.run_request(req, False, **kwargs)
             return jsonify(req.req_id)
 
-    def wrapper_info(self, req_id):
-        res = []
-        req_id = int(req_id)
-        if req_id in self._requests_.keys():
-            rule = str(request.url_rule).strip()
-            target = rule.split('/')[-2]
-            if self._requests_[req_id].target.__name__ == target:
-                res = self._requests_[req_id].info()
+    def req_info(self, req_id):
+        res = self._requests_[int(req_id)].info()
         return jsonify(res)
 
     def list(self):
         return jsonify(list(self._services_.keys()))
+
+    def all_requests(self):
+        reqs = []
+        for req in self._requests_.values():
+            reqs.append(req.info())
+        return jsonify(reqs)
+
+    def pending_requests(self):
+        reqs = []
+        for req in self._requests_.values():
+            if req.status == "RUNNING":
+                reqs.append(req.info())
+        return jsonify(reqs)
 
     def register(self, target, rule_prefix=None):
         if rule_prefix:
@@ -85,5 +104,8 @@ class iCubHTTPManager(iCubRequestsManager):
         else:
             rule = "%s/%s" % (self._rule_prefix_, target.__name__)
         self._flaskapp_.add_url_rule(rule, methods=['GET', 'POST'], view_func=self.wrapper_target)
-        self._services_[rule] = target
-        self._flaskapp_.add_url_rule("%s/<req_id>" % rule, methods=['GET'], view_func=self.wrapper_info)
+        self._services_[rule] = iCubRESTService(name=target.__name__, 
+                                                url=rule, 
+                                                target=target,
+                                                doc=target.__doc__,
+                                                signature=str(inspect.signature(target)))

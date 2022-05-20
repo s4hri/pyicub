@@ -11,17 +11,14 @@
                         0.0,
                         15.0,
                         0.0
-                    ],
-                    "timeout": 60.0
+                    ]
                 },
                 {
                     "target": "emo.neutral",
-                    "args": [],
-                    "timeout": 60.0
+                    "args": []
                 }
             ],
-            "offset_ms": null,
-            "timeout": 60.0
+            "offset_ms": null
         },
         {
             "name": "step",
@@ -34,18 +31,16 @@
                         0.0,
                         0.0,
                         0.0
-                    ],
-                    "timeout": 60.0
+                    ]
                 },
                 {
                     "target": "emo.smile",
-                    "args": [],
-                    "timeout": 60.0
+                    "args": []
                 }
             ],
-            "offset_ms": null,
-            "timeout": 60.0
+            "offset_ms": null
         }
     ],
-    "name": "action"
+    "name": "action",
+    "description": null
 }

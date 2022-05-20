@@ -26,29 +26,14 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS
+from pyicub.helper import iCubRESTApp
+import time
 
-class WebApp:
+class WebApp(iCubRESTApp):
 
-    def __init__(self):
-        self.icub = iCub(http_server="0.0.0.0")
+    def foo(self, args='empty'):
+        print("I AM FOO", args)
+        time.sleep(5)
+        return self.icub.parts
 
-        down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-15.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.5)
-        home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=1.0)
-
-        example_motion = LimbMotion(ICUB_PARTS.HEAD)
-        example_motion.addCheckpoint(down)
-        example_motion.addCheckpoint(home)
-
-        self.action = self.icub.createAction()
-        step = self.icub.createStep()
-        step.setLimbMotion(example_motion)
-        self.action.addStep(step)
-
-        self.icub.http_manager.register(target=self.foo, rule_prefix="mywebapp")
-
-    def foo(self, value):
-        self.icub.play(self.action)
-        return value
-
-WebApp()
+WebApp(name="mywebapp", rest_manager="0.0.0.0")

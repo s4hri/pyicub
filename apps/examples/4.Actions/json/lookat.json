@@ -24,8 +24,7 @@
                 "lookat_method": "lookAtFixationPoint"
             },
             "custom_calls": [],
-            "offset_ms": null,
-            "timeout": 60.0
+            "offset_ms": null
         },
         {
             "name": "step",
@@ -43,9 +42,9 @@
                 "lookat_method": "lookAtAbsAngles"
             },
             "custom_calls": [],
-            "offset_ms": null,
-            "timeout": 60.0
+            "offset_ms": null
         }
     ],
-    "name": "action"
+    "name": "action",
+    "description": "empty"
 }
