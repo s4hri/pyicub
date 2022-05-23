@@ -31,7 +31,7 @@ from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotio
 icub = iCub()
 action = icub.createAction()
 up = JointsTrajectoryCheckpoint(JointPose(target_joints=[30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
-down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0, timeout=1.0)
+down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
 home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
     
 example_motion = LimbMotion(ICUB_PARTS.HEAD)

@@ -28,16 +28,12 @@
 
 import json
 from pyicub.requests import iCubRequest
+from pyicub.controllers.position import JointPose, DEFAULT_TIMEOUT
 
-class JointPose:
-
-    def __init__(self, target_joints, joints_list=None):
-        self.target_joints = target_joints
-        self.joints_list = joints_list
 
 class JointsTrajectoryCheckpoint:
 
-    def __init__(self, pose: JointPose, duration: float=0.0, timeout: float=0.0):
+    def __init__(self, pose: JointPose, duration: float=0.0, timeout: float=DEFAULT_TIMEOUT):
         self.pose = pose
         self.duration = duration
         self.timeout = timeout

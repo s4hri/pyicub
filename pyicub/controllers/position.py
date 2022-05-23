@@ -42,12 +42,6 @@ class JointPose:
         self.target_joints = target_joints
         self.joints_list = joints_list
 
-class JointsTrajectoryCheckpoint:
-
-    def __init__(self, pose: JointPose, duration: float=0.0, timeout: float=DEFAULT_TIMEOUT):
-        self.pose = pose
-        self.duration = duration
-        self.timeout = timeout
 
 class RemoteControlboard:
 
