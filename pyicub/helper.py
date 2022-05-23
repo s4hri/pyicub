@@ -67,7 +67,7 @@ class iCubPart:
 
 class iCub:
 
-    def __init__(self, rest_manager=False, robot_name="icub", logging=True, logging_path=None):
+    def __init__(self, rest_manager=False, robot_name="icub"):
         self._position_controllers_ = {}
         self._services_ = {}
         self._gaze_ctrl_            = None
@@ -92,19 +92,17 @@ class iCub:
         PYICUB_LOGGING = os.getenv('PYICUB_LOGGING')
         if not PYICUB_LOGGING is None:
             if PYICUB_LOGGING == 'true':
-                logging = True 
+                logging = True
+            else:
+                logging = False
         self._logging_ = logging
 
         if self._logging_:
             PYICUB_LOGGING_PATH = os.getenv('PYICUB_LOGGING_PATH')
             if PYICUB_LOGGING_PATH is None:
-                if logging_path:
-                    self._logging_path_ = logging_path
-                    if isinstance(self._logger_, PyicubLogger):
-                        self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT, True, self._logging_path_)
-                else:
-                    if isinstance(self._logger_, PyicubLogger):
-                        self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT)
+                self._logging_path_ = None
+                if isinstance(self._logger_, PyicubLogger):
+                    self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT)
             else:
                 self._logging_path_ = PYICUB_LOGGING_PATH
                 if isinstance(self._logger_, PyicubLogger):
@@ -113,7 +111,6 @@ class iCub:
             self._logger_.disable_logs()
 
         self.request_manager = iCubRequestsManager(self._logger_, self._logging_, self._logging_path_)
-
 
         SIMULATION = os.getenv('ICUB_SIMULATION')
         if not SIMULATION is None:
@@ -376,7 +373,6 @@ class iCub:
                                              step,
                                              req.tag,
                                              t0)
-            #self.request_manager.join_pending_requests()
         self._logger_.debug('Action <%s> finished!' % action.name)
 
     def portmonitor(self, yarp_src_port, activate_function, callback):
