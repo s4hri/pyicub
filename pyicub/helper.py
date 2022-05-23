@@ -90,11 +90,11 @@ class iCub:
         self._imported_actions_ = {}
 
         PYICUB_LOGGING = os.getenv('PYICUB_LOGGING')
+
+        logging = False
         if not PYICUB_LOGGING is None:
             if PYICUB_LOGGING == 'true':
                 logging = True
-            else:
-                logging = False
         self._logging_ = logging
 
         if self._logging_:
@@ -108,6 +108,7 @@ class iCub:
                 if isinstance(self._logger_, PyicubLogger):
                     self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT, True, self._logging_path_)
         else:
+            self._logging_path_ = None
             self._logger_.disable_logs()
 
         self.request_manager = iCubRequestsManager(self._logger_, self._logging_, self._logging_path_)
