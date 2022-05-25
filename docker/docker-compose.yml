@@ -42,7 +42,7 @@ services:
       - ICUB_IP=10.0.0.2
       - ICUBSRV_HOST=icubsrv
       - ICUBSRV_IP=10.0.0.1
-      - ICUB_APPS=/usr/local/src/robot/applications
+      - ICUB_APPS=/home/icub/pyicub/apps/applications
       - PYICUB_LOGGING=true
       - PYICUB_LOGGING_PATH=/home/icub/shared/logs
 
