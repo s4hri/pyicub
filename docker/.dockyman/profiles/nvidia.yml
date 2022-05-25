@@ -29,7 +29,7 @@ services:
   local:
 
     extends:
-      file: ${LOCAL_PROFILE}
+      file: common.yml
       service: local
 
     deploy:
