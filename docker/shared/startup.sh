@@ -11,7 +11,7 @@ fi
 
 yarprun --server /$ICUBSRV_HOST --log &
 
-yarpmanager --apppath ${ICUB_APPS}
+yarpmanager --apppath ${ICUB_APPS} --from ${ICUB_APPS}/cluster-config.xml
 
 if ! $ICUB_SIMULATION ; then
   sshpass -p $ICUB_PSW ssh -o StrictHostKeyChecking=no $ICUB_USER@$ICUB_IP "killall -9 yarprun"
