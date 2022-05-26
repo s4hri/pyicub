@@ -65,7 +65,6 @@ class RemoteControlboard:
     def getDriver(self):
         return self.__driver__
 
-
 class PositionController:
 
     WAITMOTIONDONE_PERIOD = 0.1
@@ -81,7 +80,7 @@ class PositionController:
         self.__IControlMode__   = None
         self.__IPositionControl__   = None
         self.__joints__   = None
-        self.__waitMotionDone__ = self.waitMotionDone
+        self.__waitMotionDone__ = self.waitMotionDone2
 
     def isValid(self):
         return self.PolyDriver.isValid()
@@ -156,18 +155,28 @@ class PositionController:
                 self.__IPositionControl__.positionMove(j, tmp[i])
                 i+=1
         else:
+            disp  = [0]*len(joints_list)
             speeds = [0]*len(joints_list)
+            times = [0]*len(joints_list)
             tmp   = yarp.Vector(self.__joints__)
+            encs  = yarp.Vector(self.__joints__)
+            while not self.__IEncoders__.getEncoders(encs.data()):
+                yarp.delay(0.1)
             i = 0
             for j in joints_list:
                 tmp.set(i, target_joints[i])
+                disp[i] = target_joints[i] - encs[j]
+                if disp[i] < 0.0:
+                    disp[i] =- disp[i]
                 speeds[i] = speed
+                times[i] = disp[i]/speeds[i]
                 self.__IPositionControl__.setRefSpeed(j, speeds[i])
                 self.__IPositionControl__.positionMove(j, tmp[i])
                 i+=1
+            req_time = max(times)
 
         if waitMotionDone is True:
-            res = self.__waitMotionDone__(timeout=timeout)
+            res = self.__waitMotionDone__(req_time=req_time, timeout=timeout)
             if res:
                 self.__logger__.info("""Motion COMPLETED!
                                 tag: %s,
@@ -215,7 +224,7 @@ class PositionController:
     def unsetCustomWaitMotionDone(self):
         self.__waitMotionDone__ = self.waitMotionDone
 
-    def waitMotionDone(self, timeout: float):
+    def waitMotionDone(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
         t0 = time.perf_counter()
         while (time.perf_counter() - t0) < timeout:
             if self.__IPositionControl__.checkMotionDone():
@@ -223,13 +232,14 @@ class PositionController:
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
         return False
 
-    def waitMotionDone2(self, timeout: float):
+    def waitMotionDone2(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
         t0 = time.perf_counter()
         target_pos = yarp.Vector(self.__joints__)
         encs=yarp.Vector(self.__joints__)
         self.__IPositionControl__.getTargetPositions(target_pos.data())
         count = 0
-        while (time.perf_counter() - t0) < timeout:
+        deadline = min(timeout, req_time)
+        while (time.perf_counter() - t0) < deadline:
             while not self.__IEncoders__.getEncoders(encs.data()):
                 yarp.delay(0.05)
             v = []
@@ -244,4 +254,31 @@ class PositionController:
             if dist <= (1.0 - PositionController.MOTION_COMPLETE_AT)*tot_disp:
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
-        return False
+        if (time.perf_counter() - t0) > timeout:
+            return False
+        else:
+            return True
+
+    def waitMotionDone3(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
+        onset = False
+        offset = False
+        t0 = time.perf_counter()
+        vel= yarp.Vector(self.__joints__)
+        while (time.perf_counter() - t0) < timeout:
+            self.__IEncoders__.getEncoderSpeeds(vel.data())
+            v = []
+            for i in range(0, self.__joints__):
+                v.append(vel[i])
+            if not onset:
+                if utils.norm(v) > 0:
+                    onset = True
+            elif onset and (not offset):
+                if utils.norm(v) == 0:
+                    offset = True
+                    break
+            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
+        return onset and offset
+
+    def waitMotionDone4(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
+        yarp.delay(req_time)
+        return True
