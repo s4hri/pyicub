@@ -31,9 +31,9 @@ export XP_TARGET_DIR=${CURRENT_DIR}/..
 source ${XP_SCRIPT_DIR}/setup.sh
 
 if [[ $(lsmod | grep nvidia) ]]; then
-  export BASE_SERVICE_FILENAME=${XP_TARGET_DIR}/.dockyman/compose/nvidia.yml
+  export LOCAL_PROFILE=${XP_TARGET_DIR}/.dockyman/profiles/nvidia.yml
 else
-  export BASE_SERVICE_FILENAME=${XP_TARGET_DIR}/.dockyman/compose/common.yml
+  export LOCAL_PROFILE=${XP_TARGET_DIR}/.dockyman/profiles/common.yml
 fi
 
 docker-compose -f ${XP_TARGET_DIR}/docker-compose.yml $@ up
