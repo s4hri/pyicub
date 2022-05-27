@@ -3,7 +3,8 @@
 
 Quick start (Docker)
 -------------
-```cd docker
+```
+cd docker
 bash go
 ```
 
