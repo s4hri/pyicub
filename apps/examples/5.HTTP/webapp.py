@@ -34,6 +34,6 @@ class WebApp(iCubRESTApp):
     def foo(self, args='empty'):
         print("I AM FOO", args)
         time.sleep(5)
-        return self.icub.parts
+        return args
 
 WebApp(name="mywebapp", rest_manager="0.0.0.0")

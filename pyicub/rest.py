@@ -70,11 +70,14 @@ class iCubRESTManager:
             res = json.dumps(self._services_[rule], default=lambda o: o.__dict__, indent=4)
             return res
         elif request.method == 'POST':
-            req = self.request_manager.create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self._services_[rule].target, name=rule)
-            self._requests_[req.req_id] = req
             res = request.get_json(force=True)
             args = tuple(res.values())
             kwargs =  res
+            if 'sync' in request.args:
+                res = self._services_[rule].target(**kwargs)
+                return jsonify(res)
+            req = self.request_manager.create(timeout=iCubRequest.TIMEOUT_REQUEST, target=self._services_[rule].target, name=rule)
+            self._requests_[req.req_id] = req
             self.request_manager.run_request(req, False, **kwargs)
             return jsonify(req.req_id)
 

@@ -190,11 +190,12 @@ class iCubRequest:
         info['end_time'] = self.end_time
         info['duration'] = self.duration
         info['exception'] = self.exception
+        info['retval'] = self.retval
         return info
 
 class iCubRequestsManager(metaclass=SingletonMeta):
 
-    CSV_COLUMNS = ['req_id', 'target', 'tag', 'status', 'creation_time', 'start_time', 'end_time', 'duration', 'exception']
+    CSV_COLUMNS = ['req_id', 'target', 'tag', 'status', 'creation_time', 'start_time', 'end_time', 'duration', 'exception', 'retval']
 
     def __init__(self, logger, logging=False, logging_path=None):
         self._pending_futures_ = {}
