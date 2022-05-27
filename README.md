@@ -1,4 +1,4 @@
-![PYICUB logo](pyicub/media/pyicub-logo.png?raw=true)
+![PYICUB logo](media/pyicub-logo.png?raw=true)
 ====
 
 Quick start (Docker)
