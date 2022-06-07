@@ -3,7 +3,7 @@
 
 Introduction
 -------------
-Pyicub is a framework for developing iCub applications using Python.
+PYICUB is a framework for developing iCub applications using Python.
 
 
 Requirements
@@ -25,8 +25,8 @@ Quick start (using Docker)
 In order to simplify the installation procedure, we have containerized the
 essential requirements in a Docker image including YARP and icub-main.
 
-[Pyicub-lab](https://github.com/s4hri/pyicub-lab) is a development platform
-for coding iCub applications in minutes! Try it right now and leave your feedback!
+[PYICUB-LAB](https://github.com/s4hri/pyicub-lab) is a development platform
+for coding iCub applications in minutes! Try it now and leave your feedback!
 
 ```
 git clone https://github.com/s4hri/pyicub-lab
