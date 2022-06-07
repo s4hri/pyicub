@@ -48,8 +48,7 @@ jobs:
             sed -i -r 's/^(PYICUB_BRANCH=).*/\1${{ steps.extract_branch.outputs.branch }}/' docker/.env
             sed -i -e "/ICUB_DISTRO=/c\ICUB_DISTRO=$(cut -d'_' -f3 <<<"${{ steps.tag.outputs.tag }}")" docker/.env
             cat docker/.env
-            bash docker/.dockyman/build.sh base
-            bash docker/.dockyman/build.sh distro
+            source docker/.env && docker build docker --build-arg DOCKER_SRC=${DOCKER_SRC}
        env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

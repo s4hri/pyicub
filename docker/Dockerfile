@@ -1,11 +1,10 @@
 ARG DOCKER_SRC
-
 FROM $DOCKER_SRC
 
 LABEL maintainer="Davide De Tommaso <davide.detommaso@iit.it>"
 
-ARG PYICUB_TAG
-ARG PYICUB_BRANCH
+ARG PYICUB_TAG=master
+ARG PYICUB_BRANCH=master
 
 WORKDIR /home/icub
 
