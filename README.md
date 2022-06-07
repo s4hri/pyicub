@@ -3,7 +3,7 @@
 
 Introduction
 -------------
-PYICUB is a framework for developing iCub applications using Python.
+[PYICUB](https://github.com/s4hri/pyicub) is a framework for developing iCub applications using Python.
 
 
 Requirements
