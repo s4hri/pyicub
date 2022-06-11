@@ -27,6 +27,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import math
+import pyicub
 
 class SingletonMeta(type):
 
@@ -56,3 +57,18 @@ def norm(v):
         except OverflowError:
             t = t + 0
     return math.sqrt(t)
+
+def getPublicMethods(obj):
+    object_methods = [method_name for method_name in dir(obj) if callable(getattr(obj, method_name))]
+    public_object_methods = list(filter(lambda x: not x.startswith('_'), object_methods))
+    return public_object_methods
+
+def getPyiCubInfo():
+    info = {
+        'Version': pyicub.__version__,
+        'License': pyicub.__license__,
+        'Authors': pyicub.__authors__,
+        'Emails': pyicub.__emails__,
+        'Description': pyicub.__description__
+    }
+    return info
