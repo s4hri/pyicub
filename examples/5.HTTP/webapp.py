@@ -29,11 +29,18 @@
 from pyicub.helper import iCubRESTApp
 import time
 
-class WebApp(iCubRESTApp):
+class myWebApp(iCubRESTApp):
+
+    def __init__(self):
+        iCubRESTApp.__init__(self, app_name="myWebApp")
 
     def foo(self, args='empty'):
         print("I AM FOO", args)
         time.sleep(5)
         return args
 
-WebApp(name="mywebapp", rest_manager="0.0.0.0")
+app = myWebApp()
+app.icub.rest_manager.run_forever()
+
+
+

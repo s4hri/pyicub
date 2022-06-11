@@ -26,49 +26,25 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import math
-import pyicub
+from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, iCubFullbodyAction, iCubFullbodyStep, ICUB_PARTS
 
-class SingletonMeta(type):
+icub = iCub()
+action = icub.createAction()
+up = JointsTrajectoryCheckpoint(JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
+down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
+home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
+    
+example_motion = LimbMotion(ICUB_PARTS.HEAD)
+example_motion.addCheckpoint(up)
+example_motion.addCheckpoint(down)
+example_motion.addCheckpoint(home)
+    
+step = icub.createStep()
+step.setLimbMotion(example_motion)
+action.addStep(step)
 
-    _instances = {}
+req = icub.play(action, wait_for_completed=False)
+print("Doing some stuff in parallel...")
+print("...waiting for action completation...")
+req.wait_for_completed()
 
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            instance = super().__call__(*args, **kwargs)
-            cls._instances[cls] = instance
-        return cls._instances[cls]
-
-
-def vector_distance(v, w):
-    t = 0
-    for i in range(0, len(v)):
-        try:
-            t = t + math.pow(v[i]-w[i],2)
-        except OverflowError:
-            t = t + 0
-    return math.sqrt(t)
-
-def norm(v):
-    t = 0
-    for i in range(0, len(v)):
-        try:
-            t = t + math.pow(v[i],2)
-        except OverflowError:
-            t = t + 0
-    return math.sqrt(t)
-
-def getPublicMethods(obj):
-    object_methods = [method_name for method_name in dir(obj) if callable(getattr(obj, method_name))]
-    public_object_methods = list(filter(lambda x: not x.startswith('_'), object_methods))
-    return public_object_methods
-
-def getPyiCubInfo():
-    info = {
-        'Version': pyicub.__version__,
-        'License': pyicub.__license__,
-        'Authors': pyicub.__authors__,
-        'Emails': pyicub.__emails__,
-        'Description': pyicub.__description__
-    }
-    return info

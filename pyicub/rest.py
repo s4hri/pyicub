@@ -26,8 +26,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 from pyicub.requests import iCubRequest
+from pyicub.utils import getPyiCubInfo
 
 from flask import Flask, jsonify, request
 import threading
@@ -50,13 +50,20 @@ class iCubRESTManager:
         self.request_manager = icubrequestmanager
         self._services_ = {}
         self._requests_ = {}
+        self._app_services_ = {}
         self._flaskapp_ = Flask(__name__)
+        self._host_ = host
+        self._port_ = port
         self._rule_prefix_ = rule_prefix
+        self._flaskapp_.add_url_rule("/", methods=['GET'], view_func=self.info)
         self._flaskapp_.add_url_rule(self._rule_prefix_, methods=['GET'], view_func=self.list)
         self._flaskapp_.add_url_rule("%s/requests/<req_id>" % self._rule_prefix_, methods=['GET'], view_func=self.req_info)
         self._flaskapp_.add_url_rule("%s/requests/pending" % self._rule_prefix_, methods=['GET'], view_func=self.pending_requests)
         self._flaskapp_.add_url_rule("%s/requests/all" % self._rule_prefix_, methods=['GET'], view_func=self.all_requests)
-        threading.Thread(target=self._flaskapp_.run, args=(host, port,)).start()
+        self._flaskapp_.add_url_rule("%s/robots" % self._rule_prefix_, methods=['GET'], view_func=self.list_robots)
+    
+    def run_forever(self):
+        self._flaskapp_.run(self._host_, self._port_)
 
     def shutdown(self):
         func = request.environ.get('werkzeug.server.shutdown')
@@ -85,10 +92,26 @@ class iCubRESTManager:
         res = self._requests_[int(req_id)].info()
         return jsonify(res)
 
+    def info(self):
+        return jsonify(getPyiCubInfo())
+
     def list(self):
         return jsonify(list(self._services_.keys()))
 
+    def list_apps(self, robot_name):
+        return jsonify(list(self._app_services_[robot_name].keys()))
+
+    def list_robots(self):
+        return jsonify(list(self._app_services_.keys()))
+
+    def list_services(self, robot_name, app_name):
+        return jsonify(self._app_services_[robot_name][app_name])
+
     def all_requests(self):
+        res = request.get_json(force=True)
+        args = tuple(res.values())
+        print(args)
+
         reqs = []
         for req in self._requests_.values():
             reqs.append(req.info())
@@ -101,14 +124,20 @@ class iCubRESTManager:
                 reqs.append(req.info())
         return jsonify(reqs)
 
-    def register(self, target, rule_prefix=None):
-        if rule_prefix:
-            rule = "%s/%s/%s" % (self._rule_prefix_, rule_prefix, target.__name__)
-        else:
-            rule = "%s/%s" % (self._rule_prefix_, target.__name__)
+    def register(self, target, robot_name, app_name):
+        rule = "%s/%s/%s/%s" % (self._rule_prefix_, robot_name, app_name, target.__name__)
+        if not robot_name in self._app_services_.keys():
+            self._app_services_[robot_name] = {}
+            self._flaskapp_.add_url_rule("%s/<robot_name>" % self._rule_prefix_, methods=['GET'], view_func=self.list_apps)
+        if not app_name in self._app_services_[robot_name].keys():
+            self._app_services_[robot_name][app_name] = []
+            self._flaskapp_.add_url_rule("%s/<robot_name>/<app_name>" % self._rule_prefix_, methods=['GET'], view_func=self.list_services)
+        self._app_services_[robot_name][app_name].append(target.__name__)
         self._flaskapp_.add_url_rule(rule, methods=['GET', 'POST'], view_func=self.wrapper_target)
         self._services_[rule] = iCubRESTService(name=target.__name__, 
                                                 url=rule, 
                                                 target=target,
                                                 doc=target.__doc__,
                                                 signature=str(inspect.signature(target)))
+
+
