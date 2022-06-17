@@ -65,6 +65,7 @@ def getPublicMethods(obj):
 
 def getPyiCubInfo():
     info = {
+        'Name': pyicub.__name__,
         'Version': pyicub.__version__,
         'License': pyicub.__license__,
         'Authors': pyicub.__authors__,

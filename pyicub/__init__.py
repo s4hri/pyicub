@@ -26,8 +26,9 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'v6.6-rc1_distro_v2022.02.0-ubuntu20.04'
+__name__        = 'PyiCub'
+__authors__     = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
+__emails__      = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
+__license__     = 'BSD-2'
+__version__     = 'v6.6-rc1_distro_v2022.02.0-ubuntu20.04'
 __description__ = 'Developing iCub applications using Python'

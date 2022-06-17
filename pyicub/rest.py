@@ -29,24 +29,24 @@
 from pyicub.requests import iCubRequest
 from pyicub.utils import getPyiCubInfo
 
-from flask import Flask, jsonify, request
-import threading
+from flask import Flask, jsonify, request, redirect
+import requests
 import json
-import inspect
 
 class iCubRESTService:
 
-    def __init__(self, name, url, target, doc, signature):
+    def __init__(self, name, url, target, signature, proxy):
 
         self.name = name
         self.url = url
         self.target = target
-        self.doc = doc
         self.signature = signature
+        self.proxy = proxy
 
+#class iCubRESTAppManager:
 class iCubRESTManager:
 
-    def __init__(self, icubrequestmanager, rule_prefix="/pyicub", host=None, port=None):
+    def __init__(self, icubrequestmanager, rule_prefix, host=None, port=None):
         self.request_manager = icubrequestmanager
         self._services_ = {}
         self._requests_ = {}
@@ -61,9 +61,17 @@ class iCubRESTManager:
         self._flaskapp_.add_url_rule("%s/requests/pending" % self._rule_prefix_, methods=['GET'], view_func=self.pending_requests)
         self._flaskapp_.add_url_rule("%s/requests/all" % self._rule_prefix_, methods=['GET'], view_func=self.all_requests)
         self._flaskapp_.add_url_rule("%s/robots" % self._rule_prefix_, methods=['GET'], view_func=self.list_robots)
+        self._flaskapp_.add_url_rule("%s/register" % self._rule_prefix_, methods=['POST'], view_func=self.register)
     
     def run_forever(self):
-        self._flaskapp_.run(self._host_, self._port_)
+        first_available_port = 0
+        while first_available_port == 0:
+            try:
+                requests.get('http://%s:%s' % (self._host_, self._port_))
+                self._port_ = self._port_ + 1
+            except:
+                first_available_port = self._port_
+        self._flaskapp_.run(self._host_, first_available_port)
 
     def shutdown(self):
         func = request.environ.get('werkzeug.server.shutdown')
@@ -124,20 +132,21 @@ class iCubRESTManager:
                 reqs.append(req.info())
         return jsonify(reqs)
 
-    def register(self, target, robot_name, app_name):
-        rule = "%s/%s/%s/%s" % (self._rule_prefix_, robot_name, app_name, target.__name__)
+    def register(self, robot_name, app_name, target_name, target_signature, proxy_host=None, proxy_port=None):
+        print(target_name, target_signature, robot_name, app_name, proxy_host, proxy_port)
+        rule = "%s/%s/%s/%s" % (self._rule_prefix_, robot_name, app_name, target_name)
         if not robot_name in self._app_services_.keys():
             self._app_services_[robot_name] = {}
             self._flaskapp_.add_url_rule("%s/<robot_name>" % self._rule_prefix_, methods=['GET'], view_func=self.list_apps)
         if not app_name in self._app_services_[robot_name].keys():
             self._app_services_[robot_name][app_name] = []
             self._flaskapp_.add_url_rule("%s/<robot_name>/<app_name>" % self._rule_prefix_, methods=['GET'], view_func=self.list_services)
-        self._app_services_[robot_name][app_name].append(target.__name__)
+        self._app_services_[robot_name][app_name].append(target_name)
         self._flaskapp_.add_url_rule(rule, methods=['GET', 'POST'], view_func=self.wrapper_target)
-        self._services_[rule] = iCubRESTService(name=target.__name__, 
+        self._services_[rule] = iCubRESTService(name=target_name, 
                                                 url=rule, 
-                                                target=target,
-                                                doc=target.__doc__,
-                                                signature=str(inspect.signature(target)))
+                                                target=target_name,
+                                                signature=target_signature,
+                                                proxy=(proxy_host, proxy_port))
 
 

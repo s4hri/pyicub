@@ -58,7 +58,7 @@ class RemoteControlboard:
     def _getRobotPartProperties_(self):
         props = yarp.Property()
         props.put("device","remote_controlboard")
-        props.put("local","/client/" + self.__pid__ + self.__port_name__)
+        props.put("local","/pyicub/" + self.__pid__ + self.__port_name__)
         props.put("remote", self.__port_name__)
         return props
 
