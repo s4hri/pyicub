@@ -28,6 +28,7 @@
 
 import math
 import pyicub
+import socket
 
 class SingletonMeta(type):
 
@@ -65,6 +66,7 @@ def getPublicMethods(obj):
 
 def getPyiCubInfo():
     info = {
+        'Name': pyicub.__name__,
         'Version': pyicub.__version__,
         'License': pyicub.__license__,
         'Authors': pyicub.__authors__,
@@ -72,3 +74,16 @@ def getPyiCubInfo():
         'Description': pyicub.__description__
     }
     return info
+
+def firstAvailablePort(host, start_port):
+    res = 1
+    while True:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            sock.bind((host, start_port))
+            sock.close()
+            break
+        except:
+            start_port+=1
+        sock.close()
+    return start_port

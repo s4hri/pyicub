@@ -37,7 +37,7 @@ class GazeControllerPolyDriver:
         self.__props__ = yarp.Property()
         self.__props__.put("robot", robot)
         self.__props__.put("device","gazecontrollerclient")
-        self.__props__.put("local","/gaze_client/" + self.__pid__)
+        self.__props__.put("local","/pyicub/gaze/" + self.__pid__)
         self.__props__.put("remote","/iKinGazeCtrl")
         self.__driver__ = yarp.PolyDriver(self.__props__)
 
