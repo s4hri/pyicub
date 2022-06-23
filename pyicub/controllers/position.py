@@ -29,7 +29,6 @@
 import os
 import time
 import yarp
-import concurrent.futures
 
 import pyicub.utils as utils
 

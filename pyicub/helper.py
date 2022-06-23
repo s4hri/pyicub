@@ -30,8 +30,8 @@ import yarp
 yarp.Network().init()
 
 from pyicub.controllers.gaze import GazeController
-from pyicub.controllers.position import PositionController
-from pyicub.actions import PyiCubCustomCall, LimbMotion, GazeMotion, iCubFullbodyStep, iCubFullbodyAction
+from pyicub.controllers.position import PositionController, JointPose
+from pyicub.actions import PyiCubCustomCall, LimbMotion, GazeMotion, iCubFullbodyStep, iCubFullbodyAction, JointsTrajectoryCheckpoint
 from pyicub.modules.emotions import emotionsPyCtrl
 from pyicub.modules.speech import iSpeakPyCtrl
 from pyicub.modules.face import facePyCtrl
@@ -39,7 +39,7 @@ from pyicub.modules.faceLandmarks import faceLandmarksPyCtrl
 from pyicub.core.ports import BufferedReadPort
 from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequestsManager, iCubRequest
-from pyicub.rest import iCubRESTServer, iCubRESTManager
+from pyicub.rest import iCubRESTManager
 from pyicub.utils import SingletonMeta, getPublicMethods, firstAvailablePort
 
 from collections import deque
@@ -442,7 +442,7 @@ class iCub(metaclass=iCubSingleton):
         self.request_manager.run_request(req,
                                          wait_for_completed,
                                          action.steps,
-                                         prefix)
+                                         req.tag)
         if wait_for_completed:
             self._logger_.debug('Action <%s> finished!' % action.name)
         return req

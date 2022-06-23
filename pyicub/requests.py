@@ -51,14 +51,14 @@ class iCubRequest:
 
     TIMEOUT_REQUEST = 60.0
 
-    def __init__(self, req_id, timeout, target, logger, ts_ref=0.0, prefix=''):
+    def __init__(self, req_id, timeout, target, logger, ts_ref=0.0, tag=''):
         self._ts_ref_ = ts_ref
         self._logger_ = logger
         self._creation_time_ = round(time.perf_counter() - self._ts_ref_, 4)
         self._start_time_ = None
         self._end_time_ = None
         self._req_id_ = req_id
-        self._prefix_ = prefix
+        self._tag_ = tag
         self._status_ = iCubRequest.INIT
         self._timeout_ = timeout
         self._duration_ = None
@@ -111,8 +111,8 @@ class iCubRequest:
         return self._start_time_
 
     @property
-    def prefix(self):
-        return self._prefix_
+    def tag(self):
+        return self._tag_
 
     @property
     def target(self):
@@ -123,7 +123,7 @@ class iCubRequest:
 
     def run(self, *args, **kwargs):
         self._future_target_ = self._target_executor_.submit(self._target_, *args, **kwargs)
-        self._logger_.debug("iCubRequest req_id=%s STARTED!" % self.req_id)
+        self._logger_.debug("iCubRequest tag=%s, req_id=%s STARTED!" % (self.tag, self.req_id))
         self._status_ = iCubRequest.RUNNING
         self._start_time_ = round(time.perf_counter() - self._ts_ref_, 4)
         self._future_req_ = self._req_executor_.submit(self._execute_)
@@ -134,7 +134,7 @@ class iCubRequest:
             self._terminate_thread_(t)
 
     def cancel(self):
-        self._logger_.debug("iCubRequest req_id=%s cancelling target future ..." % self.req_id )
+        self._logger_.debug("iCubRequest tag=%s, req_id=%s cancelling target future ..." % (self.tag, self.req_id) )
         self._future_target_.cancel()
         self._stop_request_()
         self._target_executor_.shutdown(wait=False)
@@ -167,12 +167,12 @@ class iCubRequest:
             self._end_time_ = round(time.perf_counter() - self._ts_ref_, 4)
             self._duration_ = round(self._end_time_ - self._start_time_, 4)
             if self._status_ == iCubRequest.DONE:
-                self._logger_.debug("iCubRequest req_id=%s COMPLETED! %s" % (self.req_id, self.info()))
+                self._logger_.debug("iCubRequest tag=%s, req_id=%s COMPLETED! %s" % (self.tag, self.req_id, self.info()))
             elif self._status_ == iCubRequest.TIMEOUT:
-                self._logger_.warning("iCubRequest req_id=%s TIMEOUT! %s" % (self.req_id, self.info()))
+                self._logger_.warning("iCubRequest tag=%s, req_id=%s TIMEOUT! %s" % (self.tag, self.req_id, self.info()))
                 self.cancel()
             elif self._status_ == iCubRequest.FAILED:
-                self._logger_.error("iCubRequest req_id=%s ERROR! %s" % (self.req_id, self.info()))
+                self._logger_.error("iCubRequest tag=%s, req_id=%s ERROR! %s" % (self.tag, self.req_id, self.info()))
             self._retval_ = res
             return self
 
@@ -183,6 +183,7 @@ class iCubRequest:
         info = {}
         info['target'] = self.target.__name__
         info['req_id'] = self.req_id
+        info['tag'] = self.tag
         info['status'] = self.status
         info['creation_time'] = self.creation_time
         info['start_time'] = self.start_time
@@ -194,7 +195,7 @@ class iCubRequest:
 
 class iCubRequestsManager(metaclass=SingletonMeta):
 
-    CSV_COLUMNS = ['req_id', 'target', 'status', 'creation_time', 'start_time', 'end_time', 'duration', 'exception', 'retval']
+    CSV_COLUMNS = ['req_id', 'target', 'tag', 'status', 'creation_time', 'start_time', 'end_time', 'duration', 'exception', 'retval']
 
     def __init__(self, logger, logging=False, logging_path=None):
         self._pending_futures_ = {}
@@ -228,8 +229,11 @@ class iCubRequestsManager(metaclass=SingletonMeta):
             else:
                 self._req_topics_[name] += 1
             self._last_req_id_ += 1
-            req_id = prefix + '/' + str(self._last_req_id_)
-            req = iCubRequest(req_id, timeout, target, self._logger_, ts_ref, prefix)
+            req_id = str(self._last_req_id_)
+            tag = name + '/' + str(self._req_topics_[name])
+            if prefix:
+                req_id = prefix + '/' + req_id
+            req = iCubRequest(req_id, timeout, target, self._logger_, ts_ref, tag)
             if self._logging_:
                 self._log_request_(req)
         return req
