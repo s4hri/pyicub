@@ -68,17 +68,17 @@ class iCubPart:
 class PyiCubApp(metaclass=SingletonMeta):
 
     def __init__(self, logging=False, logging_path=None, rest_manager_host=None, rest_manager_port=None):
-        
+
         PYICUB_LOGGING = os.getenv('PYICUB_LOGGING')
         PYICUB_LOGGING_PATH = os.getenv('PYICUB_LOGGING_PATH')
         PYICUB_API = os.getenv('PYICUB_API')
         PYICUB_API_BACKEND_HOST = os.getenv('PYICUB_API_BACKEND_HOST')
         PYICUB_API_BACKEND_PORT = os.getenv('PYICUB_API_BACKEND_PORT')
-    
+
         if PYICUB_LOGGING:
             if PYICUB_LOGGING == 'true':
                 logging = True
-        
+
         self._logging_ = logging
         self._logger_ = PyicubLogger.getLogger() #YarpLogger.getLogger()
 
@@ -89,9 +89,9 @@ class PyiCubApp(metaclass=SingletonMeta):
             if PYICUB_LOGGING_PATH:
                 logging_path = PYICUB_LOGGING_PATH
 
-            if os.path.isdir(logging_path):
-                if isinstance(self._logger_, PyicubLogger):
-                    self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT, True, logging_path)
+                if os.path.isdir(logging_path):
+                    if isinstance(self._logger_, PyicubLogger):
+                        self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT, True, logging_path)
             else:
                 if isinstance(self._logger_, PyicubLogger):
                     self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT)
@@ -175,7 +175,7 @@ class iCub(metaclass=iCubSingleton):
 
         if PyiCubApp().rest_manager:
             self._registerDefaultServices_()
-    
+
     def __del__(self):
         self.close()
         yarp.Network().init()
