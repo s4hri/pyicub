@@ -39,14 +39,13 @@ from pyicub.modules.faceLandmarks import faceLandmarksPyCtrl
 from pyicub.core.ports import BufferedReadPort
 from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequestsManager, iCubRequest
-from pyicub.rest import iCubRESTManager
-from pyicub.utils import SingletonMeta, getPublicMethods
+from pyicub.rest import iCubRESTServer, iCubRESTManager
+from pyicub.utils import SingletonMeta, getPublicMethods, firstAvailablePort
 
 from collections import deque
 import threading
 import os
 import time
-import requests
 import inspect
 
 
@@ -68,13 +67,15 @@ class iCubPart:
 
 class PyiCubApp(metaclass=SingletonMeta):
 
-    def __init__(self, logging=False, logging_path=None, rest_manager_host=None, rest_manager_port=None):
+    def __init__(self, logging=False, logging_path=None, restmanager_proxy_host=None, restmanager_proxy_port=None):
 
         PYICUB_LOGGING = os.getenv('PYICUB_LOGGING')
         PYICUB_LOGGING_PATH = os.getenv('PYICUB_LOGGING_PATH')
         PYICUB_API = os.getenv('PYICUB_API')
-        PYICUB_API_BACKEND_HOST = os.getenv('PYICUB_API_BACKEND_HOST')
-        PYICUB_API_BACKEND_PORT = os.getenv('PYICUB_API_BACKEND_PORT')
+        PYICUB_API_RESTMANAGER_HOST = os.getenv('PYICUB_API_RESTMANAGER_HOST')
+        PYICUB_API_RESTMANAGER_PORT = os.getenv('PYICUB_API_RESTMANAGER_PORT')
+        PYICUB_API_PROXY_HOST = os.getenv('PYICUB_API_PROXY_HOST')
+        PYICUB_API_PROXY_PORT = os.getenv('PYICUB_API_PROXY_PORT')
 
         if PYICUB_LOGGING:
             if PYICUB_LOGGING == 'true':
@@ -101,22 +102,20 @@ class PyiCubApp(metaclass=SingletonMeta):
 
         self._request_manager_ = iCubRequestsManager(self._logger_, self._logging_, logging_path)
 
-        if PYICUB_API:
-            if PYICUB_API == 'true':
-                if PYICUB_API_BACKEND_HOST:
-                    rest_manager_host = PYICUB_API_BACKEND_HOST
-                    if PYICUB_API_BACKEND_PORT:
-                        rest_manager_port = PYICUB_API_BACKEND_PORT
-                    else:
-                        rest_manager_port = 5000
-                else:
-                    rest_manager_host = "0.0.0.0"
-
-        if rest_manager_host:
-            if self.isRESTManagerAlreadyRunning():
-                self._rest_manager_ = iCubRESTManager(icubrequestmanager=self._request_manager_, rule_prefix="/pyicub",  host=rest_manager_host, port=rest_manager_port)
-        else:
-            self._rest_manager_ = None
+        if not PYICUB_API:
+            PYICUB_API = False
+        elif PYICUB_API == 'true':
+            if not (PYICUB_API_RESTMANAGER_HOST and PYICUB_API_RESTMANAGER_PORT):
+                PYICUB_API_RESTMANAGER_HOST = "0.0.0.0"
+                PYICUB_API_RESTMANAGER_PORT = 9001
+            if PYICUB_API_PROXY_HOST and PYICUB_API_PROXY_PORT:
+                restmanager_proxy_host = PYICUB_API_PROXY_HOST
+                restmanager_proxy_port = int(PYICUB_API_PROXY_PORT)
+            else:
+                restmanager_proxy_host = "0.0.0.0"
+                restmanager_proxy_port = 9001
+            PYICUB_API_RESTMANAGER_PORT = firstAvailablePort(PYICUB_API_RESTMANAGER_HOST, int(PYICUB_API_RESTMANAGER_PORT))            
+            self._rest_manager_ = iCubRESTManager(icubrequestmanager=self._request_manager_, rule_prefix="pyicub",  host=PYICUB_API_RESTMANAGER_HOST, port=PYICUB_API_RESTMANAGER_PORT, proxy_host=restmanager_proxy_host, proxy_port=restmanager_proxy_port)
 
     @property
     def logger(self):
@@ -207,18 +206,18 @@ class iCub(metaclass=iCubSingleton):
             self._gaze_ctrl_ = None
 
     def _registerDefaultServices_(self):
-        PyiCubApp().rest_manager.register(robot_name=self.robot_name, app_name='utils', target_name=self.importActionFromJSON.__name__, target_signature=str(inspect.signature(self.importActionFromJSON)) )
-        PyiCubApp().rest_manager.register(robot_name=self.robot_name, app_name='utils', target_name=self.playAction.__name__, target_signature=str(inspect.signature(self.importActionFromJSON)) )
+        PyiCubApp().rest_manager.register_target(robot_name=self.robot_name, app_name='utils', target_name=self.importActionFromJSON.__name__, target=self.importActionFromJSON, target_signature=str(inspect.signature(self.importActionFromJSON)) )
+        PyiCubApp().rest_manager.register_target(robot_name=self.robot_name, app_name='utils', target_name=self.playAction.__name__, target=self.playAction, target_signature=str(inspect.signature(self.importActionFromJSON)) )
 
         if self.gaze:
             for method in getPublicMethods(self.gaze):
-                self.rest_manager.register(robot_name=self.robot_name, app_name='gaze', target_name=getattr(self.gaze, method).__name__, target_signature=str(inspect.signature(getattr(self.gaze, method))) )
+                self.rest_manager.register_target(robot_name=self.robot_name, app_name='gaze', target_name=getattr(self.gaze, method).__name__, target=getattr(self.gaze, method), target_signature=str(inspect.signature(getattr(self.gaze, method))) )
         if self.speech:
             for method in getPublicMethods(self.speech):
-                self.rest_manager.register(robot_name=self.robot_name, app_name='speech', target_name=getattr(self.speech, method).__name__, target_signature=str(inspect.signature(getattr(self.speech, method))) )
+                self.rest_manager.register_target(robot_name=self.robot_name, app_name='speech', target_name=getattr(self.speech, method).__name__, target=getattr(self.speech, method), target_signature=str(inspect.signature(getattr(self.speech, method))) )
         if self.emo:
             for method in getPublicMethods(self.emo):
-                self.rest_manager.register(robot_name=self.robot_name, app_name='emotions', target_name=getattr(self.emo, method).__name__, target_signature=str(inspect.signature(getattr(self.emo, method))) )
+                self.rest_manager.register_target(robot_name=self.robot_name, app_name='emotions', target_name=getattr(self.emo, method).__name__, target=getattr(self.emo, method), target_signature=str(inspect.signature(getattr(self.emo, method))) )
 
     def close(self):
         if len(self._monitors_) > 0:
@@ -459,7 +458,7 @@ class iCubRESTApp:
         self._icub_ = iCub(robot_name=robot_name)
 
         for method in getPublicMethods(self):
-            PyiCubApp().rest_manager.register(robot_name=self.icub.robot_name, app_name=app_name, target_name=getattr(self, method).__name__, target_signature=str(inspect.signature(getattr(self, method))) )
+            PyiCubApp().rest_manager.register_target(robot_name=self.icub.robot_name, app_name=app_name, target_name=getattr(self, method).__name__, target=getattr(self, method), target_signature=str(inspect.signature(getattr(self, method))) )
 
     @property
     def icub(self):
