@@ -81,6 +81,8 @@ class PyiCubApp(metaclass=SingletonMeta):
             if PYICUB_LOGGING == 'true':
                 logging = True
 
+        self._request_manager_ = None
+        self._rest_manager_ = None
         self._logging_ = logging
         self._logger_ = YarpLogger.getLogger() #PyicubLogger.getLogger() 
 
