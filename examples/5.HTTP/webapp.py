@@ -39,6 +39,11 @@ class myWebApp(iCubRESTApp):
         time.sleep(5)
         return args
 
+    def goo(self, args='empty'):
+        print("I AM GOO", args)
+        time.sleep(2)
+        return args
+
 app = myWebApp()
 app.icub.rest_manager.run_forever()
 

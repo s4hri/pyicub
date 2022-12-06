@@ -124,7 +124,8 @@ class iCubRESTServer(metaclass=SingletonMeta):
         if not (self._host_ == host and self._port_ == port):
             robot['url_remote']  = "http://%s:%d" % (host, port) + robot_rule
         self._flaskapp_.add_url_rule("/%s/<robot_name>" % self._rule_prefix_, methods=['GET'], view_func=self.list_apps)
-        self._app_services_[robot_name][app_name] = []
+        if not app_name in self._app_services_[robot_name].keys():
+            self._app_services_[robot_name][app_name] = []
         app = { 'name': app_name, 
                     'url_local': self._header_ + app_rule,
                     'url_remote': None
