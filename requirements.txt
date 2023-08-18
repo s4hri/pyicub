@@ -1,2 +1,2 @@
 PyYAML==5.4.1
-Flask==2.0.2
+Flask==2.3.2
