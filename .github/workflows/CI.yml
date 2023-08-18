@@ -43,7 +43,9 @@ jobs:
        run: |
             git pull origin ${{ steps.extract_branch.outputs.branch }}
             git checkout ${{ steps.extract_branch.outputs.branch }}
+            cat pyicub/__init__.py
             sed -i "/__version__ =/c\__version__ = '${{ steps.tag.outputs.tag }}'" pyicub/__init__.py
+            cat pyicub/__init__.py
        env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
