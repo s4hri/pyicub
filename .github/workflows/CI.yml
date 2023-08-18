@@ -44,7 +44,17 @@ jobs:
             git pull origin ${{ steps.extract_branch.outputs.branch }}
             git checkout ${{ steps.extract_branch.outputs.branch }}
             cat pyicub/__init__.py
-            sed -i "/__version__ =/c\__version__ = '${{ steps.tag.outputs.tag }}'" pyicub/__init__.py
+            # Read the content of __init__.py
+            with open('pyicub/__init__.py', 'r') as f:
+                content = f.read()
+
+            # Replace the version string
+            new_version = "${{ steps.tag.outputs.tag }}"
+            updated_content = re.sub(r"__version__\s*=\s*['\"].*['\"]", f"__version__ = '{new_version}'", content)
+
+            # Write the updated content back to __init__.py
+            with open('pyicub/__init__.py', 'w') as f:
+                f.write(updated_content)
             cat pyicub/__init__.py
        env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
