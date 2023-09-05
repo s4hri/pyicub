@@ -87,3 +87,15 @@ class emotionsPyCtrl:
 
     def sendCmd(self, part, emo):
         return self.__emoCmd__(part, emo)
+
+    #set col <color>     set the color of the led
+    #        !! available only for rfe board !!
+    #        the available colors are: black, white, red, lime, blue, yellow, cyan, magenta, silver, gray, maroon, olive, green, purple, teal, navy
+    def setColor(self, color):
+        return self.__emoCmd__("col", color)
+
+    #set brig <brig>       set the brightness of the leds
+    #    !! available only for rfe board !!
+    #    the brightness is defined by an integer from 0 to 5, where 0 means led off
+    def setBrightness(self, brightness):
+        return self.__emoCmd__("brig", brightness)
