@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,22 +26,18 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, iCubFullbodyAction, iCubFullbodyStep, ICUB_PARTS
+from pyicub.helper import TemplateParameter, iCubFullbodyAction, iCubActionTemplate, iCubFullbodyStep, PyiCubCustomCall, LimbMotion
 
-icub = iCub()
-action = icub.createAction()
-up = JointsTrajectoryCheckpoint(JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
-down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
-home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
-    
-example_motion = LimbMotion(ICUB_PARTS.HEAD)
-example_motion.addCheckpoint(up)
-example_motion.addCheckpoint(down)
-example_motion.addCheckpoint(home)
-    
-step = icub.createStep()
-step.setLimbMotion(example_motion)
+param1 = TemplateParameter("step_bodymotion")
+param2 = TemplateParameter("welcome_message")
+
+speak = PyiCubCustomCall(target="speech.say", args=(param2,))
+step = iCubFullbodyStep()
+step.addCustomCall(speak)
+
+action = iCubFullbodyAction()
+action.addStep(param1)
 action.addStep(step)
-action.exportJSONFile('json/head.json')
-icub.play(action)
 
+template = iCubActionTemplate(action=action)
+template.exportJSONFile('json/hello.json')

@@ -29,6 +29,7 @@
 import math
 import pyicub
 import socket
+import json
 
 class SingletonMeta(type):
 
@@ -87,3 +88,13 @@ def firstAvailablePort(host, start_port):
             start_port+=1
         sock.close()
     return start_port
+
+def importFromJSONFile(JSON_file):
+    with open(JSON_file, encoding='UTF-8') as f:
+        data = f.read()
+    return json.loads(data)
+
+def exportJSONFile(filepath, obj):
+    res = json.dumps(obj, default=lambda o: o.__dict__, indent=4)
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(res)
