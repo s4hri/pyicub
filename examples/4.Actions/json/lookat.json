@@ -46,5 +46,6 @@
         }
     ],
     "name": "action",
-    "description": "empty"
+    "description": "empty",
+    "wait_for_completed": true
 }

@@ -31,7 +31,7 @@ yarp.Network().init()
 
 from pyicub.controllers.gaze import GazeController
 from pyicub.controllers.position import PositionController, JointPose
-from pyicub.actions import PyiCubCustomCall, LimbMotion, GazeMotion, iCubFullbodyStep, iCubFullbodyAction, JointsTrajectoryCheckpoint
+from pyicub.actions import PyiCubCustomCall, LimbMotion, GazeMotion, iCubFullbodyStep, iCubFullbodyAction, JointsTrajectoryCheckpoint, TemplateParameter, ActionParameter, iCubActionTemplate
 from pyicub.modules.emotions import emotionsPyCtrl
 from pyicub.modules.speech import iSpeakPyCtrl
 from pyicub.modules.face import facePyCtrl
@@ -40,8 +40,7 @@ from pyicub.core.ports import BufferedReadPort
 from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequestsManager, iCubRequest
 from pyicub.rest import iCubRESTManager
-from pyicub.utils import SingletonMeta, getPublicMethods, firstAvailablePort
-
+from pyicub.utils import SingletonMeta, getPublicMethods, firstAvailablePort, importFromJSONFile, exportJSONFile
 from collections import deque
 import threading
 import os
@@ -118,7 +117,7 @@ class PyiCubApp(metaclass=SingletonMeta):
                 restmanager_proxy_port = 9001
             PYICUB_API_RESTMANAGER_PORT = firstAvailablePort(PYICUB_API_RESTMANAGER_HOST, int(PYICUB_API_RESTMANAGER_PORT))            
             self._rest_manager_ = iCubRESTManager(icubrequestmanager=self._request_manager_, rule_prefix="pyicub",  host=PYICUB_API_RESTMANAGER_HOST, port=PYICUB_API_RESTMANAGER_PORT, proxy_host=restmanager_proxy_host, proxy_port=restmanager_proxy_port)
-
+    
     @property
     def logger(self):
         return self._logger_
@@ -289,11 +288,11 @@ class iCub(metaclass=iCubSingleton):
     def robot_name(self):
         return self._robot_name_
 
-    def createStep(self, name='step', offset_ms=None, timeout=iCubRequest.TIMEOUT_REQUEST):
+    def createStep(self, name='step', offset_ms=None):
         return iCubFullbodyStep(name, offset_ms)
 
-    def createAction(self, name='action', JSON_file=None):
-        return iCubFullbodyAction(name, JSON_file)
+    def createAction(self, name='action', description='default', offset_ms=None):
+        return iCubFullbodyAction(name, description=description, offset_ms=offset_ms)
 
     def execCustomCall(self, custom_call: PyiCubCustomCall, prefix='', ts_ref=0.0):
         calls = custom_call.target.split('.')
@@ -418,12 +417,26 @@ class iCub(metaclass=iCubSingleton):
         self.request_manager.join_requests(requests)
         return requests
 
-    def importActionFromJSON(self, action_json):
-        action_id = len(self._imported_actions_.values()) + 1
+    def importTemplateFromJSON(self, JSON_file, params=[]):
+        template = iCubActionTemplate()
+        template.importFromJSONFile(JSON_file)
+        action_params = {}
+        for JSON_file in params:
+            param = importFromJSONFile(JSON_file)
+            action_params.update(param)
+        template_json = template.getAction(action_params)
         action = iCubFullbodyAction()
-        action.fromJSON(action_json)
+        action.importFromJSONDict(template_json['action'])
+        return self.importAction(action)
+
+    def importAction(self, action: iCubFullbodyAction):
+        action_id = len(self._imported_actions_.values()) + 1
         self._imported_actions_[action_id] = action
         return action_id
+
+    def importActionFromJSON(self, JSON_file):
+        action = iCubFullbodyAction(JSON_file)
+        return self.importAction(self, action)
 
     def playAction(self, action_id):
         self.play(self._imported_actions_[action_id])
@@ -435,6 +448,8 @@ class iCub(metaclass=iCubSingleton):
     def play(self, action: iCubFullbodyAction, wait_for_completed=True):
         t0 = round(time.perf_counter(), 4)
         self._logger_.debug('Playing action <%s>' % action.name)
+        if action.offset_ms:
+            time.sleep(action.offset_ms/1000.0)
         prefix = "/%s" % action.name
         req = self.request_manager.create(timeout=iCubRequest.TIMEOUT_REQUEST,
                                           target=self.moveSteps,
@@ -448,7 +463,7 @@ class iCub(metaclass=iCubSingleton):
         if wait_for_completed:
             self._logger_.debug('Action <%s> finished!' % action.name)
         return req
-
+    
     def portmonitor(self, yarp_src_port, activate_function, callback):
         self._monitors_.append(PortMonitor(yarp_src_port, activate_function, callback, period=0.01, autostart=True))
 

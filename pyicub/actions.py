@@ -27,7 +27,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import json
+from string import Template
 from pyicub.requests import iCubRequest
+from pyicub.utils import importFromJSONFile, exportJSONFile
 from pyicub.controllers.position import JointPose, DEFAULT_TIMEOUT
 
 
@@ -81,18 +83,22 @@ class iCubFullbodyStep:
 
 class iCubFullbodyAction:
 
-    def __init__(self, name='action', description='empty', JSON_file=None):
+    def __init__(self, name='action', description='empty', JSON_file=None, offset_ms=None):
         self.steps = []
         self.name = name
         self.description = description
+        self.offset_ms = offset_ms
         if JSON_file:
-            self.importFromJSONFile(JSON_file)
+            action = importFromJSONFile(JSON_file)
+            self.importFromJSONDict(action)
+
     
     def addStep(self, step: iCubFullbodyStep):
         self.steps.append(step)
 
-    def fromJSON(self, json_dict):
+    def importFromJSONDict(self, json_dict):
         self.name = json_dict["name"]
+        self.description = json_dict["description"]
         for step in json_dict["steps"]:
             res = iCubFullbodyStep(name=step["name"], offset_ms=step["offset_ms"])
             for part,pose in step["limb_motions"].items():
@@ -113,13 +119,47 @@ class iCubFullbodyAction:
                     res.addCustomCall(cc)
             self.addStep(res)
 
-    def importFromJSONFile(self, JSON_file):
-        with open(JSON_file, encoding='UTF-8') as f:
-            data = f.read()
-        res = json.loads(data)
-        self.fromJSON(res)
+    def exportJSONFile(self, filepath):
+        exportJSONFile(filepath, self)
+
+class TemplateParameter(str):
+    def __new__(cls, param_name):
+        instance = super(TemplateParameter, cls).__new__(cls, "${}".format(param_name))
+        return instance
+
+class ActionParameter:
+
+    def __init__(self, name: str, value: object=None):
+        self.__dict__[name] = value
 
     def exportJSONFile(self, filepath):
-        res = json.dumps(self, default=lambda o: o.__dict__, indent=4)
-        with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(res)
+        exportJSONFile(filepath, self)
+
+
+class iCubActionTemplate:
+
+    def __init__(self, name='template', action: iCubFullbodyAction=None):
+        self.name = name
+        self.action = action
+
+    def importFromJSONFile(self, JSON_file):
+        self.template_dict = importFromJSONFile(JSON_file)
+
+    def __replace_params__(self, template_dict, params_dict):
+        if isinstance(template_dict, dict):
+            for key, value in template_dict.items():
+                template_dict[key] = self.__replace_params__(value, params_dict)
+        elif isinstance(template_dict, list):
+            for i, item in enumerate(template_dict):
+                template_dict[i] = self.__replace_params__(item, params_dict)
+        elif isinstance(template_dict, str) and template_dict.startswith('$'):
+            param_key = template_dict[1:]  # Remove the '$' character
+            if param_key in params_dict:
+                return params_dict[param_key]
+        return template_dict
+
+    def getAction(self, action_params: dict):
+        return self.__replace_params__(self.template_dict, action_params)
+
+    def exportJSONFile(self, filepath):
+        exportJSONFile(filepath, self)
