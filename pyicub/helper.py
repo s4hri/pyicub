@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -31,17 +31,17 @@ yarp.Network().init()
 
 from pyicub.controllers.gaze import GazeController
 from pyicub.controllers.position import PositionController, JointPose
-from pyicub.actions import PyiCubCustomCall, LimbMotion, GazeMotion, iCubFullbodyStep, iCubFullbodyAction, JointsTrajectoryCheckpoint, TemplateParameter, ActionParameter, iCubActionTemplate
+from pyicub.actions import PyiCubCustomCall, LimbMotion, GazeMotion, iCubFullbodyStep, iCubFullbodyAction, JointsTrajectoryCheckpoint, TemplateParameter, iCubActionTemplate
 from pyicub.modules.emotions import emotionsPyCtrl
 from pyicub.modules.speech import iSpeakPyCtrl
 from pyicub.modules.face import facePyCtrl
 from pyicub.modules.faceLandmarks import faceLandmarksPyCtrl
 from pyicub.core.ports import BufferedReadPort
 from pyicub.core.logger import PyicubLogger, YarpLogger
-from pyicub.requests import iCubRequestsManager, iCubRequest
-from pyicub.rest import iCubRESTManager
+from pyicub.requests import iCubRequest, iCubRequestsManager
 from pyicub.utils import SingletonMeta, getPublicMethods, firstAvailablePort, importFromJSONFile, exportJSONFile
 from collections import deque
+
 import threading
 import os
 import time
@@ -64,74 +64,6 @@ class iCubPart:
         self.joints_list = range(0, joints_n)
 
 
-class PyiCubApp(metaclass=SingletonMeta):
-
-    def __init__(self, logging=False, logging_path=None, restmanager_proxy_host=None, restmanager_proxy_port=None):
-
-        PYICUB_LOGGING = os.getenv('PYICUB_LOGGING')
-        PYICUB_LOGGING_PATH = os.getenv('PYICUB_LOGGING_PATH')
-        PYICUB_API = os.getenv('PYICUB_API')
-        PYICUB_API_RESTMANAGER_HOST = os.getenv('PYICUB_API_RESTMANAGER_HOST')
-        PYICUB_API_RESTMANAGER_PORT = os.getenv('PYICUB_API_RESTMANAGER_PORT')
-        PYICUB_API_PROXY_HOST = os.getenv('PYICUB_API_PROXY_HOST')
-        PYICUB_API_PROXY_PORT = os.getenv('PYICUB_API_PROXY_PORT')
-
-        if PYICUB_LOGGING:
-            if PYICUB_LOGGING == 'true':
-                logging = True
-
-        self._request_manager_ = None
-        self._rest_manager_ = None
-        self._logging_ = logging
-        self._logger_ = YarpLogger.getLogger() #PyicubLogger.getLogger() 
-
-        if self._logging_:
-            self._logger_.enable_logs()
-            self._logger_ = YarpLogger.getLogger() #PyicubLogger.getLogger() #YarpLogger.getLogger()
-
-            if PYICUB_LOGGING_PATH:
-                logging_path = PYICUB_LOGGING_PATH
-
-                if os.path.isdir(logging_path):
-                    if isinstance(self._logger_, PyicubLogger):
-                        self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT, True, logging_path)
-            else:
-                if isinstance(self._logger_, PyicubLogger):
-                    self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT)
-        else:
-            self._logger_.disable_logs()
-
-        self._request_manager_ = iCubRequestsManager(self._logger_, self._logging_, logging_path)
-
-        if not PYICUB_API:
-            PYICUB_API = False
-        elif PYICUB_API == 'true':
-            if not (PYICUB_API_RESTMANAGER_HOST and PYICUB_API_RESTMANAGER_PORT):
-                PYICUB_API_RESTMANAGER_HOST = "0.0.0.0"
-                PYICUB_API_RESTMANAGER_PORT = 9001
-            if PYICUB_API_PROXY_HOST and PYICUB_API_PROXY_PORT:
-                restmanager_proxy_host = PYICUB_API_PROXY_HOST
-                restmanager_proxy_port = int(PYICUB_API_PROXY_PORT)
-            else:
-                restmanager_proxy_host = "0.0.0.0"
-                restmanager_proxy_port = 9001
-            PYICUB_API_RESTMANAGER_PORT = firstAvailablePort(PYICUB_API_RESTMANAGER_HOST, int(PYICUB_API_RESTMANAGER_PORT))            
-            self._rest_manager_ = iCubRESTManager(icubrequestmanager=self._request_manager_, rule_prefix="pyicub",  host=PYICUB_API_RESTMANAGER_HOST, port=PYICUB_API_RESTMANAGER_PORT, proxy_host=restmanager_proxy_host, proxy_port=restmanager_proxy_port)
-    
-    @property
-    def logger(self):
-        return self._logger_
-
-    @property
-    def request_manager(self):
-        return self._request_manager_
-
-    @property
-    def rest_manager(self):
-        return self._rest_manager_
-
-
-
 class iCubSingleton(type):
 
     _instances = {}
@@ -142,9 +74,10 @@ class iCubSingleton(type):
             cls._instances[cls.robot_name] = instance
         return cls._instances[cls.robot_name]
 
+
 class iCub(metaclass=iCubSingleton):
 
-    def __init__(self, robot_name="icub"):
+    def __init__(self, robot_name="icub", request_manager: iCubRequestsManager=None):
         SIMULATION = os.getenv('ICUB_SIMULATION')
 
         self._position_controllers_ = {}
@@ -155,7 +88,8 @@ class iCub(metaclass=iCubSingleton):
         self._face_                 = None
         self._facelandmarks_        = None
         self._monitors_             = []
-        self._logger_               = PyiCubApp().logger
+        self._logger_               = YarpLogger.getLogger() #PyicubLogger.getLogger()
+        self._request_manager_      = request_manager
 
         self._icub_parts_ = {}
         self._icub_parts_[ICUB_PARTS.FACE       ]   = iCubPart(ICUB_PARTS.FACE      , 1)
@@ -177,8 +111,9 @@ class iCub(metaclass=iCubSingleton):
         self._initPositionControllers_()
         self._initGazeController_()
 
-        if PyiCubApp().rest_manager:
-            self._registerDefaultServices_()
+        if not self._request_manager_:
+            self._request_manager_ = iCubRequestsManager(self._logger_)
+
 
     def __del__(self):
         self.close()
@@ -206,24 +141,13 @@ class iCub(metaclass=iCubSingleton):
             self._logger_.warning('GazeController not correctly initialized! Are you sure the controller is available?')
             self._gaze_ctrl_ = None
 
-    def _registerDefaultServices_(self):
-        PyiCubApp().rest_manager.register_target(robot_name=self.robot_name, app_name='utils', target_name=self.importActionFromJSON.__name__, target=self.importActionFromJSON, target_signature=str(inspect.signature(self.importActionFromJSON)) )
-        PyiCubApp().rest_manager.register_target(robot_name=self.robot_name, app_name='utils', target_name=self.playAction.__name__, target=self.playAction, target_signature=str(inspect.signature(self.importActionFromJSON)) )
-
-        if self.gaze:
-            for method in getPublicMethods(self.gaze):
-                self.rest_manager.register_target(robot_name=self.robot_name, app_name='gaze', target_name=getattr(self.gaze, method).__name__, target=getattr(self.gaze, method), target_signature=str(inspect.signature(getattr(self.gaze, method))) )
-        if self.speech:
-            for method in getPublicMethods(self.speech):
-                self.rest_manager.register_target(robot_name=self.robot_name, app_name='speech', target_name=getattr(self.speech, method).__name__, target=getattr(self.speech, method), target_signature=str(inspect.signature(getattr(self.speech, method))) )
-        if self.emo:
-            for method in getPublicMethods(self.emo):
-                self.rest_manager.register_target(robot_name=self.robot_name, app_name='emotions', target_name=getattr(self.emo, method).__name__, target=getattr(self.emo, method), target_signature=str(inspect.signature(getattr(self.emo, method))) )
-
     def close(self):
         if len(self._monitors_) > 0:
             for v in self._monitors_:
                 v.stop()
+    @property
+    def logger(self):
+        return self._logger_
 
     @property
     def gaze(self):
@@ -238,7 +162,7 @@ class iCub(metaclass=iCubSingleton):
             try:
                 self._face_ = facePyCtrl(self.robot_name)
             except:
-                self._logger_.warning('facePyCtrl not correctly initialized!')
+                self._logger_.error('facePyCtrl not correctly initialized!')
                 return None
         return self._face_
 
@@ -253,31 +177,25 @@ class iCub(metaclass=iCubSingleton):
         return self._facelandmarks_
 
     @property
-    def rest_manager(self):
-        return PyiCubApp().rest_manager
-
-    @property
     def request_manager(self):
-        return PyiCubApp().request_manager
-
+        return self._request_manager_
+    
     @property
     def emo(self):
         if self._emo_ is None:
-            try:
-                self._emo_ = emotionsPyCtrl(self.robot_name)
-            except:
-                self._logger_.warning('emotionsPyCtrl not correctly initialized!')
-                return None
+            self._emo_ = emotionsPyCtrl(self.robot_name)
+            if not self._emo_.isValid():
+                self._logger_.error('emotionsPyCtrl not correctly initialized!')
+                self._emo_ = None
         return self._emo_
 
     @property
     def speech(self):
         if self._speech_ is None:
-            try:
-                self._speech_ = iSpeakPyCtrl()
-            except:
-                self._logger_.warning('iSpeakPyCtrl not correctly initialized!')
-                return None
+            self._speech_ = iSpeakPyCtrl()
+            if not self._speech_.isValid():
+                self._logger_.error('iSpeakPyCtrl not correctly initialized!')
+                self._speech_ = None
         return self._speech_
 
     @property
@@ -309,6 +227,9 @@ class iCub(metaclass=iCubSingleton):
     def execCustomCalls(self, calls, prefix='', ts_ref=0.0):
         for call in calls:
             self.execCustomCall(call, prefix, ts_ref)
+
+    def exists(self):
+        return len(self._position_controllers_.keys()) > 0
 
     def getPositionController(self, part_name):
         if part_name in self._position_controllers_.keys():
@@ -416,34 +337,36 @@ class iCub(metaclass=iCubSingleton):
                                              t0)
         self.request_manager.join_requests(requests)
         return requests
-
-    def importTemplateFromJSON(self, JSON_file, params=[]):
-        template = iCubActionTemplate()
-        template.importFromJSONFile(JSON_file)
-        action_params = {}
-        for JSON_file in params:
-            param = importFromJSONFile(JSON_file)
-            action_params.update(param)
-        template_json = template.getAction(action_params)
-        action = iCubFullbodyAction()
-        action.importFromJSONDict(template_json['action'])
-        return self.importAction(action)
-
+    
     def importAction(self, action: iCubFullbodyAction):
         action_id = len(self._imported_actions_.values()) + 1
         self._imported_actions_[action_id] = action
         return action_id
 
-    def importActionFromJSON(self, JSON_file):
-        action = iCubFullbodyAction(JSON_file)
-        return self.importAction(self, action)
+    def importActionFromJSONDict(self, JSON_dict):
+        action = iCubFullbodyAction(JSON_dict=JSON_dict)
+        return self.importAction(action)
 
-    def playAction(self, action_id):
+    def importActionFromJSONFile(self, JSON_file):
+        JSON_dict = importFromJSONFile(JSON_file)
+        action = iCubFullbodyAction(JSON_dict=JSON_dict)
+        return self.importAction(action)
+
+    def importActionFromTemplateJSONDict(self, JSON_dict, params_dict):
+        template = iCubActionTemplate()
+        template.importFromJSONDict(JSON_dict=JSON_dict, params_dict=params_dict)
+        return self.importAction(template.action)
+    
+    def importActionFromTemplateJSONFile(self, JSON_file, params_files=[]):
+        template_dict = importFromJSONFile(JSON_file)
+        params_dict = {}
+        for j in params_files:
+            param = importFromJSONFile(j)
+            params_dict.update(param)
+        return self.importActionFromTemplateJSONDict(template_dict, params_dict)
+
+    def playAction(self, action_id: int):
         self.play(self._imported_actions_[action_id])
-
-    def playActionFromJSON(self, json_file):
-        imported_action = iCubFullbodyAction(JSON_file=json_file)
-        self.play(imported_action)
 
     def play(self, action: iCubFullbodyAction, wait_for_completed=True):
         t0 = round(time.perf_counter(), 4)
@@ -467,19 +390,6 @@ class iCub(metaclass=iCubSingleton):
     def portmonitor(self, yarp_src_port, activate_function, callback):
         self._monitors_.append(PortMonitor(yarp_src_port, activate_function, callback, period=0.01, autostart=True))
 
-
-class iCubRESTApp:
-
-    def __init__(self, app_name='iCubRESTApp', robot_name="icub"):
-        self._name_ = app_name
-        self._icub_ = iCub(robot_name=robot_name)
-
-        for method in getPublicMethods(self):
-            PyiCubApp().rest_manager.register_target(robot_name=self.icub.robot_name, app_name=app_name, target_name=getattr(self, method).__name__, target=getattr(self, method), target_signature=str(inspect.signature(getattr(self, method))) )
-
-    @property
-    def icub(self):
-        return self._icub_
 
 class PortMonitor:
     def __init__(self, yarp_src_port, activate_function, callback, period=0.01, autostart=False):

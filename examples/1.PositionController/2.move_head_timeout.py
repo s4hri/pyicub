@@ -36,3 +36,4 @@ home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
 head_ctrl.move(up, timeout=1.0)
 head_ctrl.move(home)
+

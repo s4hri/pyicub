@@ -50,5 +50,5 @@ action.addStep(step2)
 
 action.exportJSONFile('json/custom.json')
 
-imported_action = iCubFullbodyAction(JSON_file='json/custom.json')
-icub.play(imported_action)
+action_id = icub.importActionFromJSONFile(JSON_file='json/custom.json')
+icub.playAction(action_id)

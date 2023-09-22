@@ -37,8 +37,12 @@ class RpcClient:
         self.__rpc_client_port_name__ = rpc_server_name + "/rpc_client/commands"
         self.__rpc_client__.open(self.__rpc_client_port_name__)
         self.__logger__.debug("Connecting %s with %s" % (self.__rpc_client_port_name__, rpc_server_name))
-        res = self.__rpc_client__.addOutput(rpc_server_name)
-        self.__logger__.debug("Result: %s" % res)
+        self.__connection_result__ = self.__rpc_client__.addOutput(rpc_server_name)
+        self.__logger__.debug("Result: %s" % self.__connection_result__)
+
+    @property
+    def connection_result(self):
+        return self.__connection_result__
 
     def execute(self, cmd):
         ans = yarp.Bottle()

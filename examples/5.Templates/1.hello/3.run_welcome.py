@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -28,6 +28,8 @@
 
 from pyicub.helper import iCub
 
+
 icub = iCub()
-action_id = icub.importActionFromJSONFile("json/lookat.json")
+
+action_id = icub.importActionFromTemplateJSONFile(JSON_file="json/hello.json", params_files=("json/bodymotion_1.json", "json/message_1.json",))
 icub.playAction(action_id)

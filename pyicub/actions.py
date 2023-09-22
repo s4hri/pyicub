@@ -28,7 +28,6 @@
 
 import json
 from string import Template
-from pyicub.requests import iCubRequest
 from pyicub.utils import importFromJSONFile, exportJSONFile
 from pyicub.controllers.position import JointPose, DEFAULT_TIMEOUT
 
@@ -40,6 +39,10 @@ class JointsTrajectoryCheckpoint:
         self.duration = duration
         self.timeout = timeout
 
+    def toJSON(self):
+        return self.__dict__
+
+
 class LimbMotion:
     def __init__(self, part_name: str):
         self.part_name = part_name
@@ -48,11 +51,17 @@ class LimbMotion:
     def addCheckpoint(self, checkpoint: JointsTrajectoryCheckpoint):
         self.checkpoints.append(checkpoint)
 
+    def toJSON(self):
+        return self.__dict__
+
 class PyiCubCustomCall:
 
     def __init__(self, target, args=()):
         self.target = target
         self.args = args
+
+    def toJSON(self):
+        return self.__dict__
 
 class GazeMotion:
     def __init__(self, lookat_method: str):
@@ -61,6 +70,9 @@ class GazeMotion:
 
     def addCheckpoint(self, value: list):
         self.checkpoints.append(value)
+
+    def toJSON(self):
+        return self.__dict__
 
 class iCubFullbodyStep:
 
@@ -80,19 +92,20 @@ class iCubFullbodyStep:
     def addCustomCall(self, custom_call: PyiCubCustomCall):
         self.custom_calls.append(custom_call)
 
+    def toJSON(self):
+        return self.__dict__
+
 
 class iCubFullbodyAction:
 
-    def __init__(self, name='action', description='empty', JSON_file=None, offset_ms=None):
+    def __init__(self, name='action', description='empty', JSON_dict=None, offset_ms=None):
         self.steps = []
         self.name = name
         self.description = description
         self.offset_ms = offset_ms
-        if JSON_file:
-            action = importFromJSONFile(JSON_file)
-            self.importFromJSONDict(action)
+        if JSON_dict:
+            self.importFromJSONDict(JSON_dict)
 
-    
     def addStep(self, step: iCubFullbodyStep):
         self.steps.append(step)
 
@@ -122,28 +135,34 @@ class iCubFullbodyAction:
     def exportJSONFile(self, filepath):
         exportJSONFile(filepath, self)
 
-class TemplateParameter(str):
-    def __new__(cls, param_name):
-        instance = super(TemplateParameter, cls).__new__(cls, "${}".format(param_name))
-        return instance
+    def toJSON(self):
+        return self.__dict__
 
-class ActionParameter:
+class TemplateParameter:
 
-    def __init__(self, name: str, value: object=None):
-        self.__dict__[name] = value
+    def __init__(self, name: str, param_type: object):
+        self.name = name
+        self.param_type = str(param_type)
+        self.key = '$' + self.name
+
+    def setValue(self, value: object):
+        self.value = value 
+
+    def getValue(self):
+        return self.value
+        
+    def toJSON(self):
+        return {self.name: self.value}
 
     def exportJSONFile(self, filepath):
         exportJSONFile(filepath, self)
 
-
 class iCubActionTemplate:
 
-    def __init__(self, name='template', action: iCubFullbodyAction=None):
+    def __init__(self, name='template'):
         self.name = name
-        self.action = action
-
-    def importFromJSONFile(self, JSON_file):
-        self.template_dict = importFromJSONFile(JSON_file)
+        self.action = None
+        self.parameters = {}            
 
     def __replace_params__(self, template_dict, params_dict):
         if isinstance(template_dict, dict):
@@ -158,8 +177,25 @@ class iCubActionTemplate:
                 return params_dict[param_key]
         return template_dict
 
-    def getAction(self, action_params: dict):
-        return self.__replace_params__(self.template_dict, action_params)
+    def importFromJSONDict(self, JSON_dict, params_dict):
+        self.name = JSON_dict['name']
+        action_dict = self.__replace_params__(JSON_dict['action'], params_dict)
+        self.action = iCubFullbodyAction(JSON_dict=action_dict)
+        self.parameters = JSON_dict['parameters']
+    
+    def createParameter(self, name: str, param_type: object):
+        param = TemplateParameter(name, param_type)
+        self.parameters[name] = str(param_type)
+        return param
+
+    def getAction(self):
+        return self.action
+
+    def setAction(self, action: iCubFullbodyAction):
+        self.action = action
 
     def exportJSONFile(self, filepath):
         exportJSONFile(filepath, self)
+
+    def toJSON(self):
+        return self.__dict__

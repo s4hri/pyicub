@@ -54,6 +54,9 @@ class iSpeakPyCtrl:
          self.__port__ = BufferedWritePort("/pyicub/speech:o", "/iSpeak")
          self.__rpcPort__ = RpcClient("/iSpeak/rpc")
 
+    def isValid(self):
+        return self.__rpcPort__.connection_result
+
     def say(self, something, waitActionDone=True):
         self.__port__.write("\"%s\"" % something)
         btl = yarp.Bottle()

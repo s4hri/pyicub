@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,8 +26,24 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub
+from pyicub.helper import TemplateParameter, JointsTrajectoryCheckpoint, LimbMotion, JointPose, ICUB_PARTS, iCubFullbodyStep
 
-icub = iCub()
-action_id = icub.importActionFromJSONFile("json/lookat.json")
-icub.playAction(action_id)
+p1 = TemplateParameter("step_bodymotion", iCubFullbodyStep)
+p2 = TemplateParameter("welcome_message", str)
+
+up = JointsTrajectoryCheckpoint(JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
+down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
+home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
+    
+example_motion = LimbMotion(ICUB_PARTS.HEAD)
+example_motion.addCheckpoint(up)
+example_motion.addCheckpoint(down)
+example_motion.addCheckpoint(home)
+step = iCubFullbodyStep()
+step.setLimbMotion(example_motion)
+
+p1.setValue(step)
+p1.exportJSONFile("json/bodymotion_1.json")
+
+p2.setValue("hello world")
+p2.exportJSONFile("json/message_1.json")
