@@ -39,7 +39,7 @@ if __name__ == '__main__':
     log.debug("init READER")
 
     log.debug("start writing")
-    writing = Thread(target=writer.sendMsg(10))
+    writing = Thread(target=writer.sendMsg(3))
     writing.start()
     writing.join()
     log.debug("end writing")

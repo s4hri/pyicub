@@ -26,8 +26,20 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub
+from pyicub.rest import PyiCubRESTfulClient
 
-icub = iCub()
-action_id = icub.importActionFromJSONFile("json/lookat.json")
-icub.playAction(action_id)
+robot_name='icubSim'
+app_name='myRESTApp'
+
+client = PyiCubRESTfulClient(host='localhost', port=9001)
+
+req_id = client.run_target_async(robot_name, app_name, target_name='foo')
+
+res = client.run_target(robot_name, app_name, target_name='hello_world', name='Johnny')
+print(res)
+
+res = client.run_target(robot_name, app_name, target_name='date', date_format='%b-%d-%Y')
+print(res)
+
+print(client.wait_until_completed(req_id))
+print(client.get_request_info(req_id))

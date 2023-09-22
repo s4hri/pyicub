@@ -28,16 +28,17 @@
 
 from pyicub.helper import TemplateParameter, iCubFullbodyAction, iCubActionTemplate, iCubFullbodyStep, PyiCubCustomCall, LimbMotion
 
-param1 = TemplateParameter("step_bodymotion")
-param2 = TemplateParameter("welcome_message")
 
-speak = PyiCubCustomCall(target="speech.say", args=(param2,))
-step = iCubFullbodyStep()
-step.addCustomCall(speak)
+template = iCubActionTemplate()
+p1 = template.createParameter("step_bodymotion", iCubFullbodyStep)
+p2 = template.createParameter("welcome_message", str)
 
 action = iCubFullbodyAction()
-action.addStep(param1)
+action.addStep(p1.key)
+speak = PyiCubCustomCall(target="speech.say", args=(p2.key,))
+step = iCubFullbodyStep()
+step.addCustomCall(speak)
 action.addStep(step)
 
-template = iCubActionTemplate(action=action)
+template.setAction(action)
 template.exportJSONFile('json/hello.json')

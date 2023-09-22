@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,9 +26,25 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, LimbMotion, JointsTrajectoryCheckpoint, iCubFullbodyAction, ICUB_PARTS, PyiCubCustomCall, TemplateParameter, iCubActionTemplate, ActionParameter
+from pyicub.helper import GazeMotion, iCubFullbodyAction, iCubFullbodyStep
 
-icub = iCub()
+action = iCubFullbodyAction()
 
-action_id = icub.importTemplateFromJSON("json/hello.json", params=("json/bodymotion_1.json", "json/message_1.json",))
-icub.playAction(action_id)
+g1 = GazeMotion(lookat_method="lookAtFixationPoint")
+g1.addCheckpoint([-1.0, -0.5, 1.0])
+g1.addCheckpoint([-1.0, -0.2, 0.5])
+g1.addCheckpoint([-1.0, 0.2, 0.1])
+
+g2 = GazeMotion(lookat_method="lookAtAbsAngles")
+g2.addCheckpoint([0.0, 0.0, 0.0, True, 1.5])
+    
+step1 = iCubFullbodyStep()
+step2 = iCubFullbodyStep()
+
+step1.setGazeMotion(g1)
+step2.setGazeMotion(g2)
+
+action.addStep(step1)
+action.addStep(step2)
+
+action.exportJSONFile('lookat.json')

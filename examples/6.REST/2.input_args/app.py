@@ -26,20 +26,23 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import ActionParameter, JointsTrajectoryCheckpoint, LimbMotion, JointPose, ICUB_PARTS, iCubFullbodyStep
+from pyicub.rest import iCubRESTApp
 
-up = JointsTrajectoryCheckpoint(JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
-down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
-home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
+class myRESTApp(iCubRESTApp):
+
+    def __init__(self, robot_name="icubSim"):
+        iCubRESTApp.__init__(self, robot_name=robot_name, 
+                                   actions_repository=None, 
+                                   arg1="your-arg1-value", 
+                                   arg2=[1,2,3,4], 
+                                   arg3=["option1", "option2"], 
+                                   arg4=0)
     
-example_motion = LimbMotion(ICUB_PARTS.HEAD)
-example_motion.addCheckpoint(up)
-example_motion.addCheckpoint(down)
-example_motion.addCheckpoint(home)
-step = iCubFullbodyStep()
-step.setLimbMotion(example_motion)
+    def process(self):
+        return "I am processing my arguments ... " + str(self.getArgs())
 
-param1 = ActionParameter("step_bodymotion", step)
-param1.exportJSONFile("json/bodymotion_1.json")
-param2 = ActionParameter("welcome_message", "hello world")
-param2.exportJSONFile("json/message_1.json")
+app = myRESTApp()
+app.rest_manager.run_forever()
+
+
+

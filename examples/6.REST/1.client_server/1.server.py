@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,8 +26,26 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub
+from pyicub.rest import iCubRESTApp
+from datetime import date
 
-icub = iCub()
-action_id = icub.importActionFromJSONFile("json/lookat.json")
-icub.playAction(action_id)
+import time
+
+class myRESTApp(iCubRESTApp):
+
+    def hello_world(self, name: str='you'):
+        return "Hello world %s!" % name
+
+    def date(self, date_format: str="%d/%m/%Y"):
+        today = date.today()
+        return today.strftime(date_format)
+
+    def foo(self):
+        time.sleep(5)
+        return "I've done a lot of stuff!"
+
+app = myRESTApp()
+app.rest_manager.run_forever()
+
+
+

@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,26 +26,17 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCubRESTApp
-import time
-
-class myWebApp(iCubRESTApp):
-
-    def __init__(self):
-        iCubRESTApp.__init__(self, app_name="myWebApp")
-
-    def foo(self, args='empty'):
-        print("I AM FOO", args)
-        time.sleep(5)
-        return args
-
-    def goo(self, args='empty'):
-        print("I AM GOO", args)
-        time.sleep(2)
-        return args
-
-app = myWebApp()
-app.icub.rest_manager.run_forever()
+from pyicub.helper import TemplateParameter, iCubFullbodyAction, iCubActionTemplate, iCubFullbodyStep, PyiCubCustomCall
 
 
+template = iCubActionTemplate()
+p = template.createParameter("welcome_message", str)
 
+action = iCubFullbodyAction()
+speak = PyiCubCustomCall(target="speech.say", args=(p.key,))
+step = iCubFullbodyStep()
+step.addCustomCall(speak)
+action.addStep(step)
+
+template.setAction(action)
+template.exportJSONFile('welcome.json')

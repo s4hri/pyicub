@@ -1,0 +1,29 @@
+{
+    "name": "template",
+    "action": {
+        "steps": [
+            "$step_bodymotion",
+            {
+                "name": "step",
+                "limb_motions": {},
+                "gaze_motion": null,
+                "custom_calls": [
+                    {
+                        "target": "speech.say",
+                        "args": [
+                            "$welcome_message"
+                        ]
+                    }
+                ],
+                "offset_ms": null
+            }
+        ],
+        "name": "action",
+        "description": "empty",
+        "offset_ms": null
+    },
+    "parameters": {
+        "step_bodymotion": "<class 'pyicub.actions.iCubFullbodyStep'>",
+        "welcome_message": "<class 'str'>"
+    }
+}
