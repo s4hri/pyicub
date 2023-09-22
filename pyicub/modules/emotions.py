@@ -35,6 +35,9 @@ class emotionsPyCtrl:
     def __init__(self, robot):
         self.__rpc__ = RpcClient("/%s/face/emotions/in" % robot)
 
+    def isValid(self):
+        return self.__rpc__.connection_result
+        
     def __emoCmd__(self, part, emo):
         cmd = yarp.Bottle()
         cmd.clear()

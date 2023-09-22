@@ -41,6 +41,10 @@ class JointPose:
         self.target_joints = target_joints
         self.joints_list = joints_list
 
+    def toJSON(self):
+        return self.__dict__
+
+
 
 class RemoteControlboard:
 
