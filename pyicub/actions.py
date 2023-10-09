@@ -182,11 +182,21 @@ class iCubActionTemplate:
         action_dict = self.__replace_params__(JSON_dict['action'], params_dict)
         self.action = iCubFullbodyAction(JSON_dict=action_dict)
         self.parameters = JSON_dict['parameters']
+
+    def importFromJSONFile(self, JSON_file):
+        JSON_dict = importFromJSONFile(JSON_file)
+        self.importActionFromJSONDict(JSON_dict)
     
     def createParameter(self, name: str, param_type: object):
         param = TemplateParameter(name, param_type)
         self.parameters[name] = str(param_type)
         return param
+
+    def getParameters(self):
+        return self.parameters
+
+    def setParameter(self, param_name, param_value):
+        self.parameters[param_name] = param_value
 
     def getAction(self):
         return self.action

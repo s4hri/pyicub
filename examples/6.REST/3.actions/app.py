@@ -27,10 +27,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from pyicub.rest import iCubRESTApp
-
 import os
 
-app = iCubRESTApp(app_name="myRESTApp")
-app.importActions(path=os.path.join(os.getcwd(), 'actions'))
+app = iCubRESTApp(action_repository_path=os.path.join(os.getcwd(), 'actions'))
 app.rest_manager.run_forever()
 

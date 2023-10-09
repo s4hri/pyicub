@@ -26,25 +26,32 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import GazeMotion, iCubFullbodyAction, iCubFullbodyStep
+from pyicub.rest import PyiCubRESTfulClient
 
-action = iCubFullbodyAction()
+client = PyiCubRESTfulClient(host='localhost', port=9001)
 
-g1 = GazeMotion(lookat_method="lookAtFixationPoint")
-g1.addCheckpoint([-1.0, -0.5, 1.0])
-g1.addCheckpoint([-1.0, -0.2, 0.5])
-g1.addCheckpoint([-1.0, 0.2, 0.1])
+print("PyiCub ver: ", client.get_version())
 
-g2 = GazeMotion(lookat_method="lookAtAbsAngles")
-g2.addCheckpoint([0.0, 0.0, 0.0, True, 1.5])
+robots = client.get_robots()
+
+print("Robots: ")
+for robot in robots:
+    print("name: '%s' url: '%s'" % (robot.name, robot.url))
+
+    applications = client.get_apps(robot.name)
     
-step1 = iCubFullbodyStep()
-step2 = iCubFullbodyStep()
+    print("\t Robot Apps: ")
+    for app in applications:
+        print("\t -> name: '%s' url: '%s'" % (app.name, app.url))
 
-step1.setGazeMotion(g1)
-step2.setGazeMotion(g2)
+        services = client.get_services(robot.name, app.name)
+        
+        print("\t\t Applications Services: ")
+        for service in services.values():
+            print("\t\t name: '%s' url: '%s'" % (service.name, service.url))
 
-action.addStep(step1)
-action.addStep(step2)
-
-action.exportJSONFile('lookat.json')
+    actions = client.get_robot_actions(robot.name)
+    print("\t Robot Actions: ")
+    for k,v in actions.items():
+        print("\t -> action_id: %s , name: %s" % (k, v))
+        client.play_action(robot.name, action_id=k)

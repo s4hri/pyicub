@@ -32,6 +32,7 @@ from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequestsManager, iCubRequest
 from pyicub.helper import iCub
 from flask import Flask, jsonify, request
+from urllib.parse import urlparse
 
 import requests
 import json
@@ -40,10 +41,39 @@ import os
 import inspect
 
 
-class iCubRESTService:
+class RESTJSON:
 
-    def __init__(self, name, robot_name, app_name, url, target, signature):
+    def __init__(self, json_dict=None):
+        if json_dict:
+            self.fromJSON(json_dict)
 
+    def fromJSON(self, json_dict: dict):
+        for k,v in json_dict.items():
+            self.__dict__[k] = v
+
+    def toJSON(self):
+        return vars(self)
+
+
+class RESTRobot(RESTJSON):
+
+    def __init__(self, name=None, url=None, json_dict=None):
+        self.name = name
+        self.url = url
+        RESTJSON.__init__(self, json_dict)
+    
+        
+class RESTApp(RESTJSON):
+
+    def __init__(self, name=None, url=None, json_dict=None):
+        self.name = name
+        self.url = url
+        RESTJSON.__init__(self, json_dict)
+
+
+class iCubRESTService(RESTJSON):
+
+    def __init__(self, name=None, robot_name=None, app_name=None, url=None, target=None, signature=None, json_dict=None):
         self.name = name
         self.robot_name = robot_name
         self.app_name = app_name
@@ -52,25 +82,38 @@ class iCubRESTService:
         self.signature = signature
 
 
+class RESTService(RESTJSON):
+
+    def __init__(self, service: iCubRESTService=None, json_dict=None):
+        if service:
+            self.name = service.name
+            self.robot_name = service.robot_name
+            self.app_name = service.app_name
+            self.url = service.url
+            self.target = str(service.target)
+            self.signature = service.signature
+        RESTJSON.__init__(self, json_dict)
+
+
 class iCubRESTServer(metaclass=SingletonMeta):
 
     def __init__(self, rule_prefix, host, port):
         self._services_ = {}
         self._app_services_ = {}
         self._apps_ = {}
-        self._robots_ = {}
+        self._robots_ = []
         self._flaskapp_ = Flask(__name__)
         self._host_ = host
         self._port_ = port
         self._rule_prefix_ = rule_prefix
         self._flaskapp_.add_url_rule("/", methods=['GET'], view_func=self.info)
-        self._flaskapp_.add_url_rule("/%s" % self._rule_prefix_, methods=['GET'], view_func=self.list_robots)
+        self._flaskapp_.add_url_rule("/%s" % self._rule_prefix_, methods=['GET'], view_func=self.get_robots)
         self._flaskapp_.add_url_rule("/%s/tree" % self._rule_prefix_, methods=['GET'], view_func=self.get_tree)
         self._flaskapp_.add_url_rule("/%s/register" % self._rule_prefix_, methods=['POST'], view_func=self.remote_register)
         self._flaskapp_.add_url_rule("/%s/unregister" % self._rule_prefix_, methods=['POST'], view_func=self.remote_unregister)
 
-        self._flaskapp_.add_url_rule("/%s/<robot_name>" % self._rule_prefix_, methods=['GET'], view_func=self.list_apps)
-        self._flaskapp_.add_url_rule("/%s/<robot_name>/<app_name>" % self._rule_prefix_, methods=['GET'], view_func=self.list_services)
+        self._flaskapp_.add_url_rule("/%s/<robot_name>" % self._rule_prefix_, methods=['GET'], view_func=self.get_apps)
+        self._flaskapp_.add_url_rule("/%s/<robot_name>/<app_name>" % self._rule_prefix_, methods=['GET'], view_func=self.get_services)
         self._flaskapp_.add_url_rule("/%s/<robot_name>/<app_name>/<target_name>" % (self._rule_prefix_), methods=['GET', 'POST'], view_func=self.wrapper_target)
 
     def header(self, host, port):
@@ -107,13 +150,12 @@ class iCubRESTServer(metaclass=SingletonMeta):
             raise RuntimeError('Not running with the Werkzeug Server')
         func()
 
-
     def wrapper_target(self, robot_name, app_name, target_name):
         target_rule = self.target_rule(robot_name, app_name, target_name)
         if request.method == 'GET':
-            return json.dumps(self._services_[target_rule], default=lambda o: o.__dict__, indent=4)
+            return self._app_services_[robot_name][app_name][target_name]
         elif request.method == 'POST':
-            if self._services_[target_rule].target:
+            if not type(self._services_[target_rule].target) is str:
                 return self.process_target(self._services_[target_rule])
             return self.process_target_remote(self._services_[target_rule])
 
@@ -132,92 +174,64 @@ class iCubRESTServer(metaclass=SingletonMeta):
         return self._app_services_
 
     def get_robots(self):
-        return list(self._robots_.values())
+        return self._robots_
 
     def get_apps(self, robot_name):
         return list(self._apps_[robot_name].values())
 
     def get_services(self, robot_name, app_name):
         return self._app_services_[robot_name][app_name]
-
-    def list_robots(self):
-        return jsonify(self.get_robots())
-
-    def list_apps(self, robot_name):
-        return jsonify(self.get_apps(robot_name))
-
-    def list_services(self, robot_name, app_name):
-        return jsonify(self.get_services(robot_name, app_name))
-
+    
     def is_local_register(self, host, port):
         return self._host_ == host and self._port_ == port
 
     def remote_register(self):
         res = request.get_json(force=True)
-        self.register(robot_name=res["robot_name"], app_name=res["app_name"], target_name=res["target_name"], target=res["target"],  target_signature=res["target_signature"], host=res["host"], port=res["port"])
+        service = RESTService(json_dict=res)
+        self.register(robot_name=service.robot_name, app_name=service.app_name, target_name=service.name, target=service.target,  target_signature=service.signature, url=service.url)
         return res
 
     def remote_unregister(self):
         res = request.get_json(force=True)
-        self.unregister(robot_name=res["robot_name"], app_name=res["app_name"], target_name=res["target_name"], host=res["host"], port=res["port"])
+        service = RESTService(json_dict=res)
+        self.unregister(robot_name=service.robot_name, app_name=service.app_name, target_name=service.name, url=service.url)
         return res
     
-    def register(self, robot_name, app_name, target_name, target, target_signature, host, port):
-        target_rule = self.target_rule(robot_name, app_name, target_name)
+    def register(self, robot_name, app_name, target_name, target, target_signature, url):
+        host = urlparse(url).hostname
+        port = urlparse(url).port
 
         if self.is_local_register(host, port) and not robot_name in self._app_services_.keys():
             self._app_services_[robot_name] = {}
-            self._apps_[robot_name] = {}        
+            self._apps_[robot_name] = {}
 
-            robot = {
-                        'name': robot_name,
-                        'url': self.robot_rule(robot_name=robot_name, host=host, port=port)
-                    }
+            robot = RESTRobot(name=robot_name, url=self.robot_rule(robot_name=robot_name, host=host, port=port))
+            self._robots_.append(robot.toJSON())
 
-            self._robots_[robot_name] = robot
-
-
-        app = {
-                'name': app_name,
-                'url': self.app_rule(robot_name=robot_name, app_name=app_name, host=host, port=port)
-              }
+        app = RESTApp(name=app_name, url=self.app_rule(robot_name=robot_name, app_name=app_name, host=host, port=port))
           
-        self._apps_[robot_name][app_name] = app
-
         if not app_name in self._app_services_[robot_name].keys():
-            self._app_services_[robot_name][app_name] = []
-
-        app = {
-                'name': app_name,
-                'url': self.app_rule(robot_name=robot_name, app_name=app_name, host=host, port=port)
-            }
+            self._app_services_[robot_name][app_name] = {}
             
-        self._apps_[robot_name][app_name] = app
+        self._apps_[robot_name][app_name] = app.toJSON()
 
-        service_url = self.target_rule(robot_name=robot_name, app_name=app_name, target_name=target_name, host=host, port=port)
+        service = iCubRESTService(name=target_name,
+                                robot_name=robot_name,
+                                app_name=app_name,
+                                url=url,
+                                target=target,
+                                signature=target_signature)
+        
+        self._services_[url] = service
+        rs = RESTService(service=service)
+        self._app_services_[robot_name][app_name][target_name] = rs.toJSON()
 
-        service = {
-                    'name': target_name,
-                    'url': service_url,
-                    'signature': target_signature
-                }
-
-        self._app_services_[robot_name][app_name].append(service)
-
-        self._services_[service_url] = iCubRESTService(name=target_name,
-                                                       robot_name=robot_name,
-                                                       app_name=app_name,
-                                                       url=service_url,
-                                                       target=target,
-                                                       signature=target_signature)
-
-    def unregister(self, robot_name, app_name, target_name, host, port):
-        target_rule = self.target_rule(robot_name=robot_name, app_name=app_name, target_name=target_name, host=host, port=port)
+    def unregister(self, robot_name, app_name, target_name, url):
         if app_name in self._apps_[robot_name].keys():
             del self._apps_[robot_name][app_name]
         if app_name in self._app_services_[robot_name].keys():
             del self._app_services_[robot_name][app_name]
-        del self._services_[target_rule]
+        del self._services_[url]
 
 
 class iCubRESTManager(iCubRESTServer):
@@ -234,7 +248,7 @@ class iCubRESTManager(iCubRESTServer):
     def __del__(self):
         for robot in self.get_robots():
             for app in self.get_apps(robot['name']):
-                for service in self.get_services(robot['name'],app['name']):
+                for service in self.get_services(robot['name'],app['name']).values():
                     self.unregister_target(robot['name'], app['name'], service['name'], self._host_, self._port_)
 
     @property
@@ -306,37 +320,35 @@ class iCubRESTManager(iCubRESTServer):
         return jsonify(req.req_id)
 
     def register_target(self, robot_name, app_name, target_name, target, target_signature):
-        self.register(robot_name, app_name, target_name, target, target_signature, self._host_, self._port_)
+        url = self.target_rule(robot_name=robot_name, app_name=app_name, target_name=target_name, host=self._host_, port=self._port_)
+        self.register(robot_name, app_name, target_name, target, target_signature, url)
 
         if not self.amiproxy():
+            service = iCubRESTService(name=target_name,
+                                        robot_name=robot_name,
+                                        app_name=app_name,
+                                        url=url,
+                                        target=target,
+                                        signature=target_signature)
 
-            data = {
-                        "robot_name": robot_name,
-                        "app_name": app_name,
-                        "target_name": target_name,
-                        "target": None,
-                        "target_signature": target_signature,
-                        "host": self._host_,
-                        "port": self._port_ 
-                    }
+            rs = RESTService(service=service)
 
-            res = requests.post('http://%s:%s/%s/register' % (self._proxy_host_, self._proxy_port_, self._rule_prefix_), json=data)
+            res = requests.post('%s/register' % self.proxy_rule(), json=rs.toJSON())
             return res.content
         return True
 
     def unregister_target(self, robot_name, app_name, target_name, host, port):
-        self.unregister(robot_name, app_name, target_name, host, port)
+        url = self.target_rule(robot_name=robot_name, app_name=app_name, target_name=target_name, host=host, port=port)
+        self.unregister(robot_name, app_name, target_name, url)
         if not self.amiproxy():
-
-            data = {
-                        "robot_name": robot_name,
-                        "app_name": app_name,
-                        "target_name": target_name,
-                        "host": host,
-                        "port": port
-                    }
-        
-            res = requests.post('http://%s:%s/%s/unregister' % (self._proxy_host_, self._proxy_port_, self._rule_prefix_), json=data)
+            service = iCubRESTService(name=target_name,
+                                    robot_name=robot_name,
+                                    app_name=app_name,
+                                    url=url,
+                                    target=None,
+                                    signature=None)
+            rs = RESTService(service=service)
+            res = requests.post('%s/unregister' % self.proxy_rule(), json=rs.toJSON())
             return res.content
 
 
@@ -347,15 +359,53 @@ class PyiCubRESTfulClient:
         self._host_ = host
         self._port_ = port
         self._rule_prefix_ = rule_prefix
-        self._header_ = "http://%s:%d/%s/" % (self._host_, self._port_, self._rule_prefix_)
+        self._header_ = "http://%s:%d/%s" % (self._host_, self._port_, self._rule_prefix_)
 
     def __run__(self, robot_name, app_name, target_name, sync, *args, **kwargs):
         data = kwargs
-        url = self._header_ + robot_name + '/' + app_name + '/' + target_name
+        url = self._header_ + '/' + robot_name + '/' + app_name + '/' + target_name
         if sync:
             url += '?sync'
         res = requests.post(url=url, json=data)
         return res.json()
+    
+    def get_version(self):
+        res = requests.get(url="http://%s:%d" % (self._host_, self._port_))
+        return res.json()['Version']
+
+    def get_robots(self):
+        res = requests.get(url=self._header_)
+        json_robots = res.json()
+        robots = []
+        for robot in json_robots:
+            robots.append(RESTRobot(json_dict=robot))
+        return robots
+
+    def get_apps(self, robot_name):
+        res = requests.get(url=self._header_ + '/' + robot_name)
+        json_apps = res.json()
+        apps = []
+        for app in json_apps:
+            apps.append(RESTApp(json_dict=app))
+        return apps
+
+    def get_services(self, robot_name, app_name):
+        res = requests.get(url=self._header_ + '/' + robot_name + '/' + app_name)
+        json_services = res.json()
+        services = {}
+        for name, service_dict in json_services.items():
+            services[name] = RESTApp(json_dict=service_dict)
+        return services
+
+    def get_robot_actions(self, robot_name):
+        res = requests.post(url=self._header_ + '/' + robot_name + '/helper/getImportedActions', json={})
+        res = requests.get(res.json())
+        return res.json()['retval']
+
+    def play_action(self, robot_name, action_id, sync=True):
+        if sync:
+            return self.run_target(robot_name, "helper", "playAction", action_id=int(action_id))
+        return self.run_target_async(robot_name, "helper", "playAction", action_id=int(action_id))
 
     def run_target(self, robot_name, app_name, target_name, *args, **kwargs):
         return self.__run__(robot_name, app_name, target_name, True, *args, **kwargs)
@@ -446,8 +496,9 @@ class PyiCubApp(metaclass=SingletonMeta):
 
 class iCubRESTApp:
 
-    def __init__(self, robot_name="icub", **kargs):
+    def __init__(self, robot_name="icub", action_repository_path='', **kargs):
         self._name_ = self.__class__.__name__
+        self.__action_repository__ = action_repository_path
         self.__app__ = PyiCubApp()
 
         SIMULATION = os.getenv('ICUB_SIMULATION')
@@ -469,6 +520,10 @@ class iCubRESTApp:
         self.__actions__ = {}
         self.__configure_default_args__()
 
+        if action_repository_path:
+            self.importActions(path=action_repository_path)
+
+
     def __is_icub_managed__(self):
         url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper'
         try:
@@ -482,6 +537,7 @@ class iCubRESTApp:
         self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.icub.playAction)
         self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.icub.importActionFromJSONDict)
         self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.icub.importActionFromTemplateJSONDict)
+        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.getImportedActions)
         if self.icub.gaze:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.gaze, class_name='gaze')
         if self.icub.speech:
@@ -506,6 +562,20 @@ class iCubRESTApp:
             else:
                 val = v
             self.__args__[k] = val
+
+    def getImportedActions(self):
+        if self.icub:
+            actions = self.icub.getImportedActions()
+            res = {}
+            for k, action in actions.items():
+                res[k] = action.name
+            return res
+        else:
+            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/getImportedActions'
+            res = requests.post(url=url, json={})
+            res = requests.get(res.json())
+            return res.json()
+
     
     def importActions(self, path):
         json_files = [pos_json for pos_json in os.listdir(path) if pos_json.endswith('.json')]
@@ -519,7 +589,7 @@ class iCubRESTApp:
                 res = requests.post(url=url, json=data)
                 res = requests.get(res.json())
                 action_id = res.json()['retval']
-            self.__actions__[os.path.join(os.path.basename(path),f)] = action_id
+            #self.__actions__[os.path.join(os.path.basename(path),f)] = action_id
 
     def importActionFromTemplate(self, template_file, params_files):
         if self.icub:
@@ -539,7 +609,7 @@ class iCubRESTApp:
         key += os.path.basename(template_file)
         for param in params_files:
             key = key + ',' + os.path.basename(param)
-        self.__actions__[key] = action_id
+        #self.__actions__[key] = action_id
 
     def getArgsTemplate(self):
         return self.__args_template__
@@ -547,8 +617,10 @@ class iCubRESTApp:
     def getArgs(self):
         return self.__args__
 
+    """
     def getActions(self):
         return self.__actions__
+    """
 
     def setArgs(self, input_args: dict):
         for k,v in input_args.items():

@@ -27,15 +27,36 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from pyicub.rest import iCubRESTApp
+from datetime import date
 
+import time
 import os
 
-app = iCubRESTApp()
+class myRESTApp(iCubRESTApp):
 
+    """
+    Defining input arguments for this application
+    """
+                 
+    def hello_world(self, name: str='you'):
+        return "Hello world %s!" % name
+
+    def date(self, date_format: str="%d/%m/%Y"):
+        today = date.today()
+        return today.strftime(date_format)
+
+    def process(self):
+        return "I am processing my arguments ... " + str(self.getArgs())
+
+    def foo(self):
+        time.sleep(5)
+        return "I've done a lot of stuff!"
+
+app = myRESTApp(action_repository_path=os.path.join(os.getcwd(), 'actions'), arg1="your-arg1-value",arg2=[1,2,3,4])
 app.importActionFromTemplate(template_file=os.path.join(os.getcwd(), 'templates', 'welcome.json'),
                              params_files = [os.path.join(os.getcwd(), 'templates', 'params', 'msg1.json')])
 
-app.importActionFromTemplate(template_file=os.path.join(os.getcwd(), 'templates', 'welcome.json'),
-                             params_files = [os.path.join(os.getcwd(), 'templates', 'params', 'msg2.json')])
-
 app.rest_manager.run_forever()
+
+
+

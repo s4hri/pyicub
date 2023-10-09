@@ -337,6 +337,9 @@ class iCub(metaclass=iCubSingleton):
                                              t0)
         self.request_manager.join_requests(requests)
         return requests
+
+    def getImportedActions(self):
+        return self._imported_actions_
     
     def importAction(self, action: iCubFullbodyAction):
         action_id = len(self._imported_actions_.values()) + 1
@@ -364,6 +367,9 @@ class iCub(metaclass=iCubSingleton):
             param = importFromJSONFile(j)
             params_dict.update(param)
         return self.importActionFromTemplateJSONDict(template_dict, params_dict)
+
+    def importTemplateJSONFile(self, JSON_file):
+        return importFromJSONFile(JSON_file)
 
     def playAction(self, action_id: int):
         self.play(self._imported_actions_[action_id])
