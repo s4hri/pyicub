@@ -33,15 +33,21 @@ import os
 class LookAtAction(iCubFullbodyAction):
 
     def prepare(self):
-        step1 = self.addStep()
-        g1 = step1.setGazeMotion("lookAtFixationPoint")
+        step1 = self.createStep()
+        
+        g1 = self.createGazeMotion("lookAtFixationPoint")
         g1.addCheckpoint([-1.0, -0.5, 1.0])
         g1.addCheckpoint([-1.0, -0.2, 0.5])
         g1.addCheckpoint([-1.0, 0.2, 0.1])
+        step1.setGazeMotion(g1)
 
-        step2 = self.addStep()
-        g2 = step2.setGazeMotion("lookAtAbsAngles")
+        step2 = self.createStep()
+        g2 = self.createGazeMotion("lookAtAbsAngles")
         g2.addCheckpoint([0.0, 0.0, 0.0, True, 1.5])
+        step2.setGazeMotion(g2)
+
+        self.addStep(step1)
+        self.addStep(step2)
 
 action = LookAtAction()
 icub = iCub()

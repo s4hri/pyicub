@@ -36,11 +36,16 @@ class GenericPoses(iCubFullbodyAction):
         pose_down = JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
         pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
         
-        step = self.addStep()
-        lm = step.setLimbMotion(ICUB_PARTS.HEAD)
-        lm.addCheckpoint(pose_up, duration=2.0)
-        lm.addCheckpoint(pose_down, duration=2.0, timeout=1.0)
-        lm.addCheckpoint(pose_home, duration=2.0)
+        step = self.createStep()
+        lm = self.createLimbMotion(ICUB_PARTS.HEAD)
+        up = self.createJointsTrajectory(pose_up, duration=2.0)
+        down = self.createJointsTrajectory(pose_down, duration=2.0, timeout=1.0)
+        home = self.createJointsTrajectory(pose_home, duration=2.0)
+        lm.addJointsTrajectoryCheckpoint(up)
+        lm.addJointsTrajectoryCheckpoint(down)
+        lm.addJointsTrajectoryCheckpoint(home)
+        step.setLimbMotion(lm)
+        self.addStep(step)
 
 
 action = GenericPoses()

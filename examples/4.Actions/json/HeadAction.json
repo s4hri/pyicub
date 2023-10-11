@@ -59,7 +59,7 @@
             "offset_ms": null
         }
     ],
-    "name": "action",
+    "name": "HeadAction",
     "description": "empty",
     "offset_ms": null
 }

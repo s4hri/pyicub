@@ -48,10 +48,8 @@ class LimbMotion:
         self.part_name = part_name
         self.checkpoints = []
 
-    def addCheckpoint(self, pose: JointPose, duration: float=0.0, timeout: float=DEFAULT_TIMEOUT):
-        checkpoint = JointsTrajectoryCheckpoint(pose=pose, duration=duration, timeout=timeout)
+    def addJointsTrajectoryCheckpoint(self, checkpoint: JointsTrajectoryCheckpoint):
         self.checkpoints.append(checkpoint)
-        return checkpoint
 
     def toJSON(self):
         return self.__dict__
@@ -85,19 +83,14 @@ class iCubFullbodyStep:
         self.custom_calls = []
         self.offset_ms = offset_ms
     
-    def setLimbMotion(self, part_name: str):
-        limb_motion = LimbMotion(part_name)
+    def setLimbMotion(self, limb_motion: LimbMotion):
         self.limb_motions[limb_motion.part_name] = limb_motion
-        return limb_motion
 
-    def setCustomCall(self, target, args=()):
-        custom_call = PyiCubCustomCall(target=target, args=args)
+    def setCustomCall(self, custom_call: PyiCubCustomCall):
         self.custom_calls.append(custom_call)
-        return custom_call
 
-    def setGazeMotion(self, lookat_method: str):
-        self.gaze_motion = GazeMotion(lookat_method)
-        return self.gaze_motion
+    def setGazeMotion(self, gaze_motion: GazeMotion):
+        self.gaze_motion = gaze_motion
 
     def toJSON(self):
         return self.__dict__
@@ -105,9 +98,10 @@ class iCubFullbodyStep:
 
 class iCubFullbodyAction:
 
-    def __init__(self, name='action', description='empty', offset_ms=None):
+    def __init__(self, description='empty', name=None, offset_ms=None):
         self.steps = []
-        self.name = name
+        if not name:
+            self.name = self.__class__.__name__
         self.description = description
         self.offset_ms = offset_ms
         self.prepare()
@@ -115,10 +109,23 @@ class iCubFullbodyAction:
     def prepare(self):
         raise NotImplementedError("The method 'prepare' contains definition for creating custom actions.")
 
-    def addStep(self, name='step', offset_ms=None):
-        step = iCubFullbodyStep(name, offset_ms)
+    def createJointsTrajectory(self, pose: JointPose, duration: float=0.0, timeout: float=DEFAULT_TIMEOUT):
+        return JointsTrajectoryCheckpoint(pose=pose, duration=duration, timeout=timeout)
+
+    def createLimbMotion(self, part_name: str):
+        return LimbMotion(part_name)
+
+    def createCustomCall(self, target, args=()):
+        return PyiCubCustomCall(target=target, args=args)
+
+    def createGazeMotion(self, lookat_method: str):
+        return GazeMotion(lookat_method)
+
+    def createStep(self, name='step', offset_ms=None):
+        return iCubFullbodyStep(name, offset_ms)
+
+    def addStep(self, step: iCubFullbodyStep):
         self.steps.append(step)
-        return step
 
     def exportJSONFile(self, filepath):
         exportJSONFile(filepath, self)
@@ -147,19 +154,24 @@ class iCubFullbodyActionImportedJSON(iCubFullbodyAction):
         self.offset_ms = json_dict["offset_ms"]
         self.description = json_dict["description"]
         for step in json_dict["steps"]:
-            res = self.addStep(name=step["name"], offset_ms=step["offset_ms"])
+            res = self.createStep(name=step["name"], offset_ms=step["offset_ms"])
+            self.addStep(res)
             for part,pose in step["limb_motions"].items():
-                lm = res.setLimbMotion(part)
+                lm = self.createLimbMotion(part)
+                res.setLimbMotion(lm)
                 for v in pose["checkpoints"]:
                     pose = JointPose(target_joints=v['pose']['target_joints'], joints_list=v['pose']['joints_list'])
-                    lm.addCheckpoint(pose, duration=v['duration'], timeout=v['timeout'])
+                    cp = self.createJointsTrajectory(pose, duration=v['duration'], timeout=v['timeout'])
+                    lm.addJointsTrajectoryCheckpoint(cp)
             if step["gaze_motion"]:
-                gaze = res.setGazeMotion(lookat_method=step["gaze_motion"]["lookat_method"])
+                gaze = self.createGazeMotion(lookat_method=step["gaze_motion"]["lookat_method"])
+                res.setGazeMotion(gaze)
                 for v in step["gaze_motion"]["checkpoints"]:
                     gaze.addCheckpoint(v)
             if step["custom_calls"]:
                 for v in step["custom_calls"]:
-                    res.setCustomCall(target=v["target"], args=v["args"])
+                    cc = self.createCustomCall(target=v["target"], args=v["args"])
+                    res.setCustomCall(cc)
                     
 
 class TemplateParameter:
@@ -180,7 +192,7 @@ class TemplateParameter:
 
     def exportJSONFile(self, filepath):
         exportJSONFile(filepath, self)
-
+"""
 class iCubActionTemplate:
 
     def __init__(self, name='template'):
@@ -233,6 +245,17 @@ class iCubActionTemplate:
 
     def toJSON(self):
         return self.__dict__
+"""
+
+class iCubActionTemplate(iCubFullbodyAction):
+
+    def __init__(self, description='empty', name=None, offset_ms=None):
+        iCubFullbodyAction.__init__(self, description=description, name=name, offset_ms=offset_ms)
+
+    def prepare(self):
+        pass
+    
+
 
 
 class ActionsManager:
@@ -242,7 +265,7 @@ class ActionsManager:
 
     def addAction(self, action: iCubFullbodyAction, action_id=None):
         if not action_id:
-            action_id = action.__class__.__name__
+            action_id = action.name
         if action_id in self.__actions__.keys():
             raise Exception("An error occurred adding a new action! Class name '%s' already present! Please choose different names for each class actions." % action_id)
         self.__actions__[action_id] = action
@@ -257,12 +280,16 @@ class ActionsManager:
         for k, action in self.__actions__.items():
             action.exportJSONFile('%s/%s.json' % (path, k))
 
-    def getImportedActions(self):
-        return self._imported_actions_
+    def getActions(self):
+        return self.__actions__.keys()
 
-    def importActionFromJSONDict(self, JSON_dict):
+    def importActionFromJSONDict(self, JSON_dict, name_prefix=None):
         action = iCubFullbodyActionImportedJSON(JSON_dict=JSON_dict)
-        return self.addAction(action)
+        if name_prefix:
+            action_id=name_prefix + '.' + action.name
+        else:
+            action_id=None
+        return self.addAction(action, action_id=action_id)
 
     def importActionFromJSONFile(self, JSON_file):
         JSON_dict = importFromJSONFile(JSON_file)

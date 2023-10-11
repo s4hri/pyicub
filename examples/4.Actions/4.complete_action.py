@@ -28,38 +28,49 @@
 
 from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, GazeMotion, iCubFullbodyAction, PyiCubCustomCall, iCubFullbodyStep
 
+import os
 
 class CompleteAction(iCubFullbodyAction):
 
     def prepare(self):
+        step1 = self.createStep()
         arm_down = JointPose(target_joints=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
         arm_up = JointPose(target_joints=[-90.0, 20.0, 10.0, 90.0, 0.0, 0.0, 0.0, 60.0, 20.0, 20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0])
 
-        step1 = self.addStep()
-        m1 = step1.setLimbMotion(ICUB_PARTS.RIGHT_ARM)
-        m1.addCheckpoint(arm_up, duration=1.0)
-        m1.addCheckpoint(arm_down, duration=1.0)
-        step1.setCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
-        step1.setCustomCall(target="emo.neutral")
+        up = self.createJointsTrajectory(arm_up, duration=1.0)
+        down = self.createJointsTrajectory(arm_down, duration=1.0)
 
-        step2 = self.addStep()
-        m2 = step2.setLimbMotion(ICUB_PARTS.LEFT_ARM)
-        m2.addCheckpoint(arm_up, duration=1.0)
-        m2.addCheckpoint(arm_down, duration=1.0)
-        step2.setLimbMotion(m2)
+        right_arm_motion = self.createLimbMotion(ICUB_PARTS.RIGHT_ARM)
+        left_arm_motion = self.createLimbMotion(ICUB_PARTS.LEFT_ARM)
 
-        step3 = self.addStep(offset_ms=500)
-        g = step3.setGazeMotion(lookat_method="lookAtAbsAngles")
+        right_arm_motion.addJointsTrajectoryCheckpoint(up)
+        right_arm_motion.addJointsTrajectoryCheckpoint(down)
+        left_arm_motion.addJointsTrajectoryCheckpoint(up)
+        left_arm_motion.addJointsTrajectoryCheckpoint(down)
+
+        cc = self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
+        step1.setCustomCall(cc)
+        cc = self.createCustomCall(target="emo.neutral")
+        step1.setCustomCall(cc)
+
+        step1.setLimbMotion(right_arm_motion)
+        self.addStep(step1)
+
+        step2 = self.createStep()
+        step2.setLimbMotion(left_arm_motion)
+        self.addStep(step2)
+
+        step3 = self.createStep(offset_ms=500)
+        g = self.createGazeMotion(lookat_method="lookAtAbsAngles")
         g.addCheckpoint([20.0, 0.0, 0.0])
         g.addCheckpoint([-20.0, 0.0, 0.0])
         g.addCheckpoint([0.0, 0.0, 0.0])
-        m3 = step3.setLimbMotion(ICUB_PARTS.RIGHT_ARM)
-        m3.addCheckpoint(arm_up, duration=1.0)
-        m3.addCheckpoint(arm_down, duration=1.0)
-        m4 = step3.setLimbMotion(ICUB_PARTS.LEFT_ARM)
-        m4.addCheckpoint(arm_up, duration=1.0)
-        m4.addCheckpoint(arm_down, duration=1.0)
-        step3.setCustomCall(target="emo.smile")
+        step3.setGazeMotion(g)
+        step3.setLimbMotion(right_arm_motion)
+        step3.setLimbMotion(left_arm_motion)
+        cc = self.createCustomCall(target="emo.smile")
+        step3.setCustomCall(cc)
+        self.addStep(step3)
 
 action = CompleteAction()
 icub = iCub()

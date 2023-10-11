@@ -33,13 +33,19 @@ import os
 class CustomAction(iCubFullbodyAction):
 
     def prepare(self):
-        step1 = self.addStep()
-        step1.setCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
-        step1.setCustomCall(target="emo.neutral")
+        step1 = self.createStep()        
+        cc = self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
+        step1.setCustomCall(cc)
+        cc = self.createCustomCall(target="emo.neutral")
+        step1.setCustomCall(cc)
+        self.addStep(step1)
 
-        step2 = self.addStep()
-        step2.setCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 0.0, 0.0,))
-        step2.setCustomCall(target="emo.smile")
+        step2 = self.createStep()
+        cc = self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 0.0, 0.0,))
+        step2.setCustomCall(cc)
+        cc = self.createCustomCall(target="emo.smile")
+        step2.setCustomCall(cc)
+        self.addStep(step2)
 
 
 action = CustomAction()
@@ -47,6 +53,3 @@ icub = iCub()
 action_id = icub.addAction(action)
 icub.playAction(action_id)
 icub.exportAction(action_id=action_id, path=os.path.join(os.getcwd(), 'json'))
-
-action_id = icub.importAction(JSON_file='json/CustomAction.json')
-icub.playAction(action_id)

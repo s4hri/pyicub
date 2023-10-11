@@ -535,9 +535,9 @@ class iCubRESTApp:
     def __register_icub_helper__(self):
         app_name = "helper"
         self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.icub.playAction)
-        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.icub.importActionFromJSONDict)
-        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.icub.importActionFromTemplateJSONDict)
-        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.getImportedActions)
+        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.importAction)
+        #self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.icub.importActionFromTemplateJSONDict)
+        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.getActions)
         if self.icub.gaze:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.gaze, class_name='gaze')
         if self.icub.speech:
@@ -563,33 +563,36 @@ class iCubRESTApp:
                 val = v
             self.__args__[k] = val
 
-    def getImportedActions(self):
+    def getActions(self):
         if self.icub:
-            actions = self.icub.getImportedActions()
-            res = {}
-            for k, action in actions.items():
-                res[k] = action.name
-            return res
+            actions = self.icub.getActions()
+            return list(actions)
         else:
-            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/getImportedActions'
+            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/getActions'
             res = requests.post(url=url, json={})
             res = requests.get(res.json())
             return res.json()
+
+    def importAction(self, JSON_dict, name_prefix=None):
+        if self.icub:
+            if not name_prefix:
+                name_prefix = self.__class__.__name__
+            return self.icub.actions_manager.importActionFromJSONDict(JSON_dict, name_prefix=name_prefix)
+        else:
+            data = {}
+            data['JSON_dict'] = JSON_dict
+            data['name_prefix'] = self.__class__.__name__
+            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/importAction'
+            res = requests.post(url=url, json=data)
+            res = requests.get(res.json())
+            return res.json()['retval']
 
     
     def importActions(self, path):
         json_files = [pos_json for pos_json in os.listdir(path) if pos_json.endswith('.json')]
         for f in json_files:
-            if self.icub:
-                action_id = self.icub.importActionFromJSONFile(os.path.join(path, f))
-            else:
-                url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/importActionFromJSONDict'
-                data = {}
-                data["JSON_dict"] = importFromJSONFile(os.path.join(path, f))
-                res = requests.post(url=url, json=data)
-                res = requests.get(res.json())
-                action_id = res.json()['retval']
-            #self.__actions__[os.path.join(os.path.basename(path),f)] = action_id
+            JSON_dict = importFromJSONFile(os.path.join(path, f))
+            self.importAction(JSON_dict)
 
     def importActionFromTemplate(self, template_file, params_files):
         if self.icub:

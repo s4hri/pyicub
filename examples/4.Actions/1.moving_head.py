@@ -33,17 +33,23 @@ import os
 class HeadAction(iCubFullbodyAction):
 
     def prepare(self):
-        step = self.addStep()
+        step = self.createStep()
 
         pose_up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 5.0])
         pose_down = JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 5.0])
         pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
 
-        motion = step.setLimbMotion(ICUB_PARTS.HEAD)
-        motion.addCheckpoint(pose_up, duration=3.0)
-        motion.addCheckpoint(pose_down, duration=3.0)
-        motion.addCheckpoint(pose_home, duration=3.0)
+        motion = self.createLimbMotion(ICUB_PARTS.HEAD)
+        up = self.createJointsTrajectory(pose_up, duration=3.0)
+        down = self.createJointsTrajectory(pose_down, duration=3.0)
+        home = self.createJointsTrajectory(pose_home, duration=3.0)
+        motion.addJointsTrajectoryCheckpoint(up)
+        motion.addJointsTrajectoryCheckpoint(down)
+        motion.addJointsTrajectoryCheckpoint(home)
 
+        step.setLimbMotion(motion)
+
+        self.addStep(step)
 
 action = HeadAction()
 icub = iCub()

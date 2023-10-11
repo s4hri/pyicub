@@ -45,7 +45,7 @@
             "offset_ms": null
         }
     ],
-    "name": "action",
+    "name": "LookAtAction",
     "description": "empty",
     "offset_ms": null
 }

@@ -246,6 +246,9 @@ class iCub(metaclass=iCubSingleton):
         action = self.actions_manager.getAction(action_id)
         action.exportJSONFile('%s/%s.json' % (path, action_id))
 
+    def getActions(self):
+        return self.actions_manager.getActions()
+
     def importAction(self, JSON_file):
         return self.actions_manager.importActionFromJSONFile(JSON_file=JSON_file)
 
