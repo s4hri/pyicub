@@ -26,25 +26,28 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, iCubFullbodyAction
 
+from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, GazeMotion, iCubFullbodyAction, PyiCubCustomCall, iCubFullbodyStep
+
+import os
+
+class GenericPoses(iCubFullbodyAction):
+
+    def prepare(self):
+        pose_up = JointPose(target_joints=[30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+        pose_down = JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+        pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+        
+        step = self.addStep()
+        lm = step.setLimbMotion(ICUB_PARTS.HEAD)
+        lm.addCheckpoint(pose_up, duration=2.0)
+        lm.addCheckpoint(pose_down, duration=2.0, timeout=1.0)
+        lm.addCheckpoint(pose_home, duration=2.0)
+
+
+action = GenericPoses()
 icub = iCub()
-
-up = JointsTrajectoryCheckpoint(JointPose(target_joints=[30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=2.0)
-down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=2.0, timeout=1.0)
-home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=2.0)
-
-example_motion = LimbMotion(ICUB_PARTS.HEAD)
-example_motion.addCheckpoint(up)
-example_motion.addCheckpoint(down)
-example_motion.addCheckpoint(home)
-
-action = iCubFullbodyAction()
-step = icub.createStep()
-step.setLimbMotion(example_motion)
-action.addStep(step)
-
-
-icub.play(action)
+action_id = icub.addAction(action)
+icub.playAction(action_id)
 icub.getPositionController(ICUB_PARTS.HEAD).setCustomWaitMotionDone(motion_complete_at=0.8)
-icub.play(action)
+icub.playAction(action_id)

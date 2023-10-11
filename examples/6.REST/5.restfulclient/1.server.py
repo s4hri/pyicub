@@ -34,10 +34,6 @@ import os
 
 class myRESTApp(iCubRESTApp):
 
-    """
-    Defining input arguments for this application
-    """
-                 
     def hello_world(self, name: str='you'):
         return "Hello world %s!" % name
 
