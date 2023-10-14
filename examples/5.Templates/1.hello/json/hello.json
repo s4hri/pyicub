@@ -1,29 +1,26 @@
 {
-    "name": "template",
-    "action": {
-        "steps": [
-            "$step_bodymotion",
-            {
-                "name": "step",
-                "limb_motions": {},
-                "gaze_motion": null,
-                "custom_calls": [
-                    {
-                        "target": "speech.say",
-                        "args": [
-                            "$welcome_message"
-                        ]
-                    }
-                ],
-                "offset_ms": null
-            }
-        ],
-        "name": "action",
-        "description": "empty",
-        "offset_ms": null
+    "params": {
+        "step_bodymotion": "$step_bodymotion",
+        "welcome_msg": "$welcome_msg"
     },
-    "parameters": {
-        "step_bodymotion": "<class 'pyicub.actions.iCubFullbodyStep'>",
-        "welcome_message": "<class 'str'>"
-    }
+    "steps": [
+        "$step_bodymotion",
+        {
+            "name": "step",
+            "limb_motions": {},
+            "gaze_motion": null,
+            "custom_calls": [
+                {
+                    "target": "speech.say",
+                    "args": [
+                        "$welcome_msg"
+                    ]
+                }
+            ],
+            "offset_ms": null
+        }
+    ],
+    "name": "TemplateExample",
+    "description": "empty",
+    "offset_ms": null
 }

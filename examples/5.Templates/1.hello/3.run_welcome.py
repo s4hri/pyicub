@@ -31,5 +31,9 @@ from pyicub.helper import iCub
 
 icub = iCub()
 
-action_id = icub.importActionFromTemplateJSONFile(JSON_file="json/hello.json", params_files=("json/bodymotion_1.json", "json/message_1.json",))
+template = icub.importTemplate(JSON_file="json/hello.json")
+params = template.getParams()
+params["step_bodymotion"].importFromJSONFile("json/step1.json")
+params["welcome_msg"].importFromJSONFile("json/msg1.json")
+action_id = icub.importActionFromTemplate(template)
 icub.playAction(action_id)

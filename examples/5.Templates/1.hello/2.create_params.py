@@ -28,22 +28,24 @@
 
 from pyicub.helper import TemplateParameter, JointsTrajectoryCheckpoint, LimbMotion, JointPose, ICUB_PARTS, iCubFullbodyStep
 
-p1 = TemplateParameter("step_bodymotion", iCubFullbodyStep)
-p2 = TemplateParameter("welcome_message", str)
+p1 = TemplateParameter("step_bodymotion")
+p2 = TemplateParameter("welcome_msg")
 
-up = JointsTrajectoryCheckpoint(JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
-down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
-home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0]), duration=3.0)
-    
-example_motion = LimbMotion(ICUB_PARTS.HEAD)
-example_motion.addCheckpoint(up)
-example_motion.addCheckpoint(down)
-example_motion.addCheckpoint(home)
 step = iCubFullbodyStep()
-step.setLimbMotion(example_motion)
+pose_up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+pose_down = JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+motion = LimbMotion(ICUB_PARTS.HEAD)
+up = JointsTrajectoryCheckpoint(pose_up, duration=3.0)
+down = JointsTrajectoryCheckpoint(pose_down, duration=3.0)
+home = JointsTrajectoryCheckpoint(pose_home, duration=3.0)
+motion.addJointsTrajectoryCheckpoint(up)
+motion.addJointsTrajectoryCheckpoint(down)
+motion.addJointsTrajectoryCheckpoint(home)
+step.setLimbMotion(motion)
 
 p1.setValue(step)
-p1.exportJSONFile("json/bodymotion_1.json")
+p1.exportJSONFile("json/step1.json")
 
 p2.setValue("hello world")
-p2.exportJSONFile("json/message_1.json")
+p2.exportJSONFile("json/msg1.json")

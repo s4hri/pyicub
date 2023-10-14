@@ -26,39 +26,24 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, iCubActionTemplate
+from pyicub.helper import iCubActionTemplate
 
 class TemplateExample(iCubActionTemplate):
 
-    p1 = 1
-    p2 = 2
+    def prepare_params(self):
+        self.createParam(name="step_bodymotion")
+        self.createParam(name="welcome_msg")
 
-    def prepare(self, p1, p2):
-        self.addStep(p1)
-        step2 = self.addStep()
-        step2.setCustomCall(target="speech.say", args=("ciao",))
-
-action = TemplateExample()
-action.exportJSONFile("json/template.json")
-#action_id = icub.addAction(action)
-#icub.playAction(action_id)
-#icub.exportAction(action_id=action_id, path=os.path.join(os.getcwd(), 'json'))
-
-
-"""
-template = iCubActionTemplate()
-p1 = template.createParameter("step_bodymotion", iCubFullbodyStep)
-p2 = template.createParameter("welcome_message", str)
+    def prepare(self):
+        step_bodymotion = self.getParam("step_bodymotion")
+        self.addStep(step_bodymotion)
+        step2 = self.createStep()
+        self.addStep(step2)
+        welcome_msg = self.getParam("welcome_msg")
+        cc = self.createCustomCall(target="speech.say", args=(welcome_msg,))
+        step2.setCustomCall(cc)
 
 
-
-action = iCubFullbodyAction()
-action.addStep(p1.key)
-speak = PyiCubCustomCall(target="speech.say", args=(p2.key,))
-step = iCubFullbodyStep()
-step.addCustomCall(speak)
-action.addStep(step)
-
-template.setAction(action)
-template.exportJSONFile('json/hello.json')
-"""
+template = TemplateExample()
+params = template.getParams()
+template.exportJSONFile("json/hello.json")

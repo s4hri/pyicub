@@ -252,6 +252,13 @@ class iCub(metaclass=iCubSingleton):
     def importAction(self, JSON_file):
         return self.actions_manager.importActionFromJSONFile(JSON_file=JSON_file)
 
+    def importActionFromTemplate(self, template: iCubActionTemplate, action_id=None):
+        action = template.getAction()
+        return self.actions_manager.addAction(action, action_id=action_id)
+
+    def importTemplate(self, JSON_file):
+        return self.actions_manager.importTemplateFromJSONFile(JSON_file=JSON_file)
+
     def movePart(self, limb_motion: LimbMotion, prefix='', ts_ref=0.0):
         requests = []
         ctrl = self.getPositionController(limb_motion.part_name)

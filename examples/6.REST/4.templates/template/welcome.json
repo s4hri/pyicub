@@ -1,10 +1,20 @@
 {
+    "params": {
+        "welcome_message": "$welcome_message"
+    },
     "steps": [
         {
             "name": "step",
             "limb_motions": {},
             "gaze_motion": null,
-            "custom_calls": [],
+            "custom_calls": [
+                {
+                    "target": "speech.say",
+                    "args": [
+                        "$welcome_message"
+                    ]
+                }
+            ],
             "offset_ms": null
         },
         {
@@ -15,7 +25,7 @@
                 {
                     "target": "speech.say",
                     "args": [
-                        "ciao"
+                        "$welcome_message"
                     ]
                 }
             ],

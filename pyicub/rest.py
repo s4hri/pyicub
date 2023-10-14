@@ -404,8 +404,9 @@ class PyiCubRESTfulClient:
 
     def play_action(self, robot_name, action_id, sync=True):
         if sync:
-            return self.run_target(robot_name, "helper", "playAction", action_id=int(action_id))
-        return self.run_target_async(robot_name, "helper", "playAction", action_id=int(action_id))
+            res = self.run_target(robot_name, "helper", "playAction", action_id=action_id)
+        res = self.run_target_async(robot_name, "helper", "playAction", action_id=action_id)
+        return res.json()['retval']
 
     def run_target(self, robot_name, app_name, target_name, *args, **kwargs):
         return self.__run__(robot_name, app_name, target_name, True, *args, **kwargs)
@@ -534,7 +535,7 @@ class iCubRESTApp:
         
     def __register_icub_helper__(self):
         app_name = "helper"
-        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.icub.playAction)
+        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.playAction)
         self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.importAction)
         #self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.icub.importActionFromTemplateJSONDict)
         self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.getActions)
@@ -562,6 +563,9 @@ class iCubRESTApp:
             else:
                 val = v
             self.__args__[k] = val
+
+    def playAction(self, action_id: str, wait_for_completed=True):
+        self.icub.playAction(action_id=action_id, wait_for_completed=wait_for_completed)
 
     def getActions(self):
         if self.icub:
@@ -594,9 +598,18 @@ class iCubRESTApp:
             JSON_dict = importFromJSONFile(os.path.join(path, f))
             self.importAction(JSON_dict)
 
-    def importActionFromTemplate(self, template_file, params_files):
+    def importActionFromTemplate(self, template_file, params_files, action_id):
         if self.icub:
-            action_id = self.icub.importActionFromTemplateJSONFile(JSON_file=template_file, params_files=params_files)
+            template = self.icub.importTemplate(JSON_file=template_file)
+            params = template.getParams()
+            for param_file in params_files:
+                param_dict = importFromJSONFile(param_file)
+                key = list(param_dict.keys())[0]
+                if key in params.keys():
+                    params[key].importFromJSONFile(param_file)
+            #action_dict = template.getActionDict()
+            #self.importAction(action_dict, name_prefix=action_id)
+            self.icub.importActionFromTemplate(template, action_id)
         else:
             url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/importActionFromTemplateJSONDict'
             data = {}

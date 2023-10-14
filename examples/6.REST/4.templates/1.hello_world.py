@@ -32,10 +32,12 @@ import os
 
 app = iCubRESTApp()
 
-app.importActionFromTemplate(template_file=os.path.join(os.getcwd(), 'templates', 'welcome.json'),
-                             params_files = [os.path.join(os.getcwd(), 'templates', 'params', 'msg1.json')])
+app.importActionFromTemplate(template_file=os.path.join(os.getcwd(), 'template', 'welcome.json'),
+                             params_files = [os.path.join(os.getcwd(), 'template', 'params', 'msg1.json')],
+                             action_id="TemplateExample1")
 
-app.importActionFromTemplate(template_file=os.path.join(os.getcwd(), 'templates', 'welcome.json'),
-                             params_files = [os.path.join(os.getcwd(), 'templates', 'params', 'msg2.json')])
+app.importActionFromTemplate(template_file=os.path.join(os.getcwd(), 'template', 'welcome.json'),
+                             params_files = [os.path.join(os.getcwd(), 'template', 'params', 'msg2.json')],
+                             action_id="TemplateExample2")
 
 app.rest_manager.run_forever()
