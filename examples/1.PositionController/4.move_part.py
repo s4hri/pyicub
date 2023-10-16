@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -28,16 +28,14 @@
 
 from pyicub.helper import iCub, JointPose, LimbMotion, JointsTrajectoryCheckpoint, ICUB_PARTS
 
-up = JointsTrajectoryCheckpoint(JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
-down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
-home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
-
-icub = iCub()
+up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+down = JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
 motion = LimbMotion(ICUB_PARTS.HEAD)
-motion.addCheckpoint(up)
-motion.addCheckpoint(down)
-motion.addCheckpoint(home)
+motion.createJointsTrajectory(up)
+motion.createJointsTrajectory(down)
+motion.createJointsTrajectory(home)
 
-
+icub = iCub()
 icub.movePart(motion)

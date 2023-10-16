@@ -1,7 +1,7 @@
 {
     "steps": [
         {
-            "name": "step",
+            "name": "Step1",
             "limb_motions": {},
             "gaze_motion": {
                 "checkpoints": [
@@ -27,7 +27,7 @@
             "offset_ms": null
         },
         {
-            "name": "step",
+            "name": "Step2",
             "limb_motions": {},
             "gaze_motion": {
                 "checkpoints": [

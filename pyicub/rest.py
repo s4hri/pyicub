@@ -353,6 +353,252 @@ class iCubRESTManager(iCubRESTServer):
 
 
 
+
+class PyiCubApp(metaclass=SingletonMeta):
+
+    def __init__(self, logging=False, logging_path=None, restmanager_proxy_host=None, restmanager_proxy_port=None):
+
+        PYICUB_LOGGING = os.getenv('PYICUB_LOGGING')
+        PYICUB_LOGGING_PATH = os.getenv('PYICUB_LOGGING_PATH')
+        PYICUB_API = os.getenv('PYICUB_API')
+        PYICUB_API_RESTMANAGER_HOST = os.getenv('PYICUB_API_RESTMANAGER_HOST')
+        PYICUB_API_RESTMANAGER_PORT = os.getenv('PYICUB_API_RESTMANAGER_PORT')
+        PYICUB_API_PROXY_HOST = os.getenv('PYICUB_API_PROXY_HOST')
+        PYICUB_API_PROXY_PORT = os.getenv('PYICUB_API_PROXY_PORT')
+
+        if PYICUB_LOGGING:
+            if PYICUB_LOGGING == 'true':
+                logging = True
+
+        self._request_manager_ = None
+        self._rest_manager_ = None
+        self._logging_ = logging
+        self._logger_ = YarpLogger.getLogger() #PyicubLogger.getLogger() 
+
+        if self._logging_:
+            self._logger_.enable_logs()
+            self._logger_ = YarpLogger.getLogger() #PyicubLogger.getLogger()
+
+            if PYICUB_LOGGING_PATH:
+                logging_path = PYICUB_LOGGING_PATH
+
+                if os.path.isdir(logging_path):
+                    if isinstance(self._logger_, PyicubLogger):
+                        self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT, True, logging_path)
+            else:
+                if isinstance(self._logger_, PyicubLogger):
+                    self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT)
+        else:
+            self._logger_.disable_logs()
+
+        self._request_manager_ = iCubRequestsManager(self._logger_, self._logging_, logging_path)
+
+        if not PYICUB_API:
+            PYICUB_API = False
+        elif PYICUB_API == 'true':
+            if not (PYICUB_API_RESTMANAGER_HOST and PYICUB_API_RESTMANAGER_PORT):
+                PYICUB_API_RESTMANAGER_HOST = "0.0.0.0"
+                PYICUB_API_RESTMANAGER_PORT = 9001
+            if PYICUB_API_PROXY_HOST and PYICUB_API_PROXY_PORT:
+                restmanager_proxy_host = PYICUB_API_PROXY_HOST
+                restmanager_proxy_port = int(PYICUB_API_PROXY_PORT)
+            else:
+                restmanager_proxy_host = "0.0.0.0"
+                restmanager_proxy_port = 9001
+            PYICUB_API_RESTMANAGER_PORT = firstAvailablePort(PYICUB_API_RESTMANAGER_HOST, int(PYICUB_API_RESTMANAGER_PORT))            
+            self._rest_manager_ = iCubRESTManager(icubrequestmanager=self._request_manager_, rule_prefix="pyicub",  host=PYICUB_API_RESTMANAGER_HOST, port=PYICUB_API_RESTMANAGER_PORT, proxy_host=restmanager_proxy_host, proxy_port=restmanager_proxy_port)
+        
+    @property
+    def logger(self):
+        return self._logger_
+
+    @property
+    def request_manager(self):
+        return self._request_manager_
+
+    @property
+    def rest_manager(self):
+        return self._rest_manager_
+
+class iCubRESTApp:
+
+    def __init__(self, robot_name="icub", action_repository_path='', **kargs):
+        self._name_ = self.__class__.__name__
+        self.__action_repository__ = action_repository_path
+        self.__app__ = PyiCubApp()
+
+        SIMULATION = os.getenv('ICUB_SIMULATION')
+        if SIMULATION:
+            if SIMULATION == 'true':
+                robot_name = "icubSim"
+
+        self.__robot_name__ = robot_name
+
+        if self.__is_icub_managed__():
+            self.__icub__ = None
+        else:
+            self.__icub__ = iCub(robot_name=robot_name, request_manager=self.__app__.request_manager)
+            if self.__icub__.exists():
+                self.__register_icub_helper__()
+        self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self)
+        self.__args_template__ = kargs
+        self.__args__ = {}
+        self.__actions__ = {}
+        self.__configure_default_args__()
+
+        if action_repository_path:
+            self.__importActions__(path=action_repository_path)
+
+
+    def __is_icub_managed__(self):
+        url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper'
+        try:
+            res = requests.get(url, json={})
+            return res.status_code == 200
+        except:
+            return False
+        
+    def __register_icub_helper__(self):
+        app_name = "helper"
+        """
+        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.playAction)
+        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.importAction)
+        #self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.icub.importActionFromTemplateJSONDict)
+        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.getActions)
+        """
+        if self.icub.actions_manager:
+            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__playAction__, target_name='actions.playAction')
+            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__getActions__, target_name='actions.getActions')
+            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__importActionFromJSONDict__, target_name='actions.importAction')
+        if self.icub.gaze:
+            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.gaze, class_name='gaze')
+        if self.icub.speech:
+            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.speech, class_name='speech')
+        if self.icub.emo:
+            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.emo, class_name='emo')
+
+    def __register_class__(self, robot_name, app_name, cls, class_name: str=''):
+        target_prefix = class_name
+        for method in getPublicMethods(cls):
+            if class_name:
+                target_prefix = class_name + '.'
+            self.__app__.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_prefix+getattr(cls, method).__name__, target=getattr(cls, method), target_signature=str(inspect.signature(getattr(cls, method))) )
+
+    def __register_method__(self, robot_name, app_name, method, target_name: str=''):
+        if not target_name:
+            target_name = method.__name__
+        self.__app__.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_name, target=method, target_signature=str(inspect.signature(method)) )
+    
+    def __configure_default_args__(self):
+        for k,v in self.__args_template__.items():
+            if type(v) is list:
+                val = v[0]
+            else:
+                val = v
+            self.__args__[k] = val
+
+    def __importActions__(self, path):
+        json_files = [pos_json for pos_json in os.listdir(path) if pos_json.endswith('.json')]
+        for f in json_files:
+            JSON_dict = importFromJSONFile(os.path.join(path, f))
+            self.__importActionFromJSONDict__(JSON_dict)
+
+    def __importActionFromJSONDict__(self, JSON_dict, name_prefix=None):
+        if not name_prefix:
+            name_prefix = self.__class__.__name__
+        if self.icub:
+            return self.icub.actions_manager.importActionFromJSONDict(JSON_dict, name_prefix=name_prefix)
+        else:
+            data = {}
+            data['JSON_dict'] = JSON_dict
+            data['name_prefix'] = name_prefix
+            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/actions.importAction'
+            res = requests.post(url=url, json=data)
+            res = requests.get(res.json())
+            return res.json()['retval']
+    
+    def __playAction__(self, action_id: str, wait_for_completed=True):
+        self.icub.playAction(action_id=action_id, wait_for_completed=wait_for_completed)
+    
+    def __getActions__(self):
+        return list(self.icub.getActions())
+        """
+        if self.icub:
+            actions = self.icub.getActions()
+            return list(actions)
+        else:
+            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/getActions'
+            res = requests.post(url=url, json={})
+            res = requests.get(res.json())
+            return res.json()
+        """
+    
+    """
+    def importActionFromTemplate(self, template_file, params_files, action_id):
+
+        if self.icub:
+            template = self.icub.importTemplate(JSON_file=template_file)
+            params = template.getParams()
+            for param_file in params_files:
+                param_dict = importFromJSONFile(param_file)
+                key = list(param_dict.keys())[0]
+                if key in params.keys():
+                    params[key].importFromJSONFile(param_file)
+            #action_dict = template.getActionDict()
+            #self.importAction(action_dict, name_prefix=action_id)
+            self.icub.importActionFromTemplate(template, action_id)
+        else:
+            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/importActionFromTemplateJSONDict'
+            data = {}
+            data["JSON_dict"] = importFromJSONFile(template_file)
+            data["params_dict"] = {}
+            for param in params_files:
+                param_dict = importFromJSONFile(param)
+                data["params_dict"].update(param_dict)
+            res = requests.post(url=url, json=data)
+            res = requests.get(res.json())
+            action_id = res.json()['retval']
+        key = ""
+        key += os.path.basename(template_file)
+        for param in params_files:
+            key = key + ',' + os.path.basename(param)
+        #self.__actions__[key] = action_id
+    """
+    def getArgsTemplate(self):
+        return self.__args_template__
+
+    def getArgs(self):
+        return self.__args__
+
+    """
+    def getActions(self):
+        return self.__actions__
+    """
+
+    def setArgs(self, input_args: dict):
+        for k,v in input_args.items():
+            self.__args__[k] = v
+        return True
+
+    def getArg(self, name: str):
+        return self.__args__[name]
+
+    def setArg(self, name: str, value: object):
+        self.__args__[name] = value
+        return True
+
+    @property
+    def icub(self):
+        return self.__icub__
+
+    @property
+    def app_name(self):
+        return self._name_
+
+    @property
+    def rest_manager(self):
+        return self.__app__.rest_manager
+
 class PyiCubRESTfulClient:
 
     def __init__(self, host, port, rule_prefix='pyicub'):
@@ -427,237 +673,3 @@ class PyiCubRESTfulClient:
             if req['status'] != iCubRequest.RUNNING:
                 return req['retval']
             time.sleep(0.01)
-
-class PyiCubApp(metaclass=SingletonMeta):
-
-    def __init__(self, logging=False, logging_path=None, restmanager_proxy_host=None, restmanager_proxy_port=None):
-
-        PYICUB_LOGGING = os.getenv('PYICUB_LOGGING')
-        PYICUB_LOGGING_PATH = os.getenv('PYICUB_LOGGING_PATH')
-        PYICUB_API = os.getenv('PYICUB_API')
-        PYICUB_API_RESTMANAGER_HOST = os.getenv('PYICUB_API_RESTMANAGER_HOST')
-        PYICUB_API_RESTMANAGER_PORT = os.getenv('PYICUB_API_RESTMANAGER_PORT')
-        PYICUB_API_PROXY_HOST = os.getenv('PYICUB_API_PROXY_HOST')
-        PYICUB_API_PROXY_PORT = os.getenv('PYICUB_API_PROXY_PORT')
-
-        if PYICUB_LOGGING:
-            if PYICUB_LOGGING == 'true':
-                logging = True
-
-        self._request_manager_ = None
-        self._rest_manager_ = None
-        self._logging_ = logging
-        self._logger_ = YarpLogger.getLogger() #PyicubLogger.getLogger() 
-
-        if self._logging_:
-            self._logger_.enable_logs()
-            self._logger_ = YarpLogger.getLogger() #PyicubLogger.getLogger()
-
-            if PYICUB_LOGGING_PATH:
-                logging_path = PYICUB_LOGGING_PATH
-
-                if os.path.isdir(logging_path):
-                    if isinstance(self._logger_, PyicubLogger):
-                        self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT, True, logging_path)
-            else:
-                if isinstance(self._logger_, PyicubLogger):
-                    self._logger_.configure(PyicubLogger.LOGGING_LEVEL, PyicubLogger.FORMAT)
-        else:
-            self._logger_.disable_logs()
-
-        self._request_manager_ = iCubRequestsManager(self._logger_, self._logging_, logging_path)
-
-        if not PYICUB_API:
-            PYICUB_API = False
-        elif PYICUB_API == 'true':
-            if not (PYICUB_API_RESTMANAGER_HOST and PYICUB_API_RESTMANAGER_PORT):
-                PYICUB_API_RESTMANAGER_HOST = "0.0.0.0"
-                PYICUB_API_RESTMANAGER_PORT = 9001
-            if PYICUB_API_PROXY_HOST and PYICUB_API_PROXY_PORT:
-                restmanager_proxy_host = PYICUB_API_PROXY_HOST
-                restmanager_proxy_port = int(PYICUB_API_PROXY_PORT)
-            else:
-                restmanager_proxy_host = "0.0.0.0"
-                restmanager_proxy_port = 9001
-            PYICUB_API_RESTMANAGER_PORT = firstAvailablePort(PYICUB_API_RESTMANAGER_HOST, int(PYICUB_API_RESTMANAGER_PORT))            
-            self._rest_manager_ = iCubRESTManager(icubrequestmanager=self._request_manager_, rule_prefix="pyicub",  host=PYICUB_API_RESTMANAGER_HOST, port=PYICUB_API_RESTMANAGER_PORT, proxy_host=restmanager_proxy_host, proxy_port=restmanager_proxy_port)
-        
-    @property
-    def logger(self):
-        return self._logger_
-
-    @property
-    def request_manager(self):
-        return self._request_manager_
-
-    @property
-    def rest_manager(self):
-        return self._rest_manager_
-
-
-class iCubRESTApp:
-
-    def __init__(self, robot_name="icub", action_repository_path='', **kargs):
-        self._name_ = self.__class__.__name__
-        self.__action_repository__ = action_repository_path
-        self.__app__ = PyiCubApp()
-
-        SIMULATION = os.getenv('ICUB_SIMULATION')
-        if SIMULATION:
-            if SIMULATION == 'true':
-                robot_name = "icubSim"
-
-        self.__robot_name__ = robot_name
-
-        if self.__is_icub_managed__():
-            self.__icub__ = None
-        else:
-            self.__icub__ = iCub(robot_name=robot_name, request_manager=self.__app__.request_manager)
-            if self.__icub__.exists():
-                self.__register_icub_helper__()
-        self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self)
-        self.__args_template__ = kargs
-        self.__args__ = {}
-        self.__actions__ = {}
-        self.__configure_default_args__()
-
-        if action_repository_path:
-            self.importActions(path=action_repository_path)
-
-
-    def __is_icub_managed__(self):
-        url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper'
-        try:
-            res = requests.get(url, json={})
-            return res.status_code == 200
-        except:
-            return False
-        
-    def __register_icub_helper__(self):
-        app_name = "helper"
-        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.playAction)
-        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.importAction)
-        #self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.icub.importActionFromTemplateJSONDict)
-        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.getActions)
-        if self.icub.gaze:
-            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.gaze, class_name='gaze')
-        if self.icub.speech:
-            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.speech, class_name='speech')
-        if self.icub.emo:
-            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.emo, class_name='emo')
-
-    def __register_class__(self, robot_name, app_name, cls, class_name: str=''):
-        target_prefix = class_name
-        for method in getPublicMethods(cls):
-            if class_name:
-                target_prefix = class_name + '.'
-            self.__app__.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_prefix+getattr(cls, method).__name__, target=getattr(cls, method), target_signature=str(inspect.signature(getattr(cls, method))) )
-
-    def __register_method__(self, robot_name, app_name, method):
-        self.__app__.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=method.__name__, target=method, target_signature=str(inspect.signature(method)) )
-    
-    def __configure_default_args__(self):
-        for k,v in self.__args_template__.items():
-            if type(v) is list:
-                val = v[0]
-            else:
-                val = v
-            self.__args__[k] = val
-
-    def playAction(self, action_id: str, wait_for_completed=True):
-        self.icub.playAction(action_id=action_id, wait_for_completed=wait_for_completed)
-
-    def getActions(self):
-        if self.icub:
-            actions = self.icub.getActions()
-            return list(actions)
-        else:
-            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/getActions'
-            res = requests.post(url=url, json={})
-            res = requests.get(res.json())
-            return res.json()
-
-    def importAction(self, JSON_dict, name_prefix=None):
-        if self.icub:
-            if not name_prefix:
-                name_prefix = self.__class__.__name__
-            return self.icub.actions_manager.importActionFromJSONDict(JSON_dict, name_prefix=name_prefix)
-        else:
-            data = {}
-            data['JSON_dict'] = JSON_dict
-            data['name_prefix'] = self.__class__.__name__
-            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/importAction'
-            res = requests.post(url=url, json=data)
-            res = requests.get(res.json())
-            return res.json()['retval']
-
-    
-    def importActions(self, path):
-        json_files = [pos_json for pos_json in os.listdir(path) if pos_json.endswith('.json')]
-        for f in json_files:
-            JSON_dict = importFromJSONFile(os.path.join(path, f))
-            self.importAction(JSON_dict)
-
-    def importActionFromTemplate(self, template_file, params_files, action_id):
-        if self.icub:
-            template = self.icub.importTemplate(JSON_file=template_file)
-            params = template.getParams()
-            for param_file in params_files:
-                param_dict = importFromJSONFile(param_file)
-                key = list(param_dict.keys())[0]
-                if key in params.keys():
-                    params[key].importFromJSONFile(param_file)
-            #action_dict = template.getActionDict()
-            #self.importAction(action_dict, name_prefix=action_id)
-            self.icub.importActionFromTemplate(template, action_id)
-        else:
-            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/importActionFromTemplateJSONDict'
-            data = {}
-            data["JSON_dict"] = importFromJSONFile(template_file)
-            data["params_dict"] = {}
-            for param in params_files:
-                param_dict = importFromJSONFile(param)
-                data["params_dict"].update(param_dict)
-            res = requests.post(url=url, json=data)
-            res = requests.get(res.json())
-            action_id = res.json()['retval']
-        key = ""
-        key += os.path.basename(template_file)
-        for param in params_files:
-            key = key + ',' + os.path.basename(param)
-        #self.__actions__[key] = action_id
-
-    def getArgsTemplate(self):
-        return self.__args_template__
-
-    def getArgs(self):
-        return self.__args__
-
-    """
-    def getActions(self):
-        return self.__actions__
-    """
-
-    def setArgs(self, input_args: dict):
-        for k,v in input_args.items():
-            self.__args__[k] = v
-        return True
-
-    def getArg(self, name: str):
-        return self.__args__[name]
-
-    def setArg(self, name: str, value: object):
-        self.__args__[name] = value
-        return True
-
-    @property
-    def icub(self):
-        return self.__icub__
-
-    @property
-    def app_name(self):
-        return self._name_
-
-    @property
-    def rest_manager(self):
-        return self.__app__.rest_manager

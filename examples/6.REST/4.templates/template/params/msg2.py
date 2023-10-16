@@ -28,7 +28,7 @@
 
 from pyicub.helper import TemplateParameter
 
-p = TemplateParameter("welcome_message")
+p = TemplateParameter("welcome_msg")
 
 p.setValue("welcome world")
 p.exportJSONFile("msg2.json")

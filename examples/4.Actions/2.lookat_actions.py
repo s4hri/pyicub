@@ -26,28 +26,29 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, ICUB_PARTS, iCubFullbodyAction
+from pyicub.helper import iCub, iCubFullbodyStep, iCubFullbodyAction
 
 import os
 
-class LookAtAction(iCubFullbodyAction):
+class Step1(iCubFullbodyStep):
 
     def prepare(self):
-        step1 = self.createStep()
-        
         g1 = self.createGazeMotion("lookAtFixationPoint")
         g1.addCheckpoint([-1.0, -0.5, 1.0])
         g1.addCheckpoint([-1.0, -0.2, 0.5])
         g1.addCheckpoint([-1.0, 0.2, 0.1])
-        step1.setGazeMotion(g1)
 
-        step2 = self.createStep()
+class Step2(iCubFullbodyStep):
+
+    def prepare(self):
         g2 = self.createGazeMotion("lookAtAbsAngles")
         g2.addCheckpoint([0.0, 0.0, 0.0, True, 1.5])
-        step2.setGazeMotion(g2)
 
-        self.addStep(step1)
-        self.addStep(step2)
+class LookAtAction(iCubFullbodyAction):
+
+    def prepare(self):
+        self.addStep(Step1())
+        self.addStep(Step2())
 
 action = LookAtAction()
 icub = iCub()

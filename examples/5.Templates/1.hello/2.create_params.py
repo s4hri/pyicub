@@ -28,23 +28,22 @@
 
 from pyicub.helper import TemplateParameter, JointsTrajectoryCheckpoint, LimbMotion, JointPose, ICUB_PARTS, iCubFullbodyStep
 
+
+class Step(iCubFullbodyStep):
+
+    def prepare(self):
+        pose_up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+        pose_down = JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+        pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+        motion = self.createLimbMotion(ICUB_PARTS.HEAD)
+        motion.createJointsTrajectory(pose_up, duration=3.0)
+        motion.createJointsTrajectory(pose_down, duration=3.0)
+        motion.createJointsTrajectory(pose_home, duration=3.0)
+
 p1 = TemplateParameter("step_bodymotion")
 p2 = TemplateParameter("welcome_msg")
 
-step = iCubFullbodyStep()
-pose_up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 5.0])
-pose_down = JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 5.0])
-pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
-motion = LimbMotion(ICUB_PARTS.HEAD)
-up = JointsTrajectoryCheckpoint(pose_up, duration=3.0)
-down = JointsTrajectoryCheckpoint(pose_down, duration=3.0)
-home = JointsTrajectoryCheckpoint(pose_home, duration=3.0)
-motion.addJointsTrajectoryCheckpoint(up)
-motion.addJointsTrajectoryCheckpoint(down)
-motion.addJointsTrajectoryCheckpoint(home)
-step.setLimbMotion(motion)
-
-p1.setValue(step)
+p1.setValue(Step())
 p1.exportJSONFile("json/step1.json")
 
 p2.setValue("hello world")

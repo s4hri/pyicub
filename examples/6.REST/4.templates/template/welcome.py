@@ -26,21 +26,26 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCubActionTemplate
+from pyicub.helper import iCubActionTemplate, iCubFullbodyStep
 
-class TemplateExample(iCubActionTemplate):
+class Step(iCubFullbodyStep):
 
-    def prepare_params(self):
-        self.createParam(name="welcome_message")
+    def __init__(self, welcome_msg, offset_ms=None, name=None, JSON_dict=None, JSON_file=None):
+        self.welcome_msg = welcome_msg
+        super().__init__(offset_ms, name, JSON_dict, JSON_file)      
 
     def prepare(self):
-        step = self.createStep()
-        self.addStep(step)
-        welcome_msg = self.getParam("welcome_message")
-        cc = self.createCustomCall(target="speech.say", args=(welcome_msg,))
-        step.setCustomCall(cc)
-        self.addStep(step)
+        self.createCustomCall(target="speech.say", args=(self.welcome_msg,))
 
 
-template = TemplateExample()
+class TemplateAction(iCubActionTemplate):
+
+    def prepare_params(self):
+        self.createParam(name="welcome_msg")
+
+    def prepare(self):
+        welcome_msg = self.getParam("welcome_msg")
+        self.addStep(Step(welcome_msg))
+
+template = TemplateAction()
 template.exportJSONFile("welcome.json")

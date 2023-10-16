@@ -26,29 +26,27 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, ICUB_PARTS, iCubFullbodyAction
+from pyicub.helper import iCub, JointPose, ICUB_PARTS, iCubFullbodyAction, iCubFullbodyStep
 
 import os
 
-class HeadAction(iCubFullbodyAction):
+class Step(iCubFullbodyStep):
 
     def prepare(self):
-        step = self.createStep()
 
         pose_up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 5.0])
         pose_down = JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 5.0])
         pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
 
         motion = self.createLimbMotion(ICUB_PARTS.HEAD)
-        up = self.createJointsTrajectory(pose_up, duration=3.0)
-        down = self.createJointsTrajectory(pose_down, duration=3.0)
-        home = self.createJointsTrajectory(pose_home, duration=3.0)
-        motion.addJointsTrajectoryCheckpoint(up)
-        motion.addJointsTrajectoryCheckpoint(down)
-        motion.addJointsTrajectoryCheckpoint(home)
+        motion.createJointsTrajectory(pose_up, duration=3.0)
+        motion.createJointsTrajectory(pose_down, duration=3.0)
+        motion.createJointsTrajectory(pose_home, duration=3.0)
 
-        step.setLimbMotion(motion)
+class HeadAction(iCubFullbodyAction):
 
+    def prepare(self):
+        step = Step()
         self.addStep(step)
 
 action = HeadAction()

@@ -6,7 +6,8 @@
     "steps": [
         "$step_bodymotion",
         {
-            "name": "step",
+            "welcome_msg": "$welcome_msg",
+            "name": "Step",
             "limb_motions": {},
             "gaze_motion": null,
             "custom_calls": [
@@ -20,7 +21,7 @@
             "offset_ms": null
         }
     ],
-    "name": "TemplateExample",
+    "name": "TemplateAction",
     "description": "empty",
     "offset_ms": null
 }

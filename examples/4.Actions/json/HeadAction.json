@@ -1,7 +1,7 @@
 {
     "steps": [
         {
-            "name": "step",
+            "name": "Step",
             "limb_motions": {
                 "head": {
                     "part_name": "head",

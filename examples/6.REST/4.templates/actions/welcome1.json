@@ -1,10 +1,6 @@
 {
-    "params": {
-        "welcome_msg": "$welcome_msg"
-    },
     "steps": [
         {
-            "welcome_msg": "$welcome_msg",
             "name": "Step",
             "limb_motions": {},
             "gaze_motion": null,
@@ -12,14 +8,14 @@
                 {
                     "target": "speech.say",
                     "args": [
-                        "$welcome_msg"
+                        "hello world"
                     ]
                 }
             ],
             "offset_ms": null
         }
     ],
-    "name": "TemplateAction",
+    "name": "Welcome1",
     "description": "empty",
     "offset_ms": null
 }

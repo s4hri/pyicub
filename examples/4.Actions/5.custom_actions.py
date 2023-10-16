@@ -26,26 +26,27 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, GazeMotion, iCubFullbodyAction, PyiCubCustomCall, iCubFullbodyStep
+from pyicub.helper import iCub, iCubFullbodyAction, iCubFullbodyStep
 
 import os
+
+class Step1(iCubFullbodyStep):
+
+    def prepare(self):
+        self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
+        self.createCustomCall(target="emo.neutral")
+
+class Step2(iCubFullbodyStep):
+
+    def prepare(self):
+        self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 0.0, 0.0,))
+        self.createCustomCall(target="emo.smile")
 
 class CustomAction(iCubFullbodyAction):
 
     def prepare(self):
-        step1 = self.createStep()        
-        cc = self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
-        step1.setCustomCall(cc)
-        cc = self.createCustomCall(target="emo.neutral")
-        step1.setCustomCall(cc)
-        self.addStep(step1)
-
-        step2 = self.createStep()
-        cc = self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 0.0, 0.0,))
-        step2.setCustomCall(cc)
-        cc = self.createCustomCall(target="emo.smile")
-        step2.setCustomCall(cc)
-        self.addStep(step2)
+        self.addStep(Step1())
+        self.addStep(Step2())
 
 
 action = CustomAction()

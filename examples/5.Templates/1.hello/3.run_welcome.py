@@ -26,7 +26,8 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub
+from pyicub.helper import iCub, iCubActionTemplate
+
 
 
 icub = iCub()
@@ -37,3 +38,5 @@ params["step_bodymotion"].importFromJSONFile("json/step1.json")
 params["welcome_msg"].importFromJSONFile("json/msg1.json")
 action_id = icub.importActionFromTemplate(template)
 icub.playAction(action_id)
+
+

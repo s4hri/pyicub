@@ -27,26 +27,24 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, GazeMotion, iCubFullbodyAction, PyiCubCustomCall, iCubFullbodyStep
+from pyicub.helper import iCub, JointPose, ICUB_PARTS, iCubFullbodyAction, iCubFullbodyStep
 
-
-class GenericPoses(iCubFullbodyAction):
+class Step(iCubFullbodyStep):
 
     def prepare(self):
         pose_up = JointPose(target_joints=[30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
         pose_down = JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
         pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
         
-        step = self.createStep()
         lm = self.createLimbMotion(ICUB_PARTS.HEAD)
-        up = self.createJointsTrajectory(pose_up, duration=2.0)
-        down = self.createJointsTrajectory(pose_down, duration=2.0, timeout=1.0)
-        home = self.createJointsTrajectory(pose_home, duration=2.0)
-        lm.addJointsTrajectoryCheckpoint(up)
-        lm.addJointsTrajectoryCheckpoint(down)
-        lm.addJointsTrajectoryCheckpoint(home)
-        step.setLimbMotion(lm)
-        self.addStep(step)
+        lm.createJointsTrajectory(pose_up, duration=2.0)
+        lm.createJointsTrajectory(pose_down, duration=2.0, timeout=1.0)
+        lm.createJointsTrajectory(pose_home, duration=2.0)
+
+class GenericPoses(iCubFullbodyAction):
+
+    def prepare(self):
+        self.addStep(Step())
 
 
 action = GenericPoses()

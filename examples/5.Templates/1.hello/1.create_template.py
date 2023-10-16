@@ -26,9 +26,19 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCubActionTemplate
+from pyicub.helper import iCubActionTemplate, iCubFullbodyStep
 
-class TemplateExample(iCubActionTemplate):
+class Step(iCubFullbodyStep):
+
+    def __init__(self, welcome_msg, offset_ms=None, name=None, JSON_dict=None, JSON_file=None):
+        self.welcome_msg = welcome_msg
+        super().__init__(offset_ms, name, JSON_dict, JSON_file)      
+
+    def prepare(self):
+        self.createCustomCall(target="speech.say", args=(self.welcome_msg,))
+
+
+class TemplateAction(iCubActionTemplate):
 
     def prepare_params(self):
         self.createParam(name="step_bodymotion")
@@ -36,14 +46,10 @@ class TemplateExample(iCubActionTemplate):
 
     def prepare(self):
         step_bodymotion = self.getParam("step_bodymotion")
-        self.addStep(step_bodymotion)
-        step2 = self.createStep()
-        self.addStep(step2)
         welcome_msg = self.getParam("welcome_msg")
-        cc = self.createCustomCall(target="speech.say", args=(welcome_msg,))
-        step2.setCustomCall(cc)
+        self.addStep(step_bodymotion)
+        self.addStep(Step(welcome_msg))
 
 
-template = TemplateExample()
-params = template.getParams()
+template = TemplateAction()
 template.exportJSONFile("json/hello.json")

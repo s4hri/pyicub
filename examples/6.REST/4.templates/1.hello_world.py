@@ -26,10 +26,13 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.rest import iCubRESTApp
+from pyicub.rest import iCub, iCubRESTApp
 
 import os
 
+
+
+"""
 app = iCubRESTApp()
 
 app.importActionFromTemplate(template_file=os.path.join(os.getcwd(), 'template', 'welcome.json'),
@@ -41,3 +44,11 @@ app.importActionFromTemplate(template_file=os.path.join(os.getcwd(), 'template',
                              action_id="TemplateExample2")
 
 app.rest_manager.run_forever()
+"""
+icub = iCub()
+template = icub.importTemplate(JSON_file="template/welcome.json")
+params = template.getParams()
+params["welcome_msg"].importFromJSONFile("template/params/msg1.json")
+action = template.getAction()
+action.setName("Welcome1")
+action.exportJSONFile(os.path.join(os.getcwd(), 'actions', 'welcome1.json'))

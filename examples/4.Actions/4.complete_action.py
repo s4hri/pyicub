@@ -26,51 +26,52 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, GazeMotion, iCubFullbodyAction, PyiCubCustomCall, iCubFullbodyStep
+from pyicub.helper import iCub, JointPose, LimbMotion, ICUB_PARTS, iCubFullbodyAction, iCubFullbodyStep
 
 import os
 
-class CompleteAction(iCubFullbodyAction):
+arm_down = JointPose(target_joints=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+arm_up = JointPose(target_joints=[-90.0, 20.0, 10.0, 90.0, 0.0, 0.0, 0.0, 60.0, 20.0, 20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0])
+
+right_arm_motion = LimbMotion(ICUB_PARTS.RIGHT_ARM)
+right_arm_motion.createJointsTrajectory(arm_up, duration=1.0)
+right_arm_motion.createJointsTrajectory(arm_down, duration=1.0)
+
+left_arm_motion = LimbMotion(ICUB_PARTS.LEFT_ARM)
+left_arm_motion.createJointsTrajectory(arm_up, duration=1.0)
+left_arm_motion.createJointsTrajectory(arm_down, duration=1.0)
+
+class Step1(iCubFullbodyStep):
 
     def prepare(self):
-        step1 = self.createStep()
-        arm_down = JointPose(target_joints=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        arm_up = JointPose(target_joints=[-90.0, 20.0, 10.0, 90.0, 0.0, 0.0, 0.0, 60.0, 20.0, 20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0])
+        self.setLimbMotion(right_arm_motion)
+        self.setLimbMotion(left_arm_motion)
+        self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
+        self.createCustomCall(target="emo.neutral")
 
-        up = self.createJointsTrajectory(arm_up, duration=1.0)
-        down = self.createJointsTrajectory(arm_down, duration=1.0)
+class Step2(iCubFullbodyStep):
 
-        right_arm_motion = self.createLimbMotion(ICUB_PARTS.RIGHT_ARM)
-        left_arm_motion = self.createLimbMotion(ICUB_PARTS.LEFT_ARM)
+    def prepare(self):
+        self.setLimbMotion(left_arm_motion)
 
-        right_arm_motion.addJointsTrajectoryCheckpoint(up)
-        right_arm_motion.addJointsTrajectoryCheckpoint(down)
-        left_arm_motion.addJointsTrajectoryCheckpoint(up)
-        left_arm_motion.addJointsTrajectoryCheckpoint(down)
+class Step3(iCubFullbodyStep):
 
-        cc = self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
-        step1.setCustomCall(cc)
-        cc = self.createCustomCall(target="emo.neutral")
-        step1.setCustomCall(cc)
-
-        step1.setLimbMotion(right_arm_motion)
-        self.addStep(step1)
-
-        step2 = self.createStep()
-        step2.setLimbMotion(left_arm_motion)
-        self.addStep(step2)
-
-        step3 = self.createStep(offset_ms=500)
+    def prepare(self):
         g = self.createGazeMotion(lookat_method="lookAtAbsAngles")
         g.addCheckpoint([20.0, 0.0, 0.0])
         g.addCheckpoint([-20.0, 0.0, 0.0])
         g.addCheckpoint([0.0, 0.0, 0.0])
-        step3.setGazeMotion(g)
-        step3.setLimbMotion(right_arm_motion)
-        step3.setLimbMotion(left_arm_motion)
-        cc = self.createCustomCall(target="emo.smile")
-        step3.setCustomCall(cc)
-        self.addStep(step3)
+
+        self.setLimbMotion(right_arm_motion)
+        self.setLimbMotion(left_arm_motion)
+        self.createCustomCall(target="emo.smile")
+
+class CompleteAction(iCubFullbodyAction):
+
+    def prepare(self):
+        self.addStep(Step1())
+        self.addStep(Step2())
+        self.addStep(Step3(offset_ms=500))
 
 action = CompleteAction()
 icub = iCub()
