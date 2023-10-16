@@ -45,6 +45,7 @@ app.importActionFromTemplate(template_file=os.path.join(os.getcwd(), 'template',
 
 app.rest_manager.run_forever()
 """
+"""
 icub = iCub()
 template = icub.importTemplate(JSON_file="template/welcome.json")
 params = template.getParams()
@@ -52,3 +53,24 @@ params["welcome_msg"].importFromJSONFile("template/params/msg1.json")
 action = template.getAction()
 action.setName("Welcome1")
 action.exportJSONFile(os.path.join(os.getcwd(), 'actions', 'welcome1.json'))
+"""
+
+from pyicub.helper import iCub, iCubActionTemplate
+from pyicub.utils import importFromJSONFile
+
+
+icub = iCub()
+
+template = icub.importTemplate(JSON_file="template/welcome.json")
+template.setParam(name="welcome_msg", JSON_file="template/params/msg1.json")
+action = template.getAction(action_name="Welcome1")
+action.exportJSONFile(os.path.join(os.getcwd(), 'actions', 'welcome1.json'))
+
+template = icub.importTemplate(JSON_file="template/welcome.json")
+template.setParam(name="welcome_msg", JSON_file="template/params/msg2.json")
+action = template.getAction(action_name="Welcome2")
+action.exportJSONFile(os.path.join(os.getcwd(), 'actions', 'welcome2.json'))
+
+app = iCubRESTApp(action_repository_path=os.path.join(os.getcwd(), 'actions'))
+app.rest_manager.run_forever()
+

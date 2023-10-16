@@ -31,7 +31,7 @@ yarp.Network().init()
 
 from pyicub.controllers.gaze import GazeController
 from pyicub.controllers.position import PositionController, JointPose
-from pyicub.actions import PyiCubCustomCall, LimbMotion, GazeMotion, iCubFullbodyStep, iCubFullbodyAction, JointsTrajectoryCheckpoint, TemplateParameter, iCubActionTemplate, ActionsManager
+from pyicub.actions import PyiCubCustomCall, LimbMotion, GazeMotion, iCubFullbodyStep, iCubFullbodyAction, JointsTrajectoryCheckpoint, iCubActionTemplate, ActionsManager
 from pyicub.modules.emotions import emotionsPyCtrl
 from pyicub.modules.speech import iSpeakPyCtrl
 from pyicub.modules.face import facePyCtrl

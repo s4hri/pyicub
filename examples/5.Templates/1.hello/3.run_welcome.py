@@ -27,16 +27,16 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from pyicub.helper import iCub, iCubActionTemplate
-
+from pyicub.utils import importFromJSONFile
 
 
 icub = iCub()
 
 template = icub.importTemplate(JSON_file="json/hello.json")
-params = template.getParams()
-params["step_bodymotion"].importFromJSONFile("json/step1.json")
-params["welcome_msg"].importFromJSONFile("json/msg1.json")
-action_id = icub.importActionFromTemplate(template)
+template.setParam(name="step_bodymotion", JSON_file="json/step1.json")
+template.setParam(name="welcome_msg", JSON_file="json/msg1.json")
+action = template.getAction()
+action_id = icub.addAction(action)
 icub.playAction(action_id)
 
 

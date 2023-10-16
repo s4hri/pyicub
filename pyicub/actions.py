@@ -50,10 +50,6 @@ class LimbMotion:
         checkpoint = JointsTrajectoryCheckpoint(pose=pose, duration=duration, timeout=timeout)
         self.checkpoints.append(checkpoint)
         return checkpoint
-    """
-    def addJointsTrajectoryCheckpoint(self, checkpoint: JointsTrajectoryCheckpoint):
-        self.checkpoints.append(checkpoint)
-    """
 
     def toJSON(self):
         return self.__dict__
@@ -199,35 +195,6 @@ class iCubFullbodyAction:
         return self.__dict__
                     
 
-class TemplateParameter:
-
-    def __init__(self, name: str):
-        self.name = name
-        self.key = '$' + self.name
-        self.value = None
-
-    def setValue(self, value: object):
-        self.value = value 
-
-    def getValue(self):
-        return self.value
-        
-    def toJSON(self):
-        if self.value:
-            return {self.name: self.value}
-        return self.key
-    
-    def importFromJSONFile(self, JSON_file):
-        JSON_dict = importFromJSONFile(JSON_file)
-        self.importFromJSONDict(JSON_dict)
-
-    def importFromJSONDict(self, JSON_dict):
-        print(JSON_dict)
-        self.value = JSON_dict[self.name]
-
-    def exportJSONFile(self, filepath):
-        exportJSONFile(filepath, self)
-
 class iCubActionTemplate(iCubFullbodyAction):
 
     def __init__(self, description='empty', name=None, offset_ms=None):
@@ -239,11 +206,7 @@ class iCubActionTemplate(iCubFullbodyAction):
         raise NotImplementedError("The method 'prepare_params' contains definition for creating custom actions.")
             
     def createParam(self, name):
-        self.params[name] = TemplateParameter(name)
-        return self.params[name]
-
-    def updateParams(self):
-        self.prepare()
+        self.params[name] = '$' + name
 
     def getParams(self):
         return self.params
@@ -251,6 +214,13 @@ class iCubActionTemplate(iCubFullbodyAction):
     def getParam(self, name):
         return self.params[name]
     
+    def setParams(self, params):
+        self.params = params
+
+    def setParam(self, name, value=None, JSON_file=None):
+        if JSON_file:
+            value = importFromJSONFile(JSON_file)[name]
+        self.params[name] = value
 
 class iCubActionTemplateImportedJSON(iCubActionTemplate):
 
@@ -269,9 +239,11 @@ class iCubActionTemplateImportedJSON(iCubActionTemplate):
     def getActionDict(self):
         return self.__replace_params__(self._json_dict_, self.params)
 
-    def getAction(self):
+    def getAction(self, action_name=None):
         action_dict = self.getActionDict()
-        return iCubFullbodyAction(JSON_dict=action_dict)
+        action = iCubFullbodyAction(JSON_dict=action_dict)
+        action.setName(action_name)
+        return action
 
     def __replace_params__(self, template_dict, params_dict):
         if isinstance(template_dict, dict):
@@ -283,7 +255,7 @@ class iCubActionTemplateImportedJSON(iCubActionTemplate):
         elif isinstance(template_dict, str) and template_dict.startswith('$'):
             param_key = template_dict[1:]  # Remove the '$' character
             if param_key in params_dict:
-                return params_dict[param_key].value
+                return params_dict[param_key]
         return template_dict
 
     
@@ -331,18 +303,6 @@ class ActionsManager:
 
     def importTemplateFromJSONDict(self, JSON_dict):
         return iCubActionTemplateImportedJSON(JSON_dict=JSON_dict)
-        #template.importFromJSONDict(JSON_dict=JSON_dict)
-        #return self.importAction(template.action)
-
-    """
-    def importTemplateFromJSONDict(self, JSON_dict, name_prefix=None):
-        action = iCubFullbodyActionImportedJSON(JSON_dict=JSON_dict)
-        if name_prefix:
-            action_id=name_prefix + '.' + action.name
-        else:
-            action_id=None
-        return self.addAction(action, action_id=action_id)
-    """
 
     def importActionFromTemplateJSONFile(self, JSON_file, params_files=[]):
         template_dict = importFromJSONFile(JSON_file)
@@ -354,5 +314,3 @@ class ActionsManager:
 
     def importTemplateJSONFile(self, JSON_file):
         return importFromJSONFile(JSON_file)
-
-

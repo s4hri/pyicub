@@ -26,9 +26,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import TemplateParameter
+from pyicub.utils import exportJSONFile
 
-p = TemplateParameter("welcome_msg")
+msg1 = {}
+msg1["welcome_msg"] = "hello world"
+exportJSONFile("msg1.json", msg1)
 
-p.setValue("welcome world")
-p.exportJSONFile("msg2.json")
+msg2 = {}
+msg2["welcome_msg"] = "welcome world"
+exportJSONFile("msg2.json", msg2)
