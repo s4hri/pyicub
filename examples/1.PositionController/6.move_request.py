@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,29 +26,28 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, LimbMotion, JointsTrajectoryCheckpoint, ICUB_PARTS
+from pyicub.helper import iCub, JointPose, LimbMotion, JointsTrajectoryCheckpoint, ICUB_PARTS, iCubFullbodyStep
 
-head_up = JointsTrajectoryCheckpoint(JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
-head_down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
-head_home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
+class HeadTorsoStep(iCubFullbodyStep):
 
-torso_down = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 20.0]))
-torso_home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0]))
+    def prepare(self):
+        head_up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        head_down = JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        head_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+
+        torso_down = JointPose(target_joints=[0.0, 0.0, 20.0])
+        torso_home = JointPose(target_joints=[0.0, 0.0, 0.0])
+
+        head_motion = self.createLimbMotion(ICUB_PARTS.HEAD)
+        head_motion.createJointsTrajectory(head_up)
+        head_motion.createJointsTrajectory(head_down)
+        head_motion.createJointsTrajectory(head_home)
+
+        torso_motion = self.createLimbMotion(ICUB_PARTS.TORSO)
+        torso_motion.createJointsTrajectory(torso_down)
+        torso_motion.createJointsTrajectory(torso_home)
 
 icub = iCub()
-
-head_motion = LimbMotion(ICUB_PARTS.HEAD)
-head_motion.addCheckpoint(head_up)
-head_motion.addCheckpoint(head_down)
-head_motion.addCheckpoint(head_home)
-
-torso_motion = LimbMotion(ICUB_PARTS.TORSO)
-torso_motion.addCheckpoint(torso_down)
-torso_motion.addCheckpoint(torso_home)
-
-step = icub.createStep()
-step.setLimbMotion(head_motion)
-step.setLimbMotion(torso_motion)
-
+step = HeadTorsoStep()
 [head_req, torso_req] = icub.moveStep(step)
 print(head_req, torso_req)

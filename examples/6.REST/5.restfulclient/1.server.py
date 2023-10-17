@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,25 +26,43 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import GazeMotion, iCubFullbodyAction, iCubFullbodyStep
+from pyicub.rest import iCubRESTApp, iCub
+from datetime import date
 
-action = iCubFullbodyAction()
+import time
+import os
 
-g1 = GazeMotion(lookat_method="lookAtFixationPoint")
-g1.addCheckpoint([-1.0, -0.5, 1.0])
-g1.addCheckpoint([-1.0, -0.2, 0.5])
-g1.addCheckpoint([-1.0, 0.2, 0.1])
+class myRESTApp(iCubRESTApp):
 
-g2 = GazeMotion(lookat_method="lookAtAbsAngles")
-g2.addCheckpoint([0.0, 0.0, 0.0, True, 1.5])
-    
-step1 = iCubFullbodyStep()
-step2 = iCubFullbodyStep()
+    def hello_world(self, name: str='you'):
+        return "Hello world %s!" % name
 
-step1.setGazeMotion(g1)
-step2.setGazeMotion(g2)
+    def date(self, date_format: str="%d/%m/%Y"):
+        today = date.today()
+        return today.strftime(date_format)
 
-action.addStep(step1)
-action.addStep(step2)
+    def process(self):
+        return "I am processing my arguments ... " + str(self.getArgs())
 
-action.exportJSONFile('lookat.json')
+    def foo(self):
+        time.sleep(5)
+        return "I've done a lot of stuff!"
+
+icub = iCub()
+
+template = icub.importTemplate(JSON_file="template/welcome.json")
+template.setParam(name="welcome_msg", JSON_file="template/params/msg1.json")
+action = template.getAction(action_name="Welcome1")
+action.exportJSONFile(os.path.join(os.getcwd(), 'actions', 'welcome1.json'))
+
+template = icub.importTemplate(JSON_file="template/welcome.json")
+template.setParam(name="welcome_msg", JSON_file="template/params/msg2.json")
+action = template.getAction(action_name="Welcome2")
+action.exportJSONFile(os.path.join(os.getcwd(), 'actions', 'welcome2.json'))
+
+app = myRESTApp(action_repository_path=os.path.join(os.getcwd(), 'actions'), arg1="your-arg1-value",arg2=[1,2,3,4])
+
+app.rest_manager.run_forever()
+
+
+

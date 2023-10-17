@@ -1,7 +1,7 @@
 {
     "steps": [
         {
-            "name": "step",
+            "name": "Step",
             "limb_motions": {
                 "head": {
                     "part_name": "head",
@@ -59,7 +59,7 @@
             "offset_ms": null
         }
     ],
-    "name": "action",
-    "description": "default",
+    "name": "HeadAction",
+    "description": "empty",
     "offset_ms": null
 }

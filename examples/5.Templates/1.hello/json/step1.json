@@ -1,6 +1,6 @@
 {
     "step_bodymotion": {
-        "name": "step",
+        "name": "Step",
         "limb_motions": {
             "head": {
                 "part_name": "head",

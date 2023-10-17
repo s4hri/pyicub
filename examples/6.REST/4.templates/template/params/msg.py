@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,30 +26,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from pyicub.utils import exportJSONFile
 
-from pyicub.helper import iCub, JointPose, ICUB_PARTS, iCubFullbodyAction, iCubFullbodyStep
+msg1 = {}
+msg1["welcome_msg"] = "hello world"
+exportJSONFile("msg1.json", msg1)
 
-class Step(iCubFullbodyStep):
-
-    def prepare(self):
-        pose_up = JointPose(target_joints=[30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
-        pose_down = JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
-        pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
-        
-        lm = self.createLimbMotion(ICUB_PARTS.HEAD)
-        lm.createJointsTrajectory(pose_up, duration=2.0)
-        lm.createJointsTrajectory(pose_down, duration=2.0, timeout=1.0)
-        lm.createJointsTrajectory(pose_home, duration=2.0)
-
-class GenericPoses(iCubFullbodyAction):
-
-    def prepare(self):
-        self.addStep(Step())
-
-
-action = GenericPoses()
-icub = iCub()
-action_id = icub.addAction(action)
-icub.playAction(action_id)
-icub.getPositionController(ICUB_PARTS.HEAD).setCustomWaitMotionDone(motion_complete_at=0.8)
-icub.playAction(action_id)
+msg2 = {}
+msg2["welcome_msg"] = "welcome world"
+exportJSONFile("msg2.json", msg2)

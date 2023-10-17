@@ -26,28 +26,32 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, GazeMotion, iCubFullbodyAction, iCubFullbodyStep
+from pyicub.helper import iCub, iCubFullbodyStep, iCubFullbodyAction
 
+import os
+
+class Step1(iCubFullbodyStep):
+
+    def prepare(self):
+        g1 = self.createGazeMotion("lookAtFixationPoint")
+        g1.addCheckpoint([-1.0, -0.5, 1.0])
+        g1.addCheckpoint([-1.0, -0.2, 0.5])
+        g1.addCheckpoint([-1.0, 0.2, 0.1])
+
+class Step2(iCubFullbodyStep):
+
+    def prepare(self):
+        g2 = self.createGazeMotion("lookAtAbsAngles")
+        g2.addCheckpoint([0.0, 0.0, 0.0, True, 1.5])
+
+class LookAtAction(iCubFullbodyAction):
+
+    def prepare(self):
+        self.addStep(Step1())
+        self.addStep(Step2())
+
+action = LookAtAction()
 icub = iCub()
-action = icub.createAction()
-action = iCubFullbodyAction()
-
-g1 = GazeMotion(lookat_method="lookAtFixationPoint")
-g1.addCheckpoint([-1.0, -0.5, 1.0])
-g1.addCheckpoint([-1.0, -0.2, 0.5])
-g1.addCheckpoint([-1.0, 0.2, 0.1])
-
-g2 = GazeMotion(lookat_method="lookAtAbsAngles")
-g2.addCheckpoint([0.0, 0.0, 0.0, True, 1.5])
-    
-step1 = icub.createStep()
-step2 = icub.createStep()
-
-step1.setGazeMotion(g1)
-step2.setGazeMotion(g2)
-
-action.addStep(step1)
-action.addStep(step2)
-
-icub.play(action)
-action.exportJSONFile('json/lookat.json')
+action_id = icub.addAction(action)
+icub.playAction(action_id)
+icub.exportAction(action_id=action_id, path=os.path.join(os.getcwd(), 'json'))

@@ -1,10 +1,8 @@
 {
     "params": {
-        "step_bodymotion": "$step_bodymotion",
         "welcome_msg": "$welcome_msg"
     },
     "steps": [
-        "$step_bodymotion",
         {
             "welcome_msg": "$welcome_msg",
             "name": "Step",

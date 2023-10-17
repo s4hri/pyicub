@@ -26,16 +26,26 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.rest import iCubRESTApp
+from pyicub.rest import iCub, iCubRESTApp
 
 import os
 
-app = iCubRESTApp(app_name="myRESTApp")
+from pyicub.helper import iCub, iCubActionTemplate
+from pyicub.utils import importFromJSONFile
 
-app.importActionFromTemplate(template_file=os.path.join(os.getcwd(), 'templates', 'welcome.json'),
-                             params_files = [os.path.join(os.getcwd(), 'templates', 'params', 'msg1.json')])
 
-app.importActionFromTemplate(template_file=os.path.join(os.getcwd(), 'templates', 'welcome.json'),
-                             params_files = [os.path.join(os.getcwd(), 'templates', 'params', 'msg2.json')])
+icub = iCub()
 
+template = icub.importTemplate(JSON_file="template/welcome.json")
+template.setParam(name="welcome_msg", JSON_file="template/params/msg1.json")
+action = template.getAction(action_name="Welcome1")
+action.exportJSONFile(os.path.join(os.getcwd(), 'actions', 'welcome1.json'))
+
+template = icub.importTemplate(JSON_file="template/welcome.json")
+template.setParam(name="welcome_msg", JSON_file="template/params/msg2.json")
+action = template.getAction(action_name="Welcome2")
+action.exportJSONFile(os.path.join(os.getcwd(), 'actions', 'welcome2.json'))
+
+app = iCubRESTApp(action_repository_path=os.path.join(os.getcwd(), 'actions'))
 app.rest_manager.run_forever()
+

@@ -26,32 +26,34 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, LimbMotion, JointsTrajectoryCheckpoint, iCubFullbodyAction, ICUB_PARTS, PyiCubCustomCall
+from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, ICUB_PARTS, GazeMotion, iCubFullbodyAction, PyiCubCustomCall, iCubFullbodyStep
 
-hamlet="""
-To be, or not to be, that is the question:
-Whether 'tis nobler in the mind to suffer
-The slings and arrows of outrageous fortune,
-...
-"""
+class Step(iCubFullbodyStep):
 
+    def prepare(self):
+        hamlet="""
+            To be, or not to be, that is the question:
+            Whether 'tis nobler in the mind to suffer
+            The slings and arrows of outrageous fortune,
+            ...
+            """
+        pose_up = JointPose(target_joints=[30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+        pose_down = JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+        pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+        
+        lm = self.createLimbMotion(ICUB_PARTS.HEAD)
+        lm.createJointsTrajectory(pose_up, duration=2.0)
+        lm.createJointsTrajectory(pose_down, duration=2.0, timeout=1.0)
+        lm.createJointsTrajectory(pose_home, duration=2.0)
+        
+        self.createCustomCall(target="speech.say", args=(hamlet,))
+
+class CustomSpeech(iCubFullbodyAction):
+
+    def prepare(self):
+        self.addStep(Step())
+
+action = CustomSpeech()
 icub = iCub()
-
-speak = PyiCubCustomCall(target="speech.say", args=(hamlet,))
-
-head_up = JointsTrajectoryCheckpoint(JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
-head_down = JointsTrajectoryCheckpoint(JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
-head_home = JointsTrajectoryCheckpoint(JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]))
-
-head_motion = LimbMotion(ICUB_PARTS.HEAD)
-head_motion.addCheckpoint(head_up)
-head_motion.addCheckpoint(head_down)
-head_motion.addCheckpoint(head_home)
-
-step = icub.createStep()
-step.addCustomCall(speak)
-step.setLimbMotion(head_motion)
-
-action = icub.createAction()
-action.addStep(step)
-icub.play(action)
+action_id = icub.addAction(action)
+icub.playAction(action_id)

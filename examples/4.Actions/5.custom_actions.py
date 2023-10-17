@@ -26,29 +26,31 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, iCubFullbodyAction, PyiCubCustomCall, iCubFullbodyStep
+from pyicub.helper import iCub, iCubFullbodyAction, iCubFullbodyStep
 
+import os
+
+class Step1(iCubFullbodyStep):
+
+    def prepare(self):
+        self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
+        self.createCustomCall(target="emo.neutral")
+
+class Step2(iCubFullbodyStep):
+
+    def prepare(self):
+        self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 0.0, 0.0,))
+        self.createCustomCall(target="emo.smile")
+
+class CustomAction(iCubFullbodyAction):
+
+    def prepare(self):
+        self.addStep(Step1())
+        self.addStep(Step2())
+
+
+action = CustomAction()
 icub = iCub()
-
-a = PyiCubCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
-b = PyiCubCustomCall(target="emo.neutral")
-
-c = PyiCubCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 0.0, 0.0,))
-d = PyiCubCustomCall(target="emo.smile")
-
-action = icub.createAction()
-step1 = icub.createStep()
-step2 = icub.createStep()
-
-step1.addCustomCall(a)
-step1.addCustomCall(b)
-step2.addCustomCall(c)
-step2.addCustomCall(d)
-
-action.addStep(step1)
-action.addStep(step2)
-
-action.exportJSONFile('json/custom.json')
-
-action_id = icub.importActionFromJSONFile(JSON_file='json/custom.json')
+action_id = icub.addAction(action)
 icub.playAction(action_id)
+icub.exportAction(action_id=action_id, path=os.path.join(os.getcwd(), 'json'))

@@ -26,10 +26,17 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub
+from pyicub.helper import iCub, iCubActionTemplate
+from pyicub.utils import importFromJSONFile
 
 
 icub = iCub()
 
-action_id = icub.importActionFromTemplateJSONFile(JSON_file="json/hello.json", params_files=("json/bodymotion_1.json", "json/message_1.json",))
+template = icub.importTemplate(JSON_file="json/hello.json")
+template.setParam(name="step_bodymotion", JSON_file="json/step1.json")
+template.setParam(name="welcome_msg", JSON_file="json/msg1.json")
+action = template.getAction()
+action_id = icub.addAction(action)
 icub.playAction(action_id)
+
+

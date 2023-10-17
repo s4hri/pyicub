@@ -1,12 +1,6 @@
 {
-    "params": {
-        "step_bodymotion": "$step_bodymotion",
-        "welcome_msg": "$welcome_msg"
-    },
     "steps": [
-        "$step_bodymotion",
         {
-            "welcome_msg": "$welcome_msg",
             "name": "Step",
             "limb_motions": {},
             "gaze_motion": null,
@@ -14,14 +8,14 @@
                 {
                     "target": "speech.say",
                     "args": [
-                        "$welcome_msg"
+                        "welcome world"
                     ]
                 }
             ],
             "offset_ms": null
         }
     ],
-    "name": "TemplateAction",
+    "name": "Welcome2",
     "description": "empty",
     "offset_ms": null
 }

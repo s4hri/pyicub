@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,17 +26,32 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import TemplateParameter, iCubFullbodyAction, iCubActionTemplate, iCubFullbodyStep, PyiCubCustomCall
+from pyicub.rest import PyiCubRESTfulClient
 
+client = PyiCubRESTfulClient(host='localhost', port=9001)
 
-template = iCubActionTemplate()
-p = template.createParameter("welcome_message", str)
+print("PyiCub ver: ", client.get_version())
 
-action = iCubFullbodyAction()
-speak = PyiCubCustomCall(target="speech.say", args=(p.key,))
-step = iCubFullbodyStep()
-step.addCustomCall(speak)
-action.addStep(step)
+robots = client.get_robots()
 
-template.setAction(action)
-template.exportJSONFile('welcome.json')
+print("Robots: ")
+for robot in robots:
+    print("name: '%s' url: '%s'" % (robot.name, robot.url))
+
+    applications = client.get_apps(robot.name)
+    
+    print("\t Robot Apps: ")
+    for app in applications:
+        print("\t -> name: '%s' url: '%s'" % (app.name, app.url))
+
+        services = client.get_services(robot.name, app.name)
+        
+        print("\t\t Applications Services: ")
+        for service in services.values():
+            print("\t\t name: '%s' url: '%s'" % (service.name, service.url))
+
+    actions = client.get_robot_actions(robot.name)
+    print("\t Robot Actions: ")
+    for action_id in actions:
+        print("\t -> action_id: %s" % action_id)
+        client.play_action(robot.name, action_id=action_id)

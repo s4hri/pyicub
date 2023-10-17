@@ -26,19 +26,30 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import TemplateParameter, iCubFullbodyAction, iCubActionTemplate, iCubFullbodyStep, PyiCubCustomCall, LimbMotion
+from pyicub.helper import iCubActionTemplate, iCubFullbodyStep
+
+class Step(iCubFullbodyStep):
+
+    def __init__(self, welcome_msg, offset_ms=None, name=None, JSON_dict=None, JSON_file=None):
+        self.welcome_msg = welcome_msg
+        super().__init__(offset_ms, name, JSON_dict, JSON_file)      
+
+    def prepare(self):
+        self.createCustomCall(target="speech.say", args=(self.welcome_msg,))
 
 
-template = iCubActionTemplate()
-p1 = template.createParameter("step_bodymotion", iCubFullbodyStep)
-p2 = template.createParameter("welcome_message", str)
+class TemplateAction(iCubActionTemplate):
 
-action = iCubFullbodyAction()
-action.addStep(p1.key)
-speak = PyiCubCustomCall(target="speech.say", args=(p2.key,))
-step = iCubFullbodyStep()
-step.addCustomCall(speak)
-action.addStep(step)
+    def prepare_params(self):
+        self.createParam(name="step_bodymotion")
+        self.createParam(name="welcome_msg")
 
-template.setAction(action)
-template.exportJSONFile('json/hello.json')
+    def prepare(self):
+        step_bodymotion = self.getParam("step_bodymotion")
+        welcome_msg = self.getParam("welcome_msg")
+        self.addStep(step_bodymotion)
+        self.addStep(Step(welcome_msg))
+
+
+template = TemplateAction()
+template.exportJSONFile("json/hello.json")

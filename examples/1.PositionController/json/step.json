@@ -1,0 +1,87 @@
+{
+    "name": "Step",
+    "limb_motions": {
+        "head": {
+            "part_name": "head",
+            "checkpoints": [
+                {
+                    "pose": {
+                        "target_joints": [
+                            20.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "joints_list": null
+                    },
+                    "duration": 0.0,
+                    "timeout": 30.0
+                },
+                {
+                    "pose": {
+                        "target_joints": [
+                            -20.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "joints_list": null
+                    },
+                    "duration": 0.0,
+                    "timeout": 30.0
+                },
+                {
+                    "pose": {
+                        "target_joints": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "joints_list": null
+                    },
+                    "duration": 0.0,
+                    "timeout": 30.0
+                }
+            ]
+        },
+        "torso": {
+            "part_name": "torso",
+            "checkpoints": [
+                {
+                    "pose": {
+                        "target_joints": [
+                            0.0,
+                            0.0,
+                            20.0
+                        ],
+                        "joints_list": null
+                    },
+                    "duration": 0.0,
+                    "timeout": 30.0
+                },
+                {
+                    "pose": {
+                        "target_joints": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "joints_list": null
+                    },
+                    "duration": 0.0,
+                    "timeout": 30.0
+                }
+            ]
+        }
+    },
+    "gaze_motion": null,
+    "custom_calls": [],
+    "offset_ms": null
+}
