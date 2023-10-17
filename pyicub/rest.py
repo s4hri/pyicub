@@ -460,12 +460,6 @@ class iCubRESTApp:
         
     def __register_icub_helper__(self):
         app_name = "helper"
-        """
-        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.playAction)
-        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.importAction)
-        #self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.icub.importActionFromTemplateJSONDict)
-        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.getActions)
-        """
         if self.icub.actions_manager:
             self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__playAction__, target_name='actions.playAction')
             self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__getActions__, target_name='actions.getActions')
@@ -522,58 +516,12 @@ class iCubRESTApp:
     
     def __getActions__(self):
         return list(self.icub.getActions())
-        """
-        if self.icub:
-            actions = self.icub.getActions()
-            return list(actions)
-        else:
-            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/getActions'
-            res = requests.post(url=url, json={})
-            res = requests.get(res.json())
-            return res.json()
-        """
-    
-    """
-    def importActionFromTemplate(self, template_file, params_files, action_id):
 
-        if self.icub:
-            template = self.icub.importTemplate(JSON_file=template_file)
-            params = template.getParams()
-            for param_file in params_files:
-                param_dict = importFromJSONFile(param_file)
-                key = list(param_dict.keys())[0]
-                if key in params.keys():
-                    params[key].importFromJSONFile(param_file)
-            #action_dict = template.getActionDict()
-            #self.importAction(action_dict, name_prefix=action_id)
-            self.icub.importActionFromTemplate(template, action_id)
-        else:
-            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/importActionFromTemplateJSONDict'
-            data = {}
-            data["JSON_dict"] = importFromJSONFile(template_file)
-            data["params_dict"] = {}
-            for param in params_files:
-                param_dict = importFromJSONFile(param)
-                data["params_dict"].update(param_dict)
-            res = requests.post(url=url, json=data)
-            res = requests.get(res.json())
-            action_id = res.json()['retval']
-        key = ""
-        key += os.path.basename(template_file)
-        for param in params_files:
-            key = key + ',' + os.path.basename(param)
-        #self.__actions__[key] = action_id
-    """
     def getArgsTemplate(self):
         return self.__args_template__
 
     def getArgs(self):
         return self.__args__
-
-    """
-    def getActions(self):
-        return self.__actions__
-    """
 
     def setArgs(self, input_args: dict):
         for k,v in input_args.items():
@@ -644,15 +592,14 @@ class PyiCubRESTfulClient:
         return services
 
     def get_robot_actions(self, robot_name):
-        res = requests.post(url=self._header_ + '/' + robot_name + '/helper/getImportedActions', json={})
+        res = requests.post(url=self._header_ + '/' + robot_name + '/helper/actions.getActions', json={})
         res = requests.get(res.json())
         return res.json()['retval']
 
     def play_action(self, robot_name, action_id, sync=True):
         if sync:
-            res = self.run_target(robot_name, "helper", "playAction", action_id=action_id)
-        res = self.run_target_async(robot_name, "helper", "playAction", action_id=action_id)
-        return res.json()['retval']
+            return self.run_target(robot_name, "helper", "actions.playAction", action_id=action_id)
+        return self.run_target_async(robot_name, "helper", "actions.playAction", action_id=action_id)
 
     def run_target(self, robot_name, app_name, target_name, *args, **kwargs):
         return self.__run__(robot_name, app_name, target_name, True, *args, **kwargs)
