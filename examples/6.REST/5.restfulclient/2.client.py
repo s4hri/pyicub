@@ -52,6 +52,6 @@ for robot in robots:
 
     actions = client.get_robot_actions(robot.name)
     print("\t Robot Actions: ")
-    for k,v in actions.items():
-        print("\t -> action_id: %s , name: %s" % (k, v))
-        client.play_action(robot.name, action_id=k)
+    for action_id in actions:
+        print("\t -> action_id: %s" % action_id)
+        client.play_action(robot.name, action_id=action_id)

@@ -1,10 +1,65 @@
 {
     "steps": [
         {
-            "name": "step",
+            "name": "Step1",
             "limb_motions": {
                 "right_arm": {
                     "part_name": "right_arm",
+                    "checkpoints": [
+                        {
+                            "pose": {
+                                "target_joints": [
+                                    -90.0,
+                                    20.0,
+                                    10.0,
+                                    90.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    60.0,
+                                    20.0,
+                                    20.0,
+                                    20.0,
+                                    10.0,
+                                    10.0,
+                                    10.0,
+                                    10.0,
+                                    10.0
+                                ],
+                                "joints_list": null
+                            },
+                            "duration": 1.0,
+                            "timeout": 30.0
+                        },
+                        {
+                            "pose": {
+                                "target_joints": [
+                                    0.0,
+                                    15.0,
+                                    0.0,
+                                    25.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    60.0,
+                                    20.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    0.0,
+                                    0.0
+                                ],
+                                "joints_list": null
+                            },
+                            "duration": 1.0,
+                            "timeout": 30.0
+                        }
+                    ]
+                },
+                "left_arm": {
+                    "part_name": "left_arm",
                     "checkpoints": [
                         {
                             "pose": {
@@ -77,7 +132,7 @@
             "offset_ms": null
         },
         {
-            "name": "step",
+            "name": "Step2",
             "limb_motions": {
                 "left_arm": {
                     "part_name": "left_arm",
@@ -140,7 +195,7 @@
             "offset_ms": null
         },
         {
-            "name": "step",
+            "name": "Step3",
             "limb_motions": {
                 "right_arm": {
                     "part_name": "right_arm",
@@ -282,7 +337,7 @@
             "offset_ms": 500
         }
     ],
-    "name": "FullBody",
-    "description": "default",
+    "name": "CompleteAction",
+    "description": "empty",
     "offset_ms": null
 }
