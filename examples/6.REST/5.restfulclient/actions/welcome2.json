@@ -1,0 +1,21 @@
+{
+    "steps": [
+        {
+            "name": "Step",
+            "limb_motions": {},
+            "gaze_motion": null,
+            "custom_calls": [
+                {
+                    "target": "speech.say",
+                    "args": [
+                        "welcome world"
+                    ]
+                }
+            ],
+            "offset_ms": null
+        }
+    ],
+    "name": "Welcome2",
+    "description": "empty",
+    "offset_ms": null
+}

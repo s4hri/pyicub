@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,10 +26,43 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from pyicub.helper import iCubFSM
+import enum
+import time
 
-__name__ = 'PyiCub'
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'v7.3-distro_v2022.02.0-ubuntu20.04'
-__description__ = 'Developing iCub applications using Python'
+class Semaphore(enum.Enum):
+    RED = 0
+    YELLOW = 1
+    GREEN = 2
+
+def on_RED():
+    print("Stop!")
+    time.sleep(1)
+
+def on_YELLOW():
+    print("Slow down!")
+    time.sleep(1)
+
+def on_GREEN():
+    print("Go!")
+    time.sleep(1)
+
+machine = iCubFSM()
+
+machine.addState(name=Semaphore.RED, on_enter_callback=on_RED)
+machine.addState(name=Semaphore.YELLOW, on_enter_callback=on_YELLOW)
+machine.addState(name=Semaphore.GREEN, on_enter_callback=on_GREEN)
+
+machine.addTransition("start", "init", Semaphore.RED)
+machine.addTransition("go", Semaphore.RED, Semaphore.GREEN)
+machine.addTransition("slowdown", Semaphore.GREEN, Semaphore.YELLOW)
+machine.addTransition("stop", Semaphore.YELLOW, Semaphore.RED)
+
+triggers = machine.getCurrentTriggers()
+
+for i in range(1,10):
+    machine.runStep(triggers[0])
+    triggers = machine.getCurrentTriggers()
+    
+print(machine.getStates())
+print(machine.getTransitions())

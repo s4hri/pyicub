@@ -29,7 +29,6 @@
 from pyicub.utils import importFromJSONFile, exportJSONFile
 from pyicub.controllers.position import JointPose, DEFAULT_TIMEOUT
 
-
 class JointsTrajectoryCheckpoint:
 
     def __init__(self, pose: JointPose, duration: float=0.0, timeout: float=DEFAULT_TIMEOUT):
@@ -284,6 +283,7 @@ class ActionsManager:
     def exportActions(self, path):
         for k, action in self.__actions__.items():
             action.exportJSONFile('%s/%s.json' % (path, k))
+    """
 
     def importActionFromJSONDict(self, JSON_dict, name_prefix=None):
         action = iCubFullbodyAction(JSON_dict=JSON_dict)
@@ -292,11 +292,12 @@ class ActionsManager:
         else:
             action_id=None
         return self.addAction(action, action_id=action_id)
-
+    
     def importActionFromJSONFile(self, JSON_file):
         JSON_dict = importFromJSONFile(JSON_file)
         return self.importActionFromJSONDict(JSON_dict=JSON_dict)
-
+    """
+    
     def importTemplateFromJSONFile(self, JSON_file):
         JSON_dict = importFromJSONFile(JSON_file)
         return self.importTemplateFromJSONDict(JSON_dict=JSON_dict)
@@ -304,6 +305,7 @@ class ActionsManager:
     def importTemplateFromJSONDict(self, JSON_dict):
         return iCubActionTemplateImportedJSON(JSON_dict=JSON_dict)
 
+    """
     def importActionFromTemplateJSONFile(self, JSON_file, params_files=[]):
         template_dict = importFromJSONFile(JSON_file)
         params_dict = {}
@@ -311,6 +313,9 @@ class ActionsManager:
             param = importFromJSONFile(j)
             params_dict.update(param)
         return self.importActionFromTemplateJSONDict(template_dict, params_dict)
-
+    """
+    
     def importTemplateJSONFile(self, JSON_file):
         return importFromJSONFile(JSON_file)
+
+
