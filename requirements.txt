@@ -1,2 +1,3 @@
 PyYAML==5.4.1
 Flask==2.2.5
+transitions==0.9.0

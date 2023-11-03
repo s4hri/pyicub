@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,10 +26,15 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from pyicub.rest import iCubRESTApp
+import os
 
-__name__ = 'PyiCub'
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = 'v7.3-distro_v2022.02.0-ubuntu20.04'
-__description__ = 'Developing iCub applications using Python'
+app = iCubRESTApp()
+action1_id = app.icub.importAction("actions/HeadAction.json")
+action2_id = app.icub.importAction("actions/LookAtAction.json")
+
+app.icub.fsm.addTransition("start", "init", action1_id)
+app.icub.fsm.addTransition("next", action1_id, action2_id)
+
+app.rest_manager.run_forever()
+    

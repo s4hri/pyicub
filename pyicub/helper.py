@@ -41,6 +41,8 @@ from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequest, iCubRequestsManager
 from pyicub.utils import SingletonMeta, getPublicMethods, firstAvailablePort, importFromJSONFile, exportJSONFile
 from collections import deque
+from transitions import Machine, State
+from enum import Enum
 
 import threading
 import os
@@ -91,6 +93,7 @@ class iCub(metaclass=iCubSingleton):
         self._logger_               = YarpLogger.getLogger() #PyicubLogger.getLogger()
         self._request_manager_      = request_manager
         self._actions_manager_      = ActionsManager()
+        self._fsm_                  = iCubFSM()
 
         self._icub_parts_ = {}
         self._icub_parts_[ICUB_PARTS.FACE       ]   = iCubPart(ICUB_PARTS.FACE      , 1)
@@ -100,8 +103,6 @@ class iCub(metaclass=iCubSingleton):
         self._icub_parts_[ICUB_PARTS.TORSO      ]   = iCubPart(ICUB_PARTS.TORSO     , 3)
         self._icub_parts_[ICUB_PARTS.LEFT_LEG   ]   = iCubPart(ICUB_PARTS.LEFT_LEG  , 6)
         self._icub_parts_[ICUB_PARTS.RIGHT_LEG  ]   = iCubPart(ICUB_PARTS.RIGHT_LEG , 6)
-
-        self._imported_actions_ = {}
 
         if SIMULATION:
             if SIMULATION == 'true':
@@ -155,7 +156,10 @@ class iCub(metaclass=iCubSingleton):
         if self._gaze_ctrl_ is None:
             self._initGazeController_()
         return self._gaze_ctrl_
-        
+
+    @property
+    def fsm(self):
+        return self._fsm_
 
     @property
     def face(self):
@@ -211,8 +215,14 @@ class iCub(metaclass=iCubSingleton):
     def robot_name(self):
         return self._robot_name_
 
-    def addAction(self, action: iCubFullbodyAction):
-        return self.actions_manager.addAction(action)
+    def addAction(self, action: iCubFullbodyAction, action_id=None):
+        action_id = self.actions_manager.addAction(action, action_id=action_id)
+        self.fsm.addState(action_id, on_enter_callback=self.on_enter_fsm_action)
+        return action_id
+    
+    def on_enter_fsm_action(self):
+        action_id = self.fsm.getCurrentState()
+        self.playAction(action_id)
 
     def exists(self):
         return len(self._position_controllers_.keys()) > 0
@@ -250,7 +260,19 @@ class iCub(metaclass=iCubSingleton):
         return self.actions_manager.getActions()
 
     def importAction(self, JSON_file):
-        return self.actions_manager.importActionFromJSONFile(JSON_file=JSON_file)
+        return self.importActionFromJSONFile(JSON_file=JSON_file)
+
+    def importActionFromJSONDict(self, JSON_dict, name_prefix=None):
+        action = iCubFullbodyAction(JSON_dict=JSON_dict)
+        if name_prefix:
+            action_id=name_prefix + '.' + action.name
+        else:
+            action_id=None
+        return self.addAction(action, action_id=action_id)
+
+    def importActionFromJSONFile(self, JSON_file):
+        JSON_dict = importFromJSONFile(JSON_file)
+        return self.importActionFromJSONDict(JSON_dict=JSON_dict)
 
     def importActionFromTemplate(self, template: iCubActionTemplate, action_id=None):
         action = template.getAction()
@@ -414,3 +436,54 @@ class PortMonitor:
                     self._callback_()
             yarp.delay(self._period_)
 
+
+class iCubFSM:
+
+    INIT_STATE = "init"
+
+    def __init__(self):
+        self._states_ = []
+        self._transitions_ = {}
+        self._machine_ = Machine(model=self, states=[], initial=iCubFSM.INIT_STATE, auto_transitions=False)
+
+    def getCurrentState(self):
+        return self.state
+
+    def getState(self, name):
+        return self._machine_.get_state(name)
+
+    def getStates(self):
+        return self._states_
+
+    def getTransitions(self):
+        return self._transitions_
+
+    def getCurrentTriggers(self):
+        return self.getTriggers(self.getCurrentState())
+
+    def getTriggers(self, state_name):
+        return self._machine_.get_triggers(state_name)
+    
+    def addState(self, name, on_enter_callback=None):
+        s = State(name=name, on_enter=on_enter_callback)
+        self._machine_.add_state(s)
+        self._states_.append(name)
+        """
+        if len(self._states_) == 1:
+            self.addTransition("setup", iCubFSM.INIT_STATE, name)
+        """
+        return s
+
+    def addTransition(self, trigger, source, dest):
+        if not source in self._transitions_.keys():
+            self._transitions_[source] = []
+        self._transitions_[source].append(dest)
+        self._machine_.add_transition(trigger=trigger, source=source, dest=dest)
+
+    def runAll(self, triggers: list):
+        for trigger in triggers:
+            self.trigger(step)
+
+    def runStep(self, trigger):
+        self.trigger(trigger)
+        return self.getCurrentTriggers()

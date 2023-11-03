@@ -422,8 +422,11 @@ class PyiCubApp(metaclass=SingletonMeta):
 
 class iCubRESTApp:
 
-    def __init__(self, robot_name="icub", action_repository_path='', **kargs):
-        self._name_ = self.__class__.__name__
+    def __init__(self, app_name="", robot_name="icub", action_repository_path='', **kargs):
+        if not app_name:
+            self._name_ = self.__class__.__name__
+        else:
+            self._name_ = app_name
         self.__action_repository__ = action_repository_path
         self.__app__ = PyiCubApp()
 
@@ -470,13 +473,19 @@ class iCubRESTApp:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.speech, class_name='speech')
         if self.icub.emo:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.emo, class_name='emo')
+        if self.icub.fsm:
+            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.fsm, class_name='fsm')
 
     def __register_class__(self, robot_name, app_name, cls, class_name: str=''):
         target_prefix = class_name
         for method in getPublicMethods(cls):
             if class_name:
                 target_prefix = class_name + '.'
-            self.__app__.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_prefix+getattr(cls, method).__name__, target=getattr(cls, method), target_signature=str(inspect.signature(getattr(cls, method))) )
+            if "__name__" in getattr(cls, method).__dict__.keys():
+                target_name = getattr(cls, method).__name__
+            else:
+                target_name = str(method)
+            self.__app__.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_prefix+target_name, target=getattr(cls, method), target_signature=str(inspect.signature(getattr(cls, method))) )
 
     def __register_method__(self, robot_name, app_name, method, target_name: str=''):
         if not target_name:
@@ -501,7 +510,7 @@ class iCubRESTApp:
         if not name_prefix:
             name_prefix = self.__class__.__name__
         if self.icub:
-            return self.icub.actions_manager.importActionFromJSONDict(JSON_dict, name_prefix=name_prefix)
+            return self.icub.importActionFromJSONDict(JSON_dict, name_prefix=name_prefix)
         else:
             data = {}
             data['JSON_dict'] = JSON_dict
