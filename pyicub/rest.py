@@ -31,6 +31,7 @@ from pyicub.utils import SingletonMeta, getPyiCubInfo, getPublicMethods, firstAv
 from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequestsManager, iCubRequest
 from pyicub.helper import iCub
+from pyicub.fsm import FSM
 from flask import Flask, jsonify, request
 from urllib.parse import urlparse
 
@@ -436,6 +437,7 @@ class iCubRESTApp:
                 robot_name = "icubSim"
 
         self.__robot_name__ = robot_name
+        self.__fsm__ = FSM()
 
         if self.__is_icub_managed__():
             self.__icub__ = None
@@ -444,6 +446,7 @@ class iCubRESTApp:
             if self.__icub__.exists():
                 self.__register_icub_helper__()
         self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self)
+        self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
         self.__args_template__ = kargs
         self.__args__ = {}
         self.__actions__ = {}
@@ -451,7 +454,6 @@ class iCubRESTApp:
 
         if action_repository_path:
             self.__importActions__(path=action_repository_path)
-
 
     def __is_icub_managed__(self):
         url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper'
@@ -473,8 +475,8 @@ class iCubRESTApp:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.speech, class_name='speech')
         if self.icub.emo:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.emo, class_name='emo')
-        if self.icub.fsm:
-            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.fsm, class_name='fsm')
+        #if self.icub.fsm:
+        #    self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.fsm, class_name='fsm')
 
     def __register_class__(self, robot_name, app_name, cls, class_name: str=''):
         target_prefix = class_name
@@ -500,17 +502,27 @@ class iCubRESTApp:
                 val = v
             self.__args__[k] = val
 
+    #self.fsm.addState(action_id, on_enter_callback=self.on_enter_fsm_action)
+    #return action_id
+
+    def importAction(self, JSON_file):
+        return self.__importActionFromJSONFile__(JSON_file=JSON_file)
+
+    def __importActionFromJSONFile__(self, JSON_file):
+        JSON_dict = importFromJSONFile(JSON_file)
+        return self.__importActionFromJSONDict__(JSON_dict=JSON_dict)
+  
     def __importActions__(self, path):
         json_files = [pos_json for pos_json in os.listdir(path) if pos_json.endswith('.json')]
         for f in json_files:
-            JSON_dict = importFromJSONFile(os.path.join(path, f))
-            self.__importActionFromJSONDict__(JSON_dict)
+            self.__importActionFromJSONFile__(os.path.join(path, f))
 
     def __importActionFromJSONDict__(self, JSON_dict, name_prefix=None):
         if not name_prefix:
             name_prefix = self.__class__.__name__
         if self.icub:
-            return self.icub.importActionFromJSONDict(JSON_dict, name_prefix=name_prefix)
+            #return self.icub.importActionFromJSONDict(JSON_dict, name_prefix=name_prefix)
+            action_id = self.icub.importActionFromJSONDict(JSON_dict, name_prefix=name_prefix)
         else:
             data = {}
             data['JSON_dict'] = JSON_dict
@@ -518,10 +530,24 @@ class iCubRESTApp:
             url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/actions.importAction'
             res = requests.post(url=url, json=data)
             res = requests.get(res.json())
-            return res.json()['retval']
-    
+            action_id = res.json()['retval']
+        self.fsm.addState(action_id, on_enter_callback=self.__on_enter_fsm_action__)
+        return action_id
+
+    def __on_enter_fsm_action__(self):
+        action_id = self.fsm.getCurrentState()
+        self.__playAction__(action_id)
+
     def __playAction__(self, action_id: str, wait_for_completed=True):
-        self.icub.playAction(action_id=action_id, wait_for_completed=wait_for_completed)
+        if self.icub:
+            self.icub.playAction(action_id=action_id, wait_for_completed=wait_for_completed)
+        else:
+            data = {}
+            data['action_id'] = action_id
+            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/actions.playAction'
+            res = requests.post(url=url, json=data)
+            res = requests.get(res.json())
+            return res
     
     def __getActions__(self):
         return list(self.icub.getActions())
@@ -545,16 +571,21 @@ class iCubRESTApp:
         return True
 
     @property
-    def icub(self):
-        return self.__icub__
-
-    @property
     def app_name(self):
         return self._name_
 
     @property
+    def fsm(self):
+        return self.__fsm__
+
+    @property
+    def icub(self):
+        return self.__icub__
+
+    @property
     def rest_manager(self):
         return self.__app__.rest_manager
+
 
 class PyiCubRESTfulClient:
 

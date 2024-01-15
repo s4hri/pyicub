@@ -26,7 +26,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCubFSM
+from pyicub.fsm import FSM
 import enum
 import time
 
@@ -47,7 +47,7 @@ def on_GREEN():
     print("Go!")
     time.sleep(1)
 
-machine = iCubFSM()
+machine = FSM()
 
 machine.addState(name=Semaphore.RED, on_enter_callback=on_RED)
 machine.addState(name=Semaphore.YELLOW, on_enter_callback=on_YELLOW)

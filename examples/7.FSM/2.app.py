@@ -26,17 +26,15 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, iCubFSM
+from pyicub.rest import iCubRESTApp
 
-icub = iCub()
-action1_id = icub.importAction("actions/HeadAction.json")
-action2_id = icub.importAction("actions/LookAtAction.json")
+import os
 
-icub.fsm.addTransition("start", "init", action1_id)
-icub.fsm.addTransition("next", action1_id, action2_id)
+app = iCubRESTApp()
+head_action = app.importAction("actions/HeadAction.json")
+lookat_action = app.importAction("actions/LookAtAction.json")
 
-triggers = icub.fsm.getCurrentTriggers()
+app.fsm.addTransition("start", "init", head_action)
+app.fsm.addTransition("next", head_action, lookat_action)
 
-while triggers:
-    icub.fsm.runStep(triggers[0])
-    triggers = icub.fsm.getCurrentTriggers()
+app.rest_manager.run_forever()
