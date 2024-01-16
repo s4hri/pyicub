@@ -44,7 +44,7 @@ class FSM:
 
     def runSteps(self, triggers: list):
         for trigger in triggers:
-            self.trigger(step)
+            self.trigger(trigger)
 
     def runStep(self, trigger):
         self.trigger(trigger)

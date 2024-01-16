@@ -27,7 +27,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from pyicub.rest import iCubRESTApp
-
 import os
 
 app = iCubRESTApp()
@@ -36,5 +35,6 @@ lookat_action = app.importAction("actions/LookAtAction.json")
 
 app.fsm.addTransition("start", "init", head_action)
 app.fsm.addTransition("next", head_action, lookat_action)
+app.fsm.addTransition("reset", lookat_action, "init")
 
 app.rest_manager.run_forever()

@@ -60,9 +60,7 @@ machine.addTransition("stop", Semaphore.YELLOW, Semaphore.RED)
 
 triggers = machine.getCurrentTriggers()
 
-for i in range(1,10):
-    machine.runStep(triggers[0])
-    triggers = machine.getCurrentTriggers()
+machine.runSteps(triggers=["start", "go", "slowdown", "stop"])
     
 print(machine.getStates())
 print(machine.getTransitions())
