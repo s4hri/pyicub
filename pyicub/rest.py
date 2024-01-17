@@ -475,6 +475,10 @@ class iCubRESTApp:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.speech, class_name='speech')
         if self.icub.emo:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.emo, class_name='emo')
+        if self.icub.cam_right:
+            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.cam_right, class_name='cam_right')
+        if self.icub.cam_left:
+            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.cam_left, class_name='cam_left')
 
     def __register_class__(self, robot_name, app_name, cls, class_name: str=''):
         target_prefix = class_name

@@ -36,6 +36,7 @@ from pyicub.modules.emotions import emotionsPyCtrl
 from pyicub.modules.speech import iSpeakPyCtrl
 from pyicub.modules.face import facePyCtrl
 from pyicub.modules.faceLandmarks import faceLandmarksPyCtrl
+from pyicub.modules.camera import cameraPyCtrl
 from pyicub.core.ports import BufferedReadPort
 from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequest, iCubRequestsManager
@@ -88,6 +89,8 @@ class iCub(metaclass=iCubSingleton):
         self._speech_               = None
         self._face_                 = None
         self._facelandmarks_        = None
+        self._cam_right_            = None
+        self._cam_left_            = None
         self._monitors_             = []
         self._logger_               = YarpLogger.getLogger() #PyicubLogger.getLogger()
         self._request_manager_      = request_manager
@@ -174,6 +177,26 @@ class iCub(metaclass=iCubSingleton):
                 self._logger_.warning('facePyCtrl not correctly initialized!')
                 return None
         return self._facelandmarks_
+
+    @property
+    def cam_right(self):
+        if self._cam_right_ is None:
+            try:
+                self._cam_right_ = cameraPyCtrl(self._robot_name_, side="right")
+            except:
+                self._logger_.warning('cameraPyCtrl (right) not correctly initialized!')
+                return None
+        return self._cam_right_
+
+    @property
+    def cam_left(self):
+        if self._cam_left_ is None:
+            try:
+                self._cam_left_ = cameraPyCtrl(self._robot_name_, side="left")
+            except:
+                self._logger_.warning('cameraPyCtrl (left) not correctly initialized!')
+                return None
+        return self._cam_left_
 
     @property
     def request_manager(self):
