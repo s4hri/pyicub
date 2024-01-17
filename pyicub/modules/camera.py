@@ -43,12 +43,26 @@ class cameraPyCtrl:
       else:
          return False
 
-   def getPortNum(self):
-      portNum = yarp.Network.queryName(self.__portCamera__)
-      if portNum:
-         return portNum.getPort()
+   def getPort(self):
+      portcam = yarp.Network.queryName(self.__portCamera__)
+      if portcam:
+         return portcam.getPort()
       else:
          return False
+
+   def getHost(self):
+      portcam = yarp.Network.queryName(self.__portCamera__)
+      if portcam:
+         return portcam.getHost()
+      else:
+         return False
+
+   def getURI(self):
+      port = self.getPort()
+      host = self.getHost()
+      if port and host:
+         return "http://" + str(host) + ":" + str(port) + "/?action"
+      return None
 
    def __del__(self):
       yarp.Network.disconnect(self.__portCamera__, self.__portImg__.getName())
