@@ -211,14 +211,7 @@ class iCub(metaclass=iCubSingleton):
 
     def addAction(self, action: iCubFullbodyAction, action_id=None):
         action_id = self.actions_manager.addAction(action, action_id=action_id)
-        #self.fsm.addState(action_id, on_enter_callback=self.on_enter_fsm_action)
         return action_id
-    
-    """
-    def on_enter_fsm_action(self):
-        action_id = self.fsm.getCurrentState()
-        self.playAction(action_id)
-    """
 
     def exists(self):
         return len(self._position_controllers_.keys()) > 0

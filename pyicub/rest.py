@@ -475,8 +475,6 @@ class iCubRESTApp:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.speech, class_name='speech')
         if self.icub.emo:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.emo, class_name='emo')
-        #if self.icub.fsm:
-        #    self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.fsm, class_name='fsm')
 
     def __register_class__(self, robot_name, app_name, cls, class_name: str=''):
         target_prefix = class_name
@@ -502,9 +500,6 @@ class iCubRESTApp:
                 val = v
             self.__args__[k] = val
 
-    #self.fsm.addState(action_id, on_enter_callback=self.on_enter_fsm_action)
-    #return action_id
-
     def importAction(self, JSON_file):
         return self.__importActionFromJSONFile__(JSON_file=JSON_file)
 
@@ -521,7 +516,6 @@ class iCubRESTApp:
         if not name_prefix:
             name_prefix = self.__class__.__name__
         if self.icub:
-            #return self.icub.importActionFromJSONDict(JSON_dict, name_prefix=name_prefix)
             action_id = self.icub.importActionFromJSONDict(JSON_dict, name_prefix=name_prefix)
         else:
             data = {}

@@ -42,10 +42,6 @@ class FSM:
         self._triggers_[trigger] = dest
         self._machine_.add_transition(trigger=trigger, source=source, dest=dest)
 
-    def runSteps(self, triggers: list):
-        for trigger in triggers:
-            self.trigger(trigger)
-
     def runStep(self, trigger):
         self.trigger(trigger)
         triggers = self.getCurrentTriggers()
