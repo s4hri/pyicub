@@ -412,7 +412,7 @@ class iCub(metaclass=iCubSingleton):
             requests.append(req)
         
         self.request_manager.join_requests(requests)
-        
+
         return requests
 
 class PortMonitor:

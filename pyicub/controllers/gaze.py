@@ -71,6 +71,9 @@ class GazeController:
         self.clearNeck()
         self.clearEyes()
 
+    def __del__(self):
+        self.PolyDriver.close()
+
     @property
     def PolyDriver(self):
         return self.__driver__.getDriver()

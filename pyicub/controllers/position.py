@@ -94,11 +94,7 @@ class PositionController:
         self.__IControlMode__     = self.PolyDriver.viewIControlMode()
         self.__IPositionControl__ = self.PolyDriver.viewIPositionControl()
         self.__joints__           = self.__IPositionControl__.getAxes()
-        self.__setPositionControlMode__(self.__joints__)
-
-    def __setPositionControlMode__(self, joints):
-        modes = yarp.IVector(joints, yarp.VOCAB_CM_POSITION)
-        self.__IControlMode__.setControlModes(modes)
+        self.__control_modes__ = yarp.IVector(self.__joints__, yarp.VOCAB_CM_POSITION)
 
     @property
     def PolyDriver(self):
@@ -117,6 +113,7 @@ class PositionController:
         return self.__IPositionControl__.checkMotionDone()
 
     def move(self, pose: JointPose, req_time: float=0.0, timeout: float=DEFAULT_TIMEOUT, speed: float=10.0, waitMotionDone: bool=True, tag: str='default'):
+        self.setPositionControlMode()
         target_joints = pose.target_joints
         joints_list = pose.joints_list
         self.__logger__.info("""Motion STARTED!
@@ -219,6 +216,8 @@ class PositionController:
             return res
                 
 
+    def setPositionControlMode(self):
+        self.__IControlMode__.setControlModes(self.__control_modes__)
 
     def setCustomWaitMotionDone(self, motion_complete_at=MOTION_COMPLETE_AT):
         self.__waitMotionDone__ = self.waitMotionDone2
