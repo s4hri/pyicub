@@ -71,7 +71,7 @@ class iSpeakPyCtrl:
             while res.toString() == "speaking":
                 res = self.__rpcPort__.execute(btl)
                 yarp.delay(0.01)
-        return res
+        return res.toString()
 
     def close(self):
         self.__port__.close()
