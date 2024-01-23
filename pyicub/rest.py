@@ -33,6 +33,7 @@ from pyicub.requests import iCubRequestsManager, iCubRequest
 from pyicub.helper import iCub
 from pyicub.fsm import FSM
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from urllib.parse import urlparse
 
 import requests
@@ -104,6 +105,7 @@ class iCubRESTServer(metaclass=SingletonMeta):
         self._apps_ = {}
         self._robots_ = []
         self._flaskapp_ = Flask(__name__)
+        CORS(self._flaskapp_)
         self._host_ = host
         self._port_ = port
         self._rule_prefix_ = rule_prefix
