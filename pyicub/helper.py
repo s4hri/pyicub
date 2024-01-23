@@ -79,24 +79,25 @@ class iCubSingleton(type):
 
 class iCub(metaclass=iCubSingleton):
 
-    def __init__(self, robot_name="icub", request_manager: iCubRequestsManager=None):
+    def __init__(self, robot_name="icub", request_manager: iCubRequestsManager=None, action_repository_path=''):
         SIMULATION = os.getenv('ICUB_SIMULATION')
 
-        self._position_controllers_ = {}
-        self._services_ = {}
-        self._gaze_ctrl_            = None
-        self._emo_                  = None
-        self._speech_               = None
-        self._face_                 = None
-        self._facelandmarks_        = None
-        self._cam_right_            = None
-        self._cam_left_            = None
-        self._monitors_             = []
-        self._logger_               = YarpLogger.getLogger() #PyicubLogger.getLogger()
-        self._request_manager_      = request_manager
-        self._actions_manager_      = ActionsManager()
+        self._position_controllers_   = {}
+        self._services_               = {}
+        self._gaze_ctrl_              = None
+        self._emo_                    = None
+        self._speech_                 = None
+        self._face_                   = None
+        self._facelandmarks_          = None
+        self._cam_right_              = None
+        self._cam_left_               = None
+        self._monitors_               = []
+        self._logger_                 = YarpLogger.getLogger() #PyicubLogger.getLogger()
+        self._request_manager_        = request_manager
+        self._actions_manager_        = ActionsManager()
+        self._action_repository_path_ = action_repository_path
 
-        self._icub_parts_ = {}
+        self._icub_parts_                           = {}
         self._icub_parts_[ICUB_PARTS.FACE       ]   = iCubPart(ICUB_PARTS.FACE      , 1)
         self._icub_parts_[ICUB_PARTS.HEAD       ]   = iCubPart(ICUB_PARTS.HEAD      , 6)
         self._icub_parts_[ICUB_PARTS.LEFT_ARM   ]   = iCubPart(ICUB_PARTS.LEFT_ARM  , 16)
@@ -111,6 +112,9 @@ class iCub(metaclass=iCubSingleton):
 
         self._robot_name_ = robot_name
 
+        if action_repository_path:
+            self.__importActions__(path=action_repository_path)
+
         self._initPositionControllers_()
         self._initGazeController_()
 
@@ -123,6 +127,11 @@ class iCub(metaclass=iCubSingleton):
         yarp.Network().init()
         yarp.Network().fini()
 
+    def __importActions__(self, path):
+        json_files = [pos_json for pos_json in os.listdir(path) if pos_json.endswith('.json')]
+        for f in json_files:
+            self.importAction(os.path.join(path, f))
+    
     def _initPositionControllers_(self):
         for part_name in self._icub_parts_.keys():
             self._initPositionController_(part_name)

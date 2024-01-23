@@ -29,6 +29,9 @@
 from pyicub.utils import importFromJSONFile, exportJSONFile
 from pyicub.controllers.position import JointPose, DEFAULT_TIMEOUT
 
+import importlib
+import inspect
+
 class JointsTrajectoryCheckpoint:
 
     def __init__(self, pose: JointPose, duration: float=0.0, timeout: float=DEFAULT_TIMEOUT):
@@ -257,12 +260,35 @@ class iCubActionTemplateImportedJSON(iCubActionTemplate):
                 return params_dict[param_key]
         return template_dict
 
-    
 
 class ActionsManager:
 
     def __init__(self):
         self.__actions__ = {}
+
+    def __get_subclasses__(self, module, base_class):
+        subclasses = []
+        for name, obj in inspect.getmembers(module):
+            if inspect.isclass(obj) and issubclass(obj, base_class) and obj != base_class:
+                subclasses.append(obj)
+        return subclasses
+
+    def __instantiate_actions__(self, module):
+        try:
+            module = importlib.import_module(module)
+            clsmembers = self.__get_subclasses__(module, iCubFullbodyAction)
+            actions = []
+
+            for class_ in clsmembers:
+                actions.append( class_() )
+            
+            return actions
+
+        except (ImportError, AttributeError) as e:
+            print(f"Error: {e}")
+            print(f"Could not import or instantiate classes for module: {module}")
+    
+        return None
 
     def addAction(self, action: iCubFullbodyAction, action_id=None):
         if not action_id:
@@ -271,6 +297,11 @@ class ActionsManager:
             raise Exception("An error occurred adding a new action! Class name '%s' already present! Please choose different names for each class actions." % action_id)
         self.__actions__[action_id] = action
         return action_id
+
+    def importActionsFromModule(self, module):
+        actions = self.__instantiate_actions__(module)
+        for action in actions:
+            self.addAction(action)
 
     def getAction(self, action_id: str):
         if action_id in self.__actions__.keys():
@@ -283,21 +314,7 @@ class ActionsManager:
     def exportActions(self, path):
         for k, action in self.__actions__.items():
             action.exportJSONFile('%s/%s.json' % (path, k))
-    """
-
-    def importActionFromJSONDict(self, JSON_dict, name_prefix=None):
-        action = iCubFullbodyAction(JSON_dict=JSON_dict)
-        if name_prefix:
-            action_id=name_prefix + '.' + action.name
-        else:
-            action_id=None
-        return self.addAction(action, action_id=action_id)
-    
-    def importActionFromJSONFile(self, JSON_file):
-        JSON_dict = importFromJSONFile(JSON_file)
-        return self.importActionFromJSONDict(JSON_dict=JSON_dict)
-    """
-    
+   
     def importTemplateFromJSONFile(self, JSON_file):
         JSON_dict = importFromJSONFile(JSON_file)
         return self.importTemplateFromJSONDict(JSON_dict=JSON_dict)
@@ -305,17 +322,6 @@ class ActionsManager:
     def importTemplateFromJSONDict(self, JSON_dict):
         return iCubActionTemplateImportedJSON(JSON_dict=JSON_dict)
 
-    """
-    def importActionFromTemplateJSONFile(self, JSON_file, params_files=[]):
-        template_dict = importFromJSONFile(JSON_file)
-        params_dict = {}
-        for j in params_files:
-            param = importFromJSONFile(j)
-            params_dict.update(param)
-        return self.importActionFromTemplateJSONDict(template_dict, params_dict)
-    """
-    
     def importTemplateJSONFile(self, JSON_file):
         return importFromJSONFile(JSON_file)
-
 
