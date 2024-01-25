@@ -368,6 +368,7 @@ class PyiCubApp(metaclass=SingletonMeta):
         PYICUB_API_RESTMANAGER_PORT = os.getenv('PYICUB_API_RESTMANAGER_PORT')
         PYICUB_API_PROXY_HOST = os.getenv('PYICUB_API_PROXY_HOST')
         PYICUB_API_PROXY_PORT = os.getenv('PYICUB_API_PROXY_PORT')
+        PYICUB_API_PROXY_SCHEME = os.getenv('PYICUB_API_PROXY_SCHEME')
 
         if PYICUB_LOGGING:
             if PYICUB_LOGGING == 'true':
