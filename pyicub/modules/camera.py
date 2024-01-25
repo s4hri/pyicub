@@ -37,11 +37,11 @@ class cameraPyCtrl:
    def getImgRes(self):
       if yarp.Network.isConnected(self.__portCamera__, self.__portImg__.getName()):
          receivedImage = self.__portImg__.read()
-         img = yarp.ImageRgb()
-         img.copy(receivedImage)
-         return [img.width(), img.height()]
-      else:
-         return False
+         if receivedImage:
+            img = yarp.ImageRgb()
+            img.copy(receivedImage)
+            return [img.width(), img.height()]
+      return False
 
    def getPort(self):
       portcam = yarp.Network.queryName(self.__portCamera__)
