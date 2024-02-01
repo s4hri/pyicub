@@ -318,8 +318,6 @@ class iCubRESTManager(iCubRESTServer):
                                        'app_name': service.app_name,
                                        'request': req}
         self.request_manager.run_request(req, wait_for_completed, **kwargs)
-        if wait_for_completed:
-            return jsonify(req.retval)
         return jsonify(req.req_id)
 
     def register_target(self, robot_name, app_name, target_name, target, target_signature):
@@ -541,14 +539,19 @@ class iCubRESTApp:
 
     def __playAction__(self, action_id: str, wait_for_completed=True):
         if self.icub:
-            self.icub.playAction(action_id=action_id, wait_for_completed=wait_for_completed)
+            return self.icub.playAction(action_id=action_id, wait_for_completed=wait_for_completed)
         else:
             data = {}
             data['action_id'] = action_id
-            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/actions.playAction'
-            res = requests.post(url=url, json=data)
-            res = requests.get(res.json())
-            return res
+            if(wait_for_completed):
+                url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/actions.playAction?sync'
+                res = requests.post(url=url, json=data)
+                return res
+            else:
+                url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/actions.playAction'
+                res = requests.post(url=url, json=data)
+                res = requests.get(res.json())
+                return res
     
     def __getActions__(self):
         return list(self.icub.getActions())
