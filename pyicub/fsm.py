@@ -10,6 +10,9 @@ class FSM:
         self._transitions_ = []
         self._machine_ = Machine(model=self, states=[], initial=FSM.INIT_STATE, auto_transitions=False)
 
+    def getAll(self):
+        return { "states": self.getStates(), "transitions": self.getTransitions() }
+
     def getCurrentState(self):
         return self.state
 
@@ -31,10 +34,10 @@ class FSM:
     def getStateTriggers(self, state_name):
         return self._machine_.get_triggers(state_name)
     
-    def addState(self, name, on_enter_callback=None):
+    def addState(self, name, description='', on_enter_callback=None):
         s = State(name=name, on_enter=on_enter_callback)
         self._machine_.add_state(s)
-        self._states_.append(name)
+        self._states_.append({"name": name, "description": description})
         return s
 
     def addTransition(self, trigger, source, dest):

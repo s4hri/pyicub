@@ -522,6 +522,7 @@ class iCubRESTApp:
             name_prefix = self.__class__.__name__
         if self.icub:
             action_id = self.icub.importActionFromJSONDict(JSON_dict, name_prefix=name_prefix)
+            action_desc = self.icub.getAction(action_id).description
         else:
             data = {}
             data['JSON_dict'] = JSON_dict
@@ -530,7 +531,8 @@ class iCubRESTApp:
             res = requests.post(url=url, json=data)
             res = requests.get(res.json())
             action_id = res.json()['retval']
-        self.fsm.addState(action_id, on_enter_callback=self.__on_enter_fsm_action__)
+            action_desc = JSON_dict["description"]
+        self.fsm.addState(name=action_id, description=action_desc, on_enter_callback=self.__on_enter_fsm_action__)
         return action_id
 
     def __on_enter_fsm_action__(self):
