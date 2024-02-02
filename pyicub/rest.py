@@ -438,7 +438,7 @@ class iCubRESTApp:
                 robot_name = "icubSim"
 
         self.__robot_name__ = robot_name
-        self.__fsm__ = FSM()
+        self.__fsm__ = iCubFSM(self)
 
         if self.__is_icub_managed__():
             self.__icub__ = None
@@ -450,11 +450,14 @@ class iCubRESTApp:
         self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
         self.__args_template__ = kargs
         self.__args__ = {}
-        self.__actions__ = {}
+        self.__imported_actions__ = {}
         self.__configure_default_args__()
 
         if action_repository_path:
             self.__importActions__(path=action_repository_path)
+
+    def __configure__(self):
+        raise Exception("iCubRESTApp.__configure__ not implemented!")
 
     def __is_icub_managed__(self):
         url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper'
@@ -532,12 +535,8 @@ class iCubRESTApp:
             res = requests.get(res.json())
             action_id = res.json()['retval']
             action_desc = JSON_dict["description"]
-        self.fsm.addState(name=action_id, description=action_desc, on_enter_callback=self.__on_enter_fsm_action__)
+        self.__imported_actions__[action_id] = action_desc
         return action_id
-
-    def __on_enter_fsm_action__(self):
-        action_id = self.fsm.getCurrentState()
-        self.__playAction__(action_id)
 
     def __playAction__(self, action_id: str, wait_for_completed=True):
         if self.icub:
@@ -558,6 +557,10 @@ class iCubRESTApp:
     def __getActions__(self):
         return list(self.icub.getActions())
 
+    def resetFSM(self):
+        self.__fsm__ = iCubFSM(self)
+        self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
+
     def getArgsTemplate(self):
         return self.__args_template__
 
@@ -567,6 +570,7 @@ class iCubRESTApp:
     def setArgs(self, input_args: dict):
         for k,v in input_args.items():
             self.__args__[k] = v
+        self.__configure__()
         return True
 
     def getArg(self, name: str):
@@ -593,6 +597,22 @@ class iCubRESTApp:
         return self.__app__.rest_manager
 
 
+class iCubFSM(FSM):
+
+    def __init__(self, app: iCubRESTApp):
+        FSM.__init__(self)
+        self._app_ = app
+    
+    def addActionState(self, action_id):
+        description = self._app_.__imported_actions__[action_id]
+        self.addState(name=action_id, description=description, on_enter_callback=self.__on_enter_action__)
+
+    def __on_enter_action__(self):
+        action_id = self.getCurrentState()
+        self._app_.__playAction__(action_id)
+
+
+   
 class PyiCubRESTfulClient:
 
     def __init__(self, host, port, rule_prefix='pyicub'):

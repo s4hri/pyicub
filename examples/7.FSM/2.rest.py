@@ -26,45 +26,19 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.fsm import FSM
-import enum
-import time
+from pyicub.rest import iCubRESTApp
+import os
 
-class Semaphore(enum.Enum):
-    RED = 0
-    YELLOW = 1
-    GREEN = 2
+app = iCubRESTApp()
+head_action = app.importAction("actions/HeadAction.json")
+lookat_action = app.importAction("actions/LookAtAction.json")
 
-def on_RED():
-    print("Stop!")
-    time.sleep(1)
+app.fsm.addAction(head_action)
+app.fsm.addAction(lookat_action)
+app.fsm.addTransition("start", "init", head_action)
+app.fsm.addTransition("next", head_action, lookat_action)
+app.fsm.addTransition("reset", lookat_action, "init")
 
-def on_YELLOW():
-    print("Slow down!")
-    time.sleep(1)
+app.fsm.draw('2.rest_diagram.png')
 
-def on_GREEN():
-    print("Go!")
-    time.sleep(1)
-
-fsm = FSM()
-
-fsm.addState(name=Semaphore.RED, on_enter_callback=on_RED)
-fsm.addState(name=Semaphore.YELLOW, on_enter_callback=on_YELLOW)
-fsm.addState(name=Semaphore.GREEN, on_enter_callback=on_GREEN)
-
-fsm.addTransition("start", "init", Semaphore.RED)
-fsm.addTransition("go", Semaphore.RED, Semaphore.GREEN)
-fsm.addTransition("slowdown", Semaphore.GREEN, Semaphore.YELLOW)
-fsm.addTransition("stop", Semaphore.YELLOW, Semaphore.RED)
-
-fsm.draw('1.semaphore_diagram.png')
-
-triggers = ["start", "go", "slowdown", "stop"]
-
-for trigger in triggers:
-    fsm.runStep(trigger)
-
-print("\nSTATES: ", fsm.getStates())
-print("\nTRANSITIONS: ", fsm.getTransitions())
-print("\nFSM: ", fsm.getAll())
+app.rest_manager.run_forever()

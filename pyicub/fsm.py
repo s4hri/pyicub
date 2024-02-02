@@ -1,4 +1,5 @@
 from transitions import Machine, State
+from transitions.extensions import GraphMachine
 
 class FSM:
 
@@ -8,8 +9,11 @@ class FSM:
         self._states_ = []
         self._triggers_ = {}
         self._transitions_ = []
-        self._machine_ = Machine(model=self, states=[], initial=FSM.INIT_STATE, auto_transitions=False)
+        self._machine_ = GraphMachine(model=self, states=[], initial=FSM.INIT_STATE, auto_transitions=False)
 
+    def draw(self, filepath):
+        self.get_graph().draw(filepath, prog='dot')
+   
     def getAll(self):
         return { "states": self.getStates(), "transitions": self.getTransitions() }
 

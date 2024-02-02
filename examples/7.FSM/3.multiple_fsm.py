@@ -29,12 +29,30 @@
 from pyicub.rest import iCubRESTApp
 import os
 
-app = iCubRESTApp()
-head_action = app.importAction("actions/HeadAction.json")
-lookat_action = app.importAction("actions/LookAtAction.json")
 
-app.fsm.addTransition("start", "init", head_action)
-app.fsm.addTransition("next", head_action, lookat_action)
-app.fsm.addTransition("reset", lookat_action, "init")
+class MultipleFSM(iCubRESTApp):
 
+    def __init__(self, machine_id):
+        iCubRESTApp.__init__(self, machine_id=machine_id)
+        self.head_action = self.importAction("actions/HeadAction.json")
+        self.lookat_action = self.importAction("actions/LookAtAction.json")
+
+    
+    def __configure__(self):
+        machine_id = int(self.getArgs()['machine_id'])
+        self.resetFSM()
+
+        if machine_id == 1:
+            self.fsm.addActionState(self.lookat_action)
+            self.fsm.addTransition("start", "init", self.lookat_action)
+            self.fsm.draw('3.M1_diagram.png')
+        elif machine_id == 2:
+            self.fsm.addActionState(self.head_action)
+            self.fsm.addActionState(self.lookat_action)
+            self.fsm.addTransition("start", "init", self.lookat_action)
+            self.fsm.addTransition("next", self.lookat_action, self.head_action)
+            self.fsm.addTransition("reset", self.head_action, "init")
+            self.fsm.draw('3.M2_diagram.png')
+
+app = MultipleFSM(machine_id=[1,2])
 app.rest_manager.run_forever()
