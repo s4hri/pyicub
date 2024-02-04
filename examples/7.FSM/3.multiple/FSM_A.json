@@ -1,0 +1,17 @@
+{
+    "name": "FSM_A",
+    "states": [
+        {
+            "name": "LookAtAction",
+            "description": "empty"
+        }
+    ],
+    "transitions": [
+        {
+            "trigger": "start",
+            "source": "init",
+            "dest": "LookAtAction"
+        }
+    ],
+    "initial_state": "init"
+}

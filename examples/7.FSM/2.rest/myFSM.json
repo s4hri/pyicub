@@ -1,0 +1,31 @@
+{
+    "name": "",
+    "states": [
+        {
+            "name": "iCubRESTApp.HeadAction",
+            "description": "empty"
+        },
+        {
+            "name": "iCubRESTApp.LookAtAction",
+            "description": "empty"
+        }
+    ],
+    "transitions": [
+        {
+            "trigger": "start",
+            "source": "init",
+            "dest": "iCubRESTApp.HeadAction"
+        },
+        {
+            "trigger": "next",
+            "source": "iCubRESTApp.HeadAction",
+            "dest": "iCubRESTApp.LookAtAction"
+        },
+        {
+            "trigger": "reset",
+            "source": "iCubRESTApp.LookAtAction",
+            "dest": "init"
+        }
+    ],
+    "initial_state": "init"
+}

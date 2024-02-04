@@ -26,19 +26,55 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.rest import iCubRESTApp
+from pyicub.rest import iCubRESTApp, iCubFSM
 import os
 
-app = iCubRESTApp()
-head_action = app.importAction("actions/HeadAction.json")
-lookat_action = app.importAction("actions/LookAtAction.json")
 
-app.fsm.addAction(head_action)
-app.fsm.addAction(lookat_action)
-app.fsm.addTransition("start", "init", head_action)
-app.fsm.addTransition("next", head_action, lookat_action)
-app.fsm.addTransition("reset", lookat_action, "init")
+class FSM_A(iCubFSM):
 
-app.fsm.draw('2.rest_diagram.png')
+    def __init__(self, app: iCubRESTApp):
+        iCubFSM.__init__(self, app)
+
+        self.addAction("LookAtAction")
+        self.addTransition("start", "init", "LookAtAction")
+        self.exportJSONFile("FSM_A.json")
+        self.draw('FSM_A.png')
+
+
+class FSM_B(iCubFSM):
+
+    def __init__(self, app: iCubRESTApp):
+        iCubFSM.__init__(self, app)
+
+        self.addAction("LookAtAction")
+        self.addAction("HeadAction")
+        self.addTransition("start", "init", "LookAtAction")
+        self.addTransition("next", "LookAtAction", "HeadAction")
+        self.addTransition("reset", "HeadAction", "init")
+        self.exportJSONFile("FSM_B.json")
+        self.draw('FSM_B.png')
+
+
+
+class MultipleFSM(iCubRESTApp):
+
+    def __init__(self, action_repository_path, machine_id):
+        iCubRESTApp.__init__(self, action_repository_path=action_repository_path, machine_id=machine_id)
+
+    def __configure__(self, input_args):
+        machine_id = int(input_args['machine_id'])
+
+        print("configure ", machine_id)
+
+        if machine_id == 1:
+            self.fsm.importFromJSONFile("FSM_A.json")
+        elif machine_id == 2:
+            self.fsm.importFromJSONFile("FSM_B.json")
+
+
+app = MultipleFSM(action_repository_path='./actions', machine_id=[1,2])
+
+FSM_A(app)
+FSM_B(app)
 
 app.rest_manager.run_forever()

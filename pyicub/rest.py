@@ -27,7 +27,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from pyicub.requests import iCubRequest
-from pyicub.utils import SingletonMeta, getPyiCubInfo, getPublicMethods, firstAvailablePort, importFromJSONFile
+from pyicub.utils import SingletonMeta, getPyiCubInfo, getPublicMethods, firstAvailablePort, importFromJSONFile, exportJSONFile
 from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequestsManager, iCubRequest
 from pyicub.helper import iCub
@@ -438,7 +438,7 @@ class iCubRESTApp:
                 robot_name = "icubSim"
 
         self.__robot_name__ = robot_name
-        self.__fsm__ = iCubFSM(self)
+        self.__fsm__ = None
 
         if self.__is_icub_managed__():
             self.__icub__ = None
@@ -446,8 +446,8 @@ class iCubRESTApp:
             self.__icub__ = iCub(robot_name=robot_name, request_manager=self.__app__.request_manager)
             if self.__icub__.exists():
                 self.__register_icub_helper__()
+        
         self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self)
-        self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
         self.__args_template__ = kargs
         self.__args__ = {}
         self.__imported_actions__ = {}
@@ -456,8 +456,7 @@ class iCubRESTApp:
         if action_repository_path:
             self.__importActions__(path=action_repository_path)
 
-    def __configure__(self):
-        raise Exception("iCubRESTApp.__configure__ not implemented!")
+        self.configure()
 
     def __is_icub_managed__(self):
         url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper'
@@ -508,9 +507,6 @@ class iCubRESTApp:
                 val = v
             self.__args__[k] = val
 
-    def importAction(self, JSON_file):
-        return self.__importActionFromJSONFile__(JSON_file=JSON_file)
-
     def __importActionFromJSONFile__(self, JSON_file):
         JSON_dict = importFromJSONFile(JSON_file)
         return self.__importActionFromJSONDict__(JSON_dict=JSON_dict)
@@ -557,9 +553,20 @@ class iCubRESTApp:
     def __getActions__(self):
         return list(self.icub.getActions())
 
-    def resetFSM(self):
+    def __configure__(self, input_args):
+        pass
+    
+    @property
+    def name(self):
+        return self._name_
+
+    def configure(self):
         self.__fsm__ = iCubFSM(self)
         self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
+        self.__configure__(self.__args__)
+
+    def importAction(self, JSON_file):
+        return self.__importActionFromJSONFile__(JSON_file=JSON_file)
 
     def getArgsTemplate(self):
         return self.__args_template__
@@ -570,7 +577,7 @@ class iCubRESTApp:
     def setArgs(self, input_args: dict):
         for k,v in input_args.items():
             self.__args__[k] = v
-        self.__configure__()
+        self.configure()
         return True
 
     def getArg(self, name: str):
@@ -600,16 +607,37 @@ class iCubRESTApp:
 class iCubFSM(FSM):
 
     def __init__(self, app: iCubRESTApp):
-        FSM.__init__(self)
+        FSM.__init__(self, name=self.__class__.__name__)
         self._app_ = app
-    
-    def addActionState(self, action_id):
-        description = self._app_.__imported_actions__[action_id]
+  
+    def addAction(self, action_id):
+        description = self._app_.__imported_actions__[self._app_.name + '.' + action_id]
         self.addState(name=action_id, description=description, on_enter_callback=self.__on_enter_action__)
+
+    def exportJSONFile(self, filepath):
+        exportJSONFile(filepath, self)
+
+    def importFromJSONDict(self, data):
+        name = data.get("name", "")
+        states = data.get("states", [])
+        transitions = data.get("transitions", [])
+
+        for state_data in states:
+            self.addState(name=state_data["name"], description=state_data["description"], on_enter_callback=self.__on_enter_action__)
+
+        for transition_data in transitions:
+            self.addTransition(trigger=transition_data["trigger"], source=transition_data["source"], dest=transition_data["dest"])
+
+        initial_state = data.get("initial_state", FSM.INIT_STATE)
+        self._machine_.set_state(initial_state)
+
+    def importFromJSONFile(self, filepath):
+        data = importFromJSONFile(filepath)
+        self.importFromJSONDict(data)
 
     def __on_enter_action__(self):
         action_id = self.getCurrentState()
-        self._app_.__playAction__(action_id)
+        self._app_.__playAction__(self._app_.name + '.' + action_id)
 
 
    

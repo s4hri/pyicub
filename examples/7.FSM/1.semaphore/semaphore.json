@@ -1,0 +1,40 @@
+{
+    "name": "Sempaphore",
+    "states": [
+        {
+            "name": "RED",
+            "description": ""
+        },
+        {
+            "name": "YELLOW",
+            "description": ""
+        },
+        {
+            "name": "GREEN",
+            "description": ""
+        }
+    ],
+    "transitions": [
+        {
+            "trigger": "start",
+            "source": "init",
+            "dest": "RED"
+        },
+        {
+            "trigger": "go",
+            "source": "RED",
+            "dest": "GREEN"
+        },
+        {
+            "trigger": "slowdown",
+            "source": "GREEN",
+            "dest": "YELLOW"
+        },
+        {
+            "trigger": "stop",
+            "source": "YELLOW",
+            "dest": "RED"
+        }
+    ],
+    "initial_state": "init"
+}

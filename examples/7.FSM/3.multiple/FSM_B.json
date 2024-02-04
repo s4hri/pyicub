@@ -1,0 +1,31 @@
+{
+    "name": "FSM_B",
+    "states": [
+        {
+            "name": "LookAtAction",
+            "description": "empty"
+        },
+        {
+            "name": "HeadAction",
+            "description": "empty"
+        }
+    ],
+    "transitions": [
+        {
+            "trigger": "start",
+            "source": "init",
+            "dest": "LookAtAction"
+        },
+        {
+            "trigger": "next",
+            "source": "LookAtAction",
+            "dest": "HeadAction"
+        },
+        {
+            "trigger": "reset",
+            "source": "HeadAction",
+            "dest": "init"
+        }
+    ],
+    "initial_state": "init"
+}

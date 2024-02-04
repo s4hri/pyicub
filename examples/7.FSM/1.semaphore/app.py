@@ -30,11 +30,6 @@ from pyicub.fsm import FSM
 import enum
 import time
 
-class Semaphore(enum.Enum):
-    RED = 0
-    YELLOW = 1
-    GREEN = 2
-
 def on_RED():
     print("Stop!")
     time.sleep(1)
@@ -47,18 +42,18 @@ def on_GREEN():
     print("Go!")
     time.sleep(1)
 
-fsm = FSM()
+fsm = FSM("Semaphore")
 
-fsm.addState(name=Semaphore.RED, on_enter_callback=on_RED)
-fsm.addState(name=Semaphore.YELLOW, on_enter_callback=on_YELLOW)
-fsm.addState(name=Semaphore.GREEN, on_enter_callback=on_GREEN)
+fsm.addState(name="RED", on_enter_callback=on_RED)
+fsm.addState(name="YELLOW", on_enter_callback=on_YELLOW)
+fsm.addState(name="GREEN", on_enter_callback=on_GREEN)
 
-fsm.addTransition("start", "init", Semaphore.RED)
-fsm.addTransition("go", Semaphore.RED, Semaphore.GREEN)
-fsm.addTransition("slowdown", Semaphore.GREEN, Semaphore.YELLOW)
-fsm.addTransition("stop", Semaphore.YELLOW, Semaphore.RED)
+fsm.addTransition("start", "init", "RED")
+fsm.addTransition("go", "RED", "GREEN")
+fsm.addTransition("slowdown", "GREEN", "YELLOW")
+fsm.addTransition("stop", "YELLOW", "RED")
 
-fsm.draw('1.semaphore_diagram.png')
+fsm.draw('diagram.png')
 
 triggers = ["start", "go", "slowdown", "stop"]
 
@@ -67,4 +62,6 @@ for trigger in triggers:
 
 print("\nSTATES: ", fsm.getStates())
 print("\nTRANSITIONS: ", fsm.getTransitions())
-print("\nFSM: ", fsm.getAll())
+print("\nFSM: ", fsm.toJSON())
+
+
