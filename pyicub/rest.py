@@ -640,7 +640,7 @@ class iCubFSM(FSM):
 
     def __on_enter_action__(self):
         state_name = self.getCurrentState()
-        action_id = self._app_.name + '.' state_name
+        action_id = self._app_.name + '.' + state_name
         self._app_.__playAction__(action_id)
 
 
