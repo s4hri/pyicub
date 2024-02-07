@@ -318,6 +318,8 @@ class iCubRESTManager(iCubRESTServer):
                                        'app_name': service.app_name,
                                        'request': req}
         self.request_manager.run_request(req, wait_for_completed, **kwargs)
+        if wait_for_completed:
+            return jsonify(req.retval)
         return jsonify(req.req_id)
 
     def register_target(self, robot_name, app_name, target_name, target, target_signature):
@@ -611,8 +613,9 @@ class iCubFSM(FSM):
         self._app_ = app
   
     def addAction(self, action_id):
-        description = self._app_.__imported_actions__[self._app_.name + '.' + action_id]
-        self.addState(name=action_id, description=description, on_enter_callback=self.__on_enter_action__)
+        description = self._app_.__imported_actions__[action_id]
+        state_name = action_id.split('.')[1]
+        self.addState(name=state_name, description=description, on_enter_callback=self.__on_enter_action__)
 
     def exportJSONFile(self, filepath):
         exportJSONFile(filepath, self)
@@ -636,8 +639,9 @@ class iCubFSM(FSM):
         self.importFromJSONDict(data)
 
     def __on_enter_action__(self):
-        action_id = self.getCurrentState()
-        self._app_.__playAction__(self._app_.name + '.' + action_id)
+        state_name = self.getCurrentState()
+        action_id = self._app_.name + '.' state_name
+        self._app_.__playAction__(action_id)
 
 
    
