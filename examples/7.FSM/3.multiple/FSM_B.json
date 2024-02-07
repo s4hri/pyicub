@@ -1,29 +1,20 @@
 {
     "name": "FSM_B",
-    "states": [
-        {
-            "name": "LookAtAction",
-            "description": "empty"
-        },
-        {
-            "name": "HeadAction",
-            "description": "empty"
-        }
-    ],
+    "states": [],
     "transitions": [
         {
             "trigger": "start",
             "source": "init",
-            "dest": "LookAtAction"
+            "dest": "MultipleFSM.HeadAction"
         },
         {
             "trigger": "next",
-            "source": "LookAtAction",
-            "dest": "HeadAction"
+            "source": "MultipleFSM.HeadAction",
+            "dest": "MultipleFSM.LookAtAction"
         },
         {
             "trigger": "reset",
-            "source": "HeadAction",
+            "source": "MultipleFSM.LookAtAction",
             "dest": "init"
         }
     ],

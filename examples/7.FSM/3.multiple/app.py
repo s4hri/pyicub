@@ -34,9 +34,9 @@ class FSM_A(iCubFSM):
 
     def __init__(self, app: iCubRESTApp):
         iCubFSM.__init__(self, app)
-
-        self.addAction("LookAtAction")
-        self.addTransition("start", "init", "LookAtAction")
+        action_id = "MultipleFSM.LookAtAction"
+        self.addAction(action_id)
+        self.addTransition("start", "init", action_id)
         self.exportJSONFile("FSM_A.json")
         self.draw('FSM_A.png')
 
@@ -45,12 +45,12 @@ class FSM_B(iCubFSM):
 
     def __init__(self, app: iCubRESTApp):
         iCubFSM.__init__(self, app)
+        head_action = "MultipleFSM.HeadAction"
+        lookat_action = "MultipleFSM.LookAtAction"
 
-        self.addAction("LookAtAction")
-        self.addAction("HeadAction")
-        self.addTransition("start", "init", "LookAtAction")
-        self.addTransition("next", "LookAtAction", "HeadAction")
-        self.addTransition("reset", "HeadAction", "init")
+        self.addTransition("start", "init", head_action)
+        self.addTransition("next", head_action, lookat_action)
+        self.addTransition("reset", lookat_action, "init")
         self.exportJSONFile("FSM_B.json")
         self.draw('FSM_B.png')
 
