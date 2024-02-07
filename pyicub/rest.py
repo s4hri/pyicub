@@ -538,14 +538,15 @@ class iCubRESTApp:
 
     def __playAction__(self, action_id: str, wait_for_completed=True):
         if self.icub:
-            return self.icub.playAction(action_id=action_id, wait_for_completed=wait_for_completed)
+            req = self.icub.playAction(action_id=action_id, wait_for_completed=wait_for_completed)
+            return 
         else:
             data = {}
             data['action_id'] = action_id
             if(wait_for_completed):
                 url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/actions.playAction?sync'
                 res = requests.post(url=url, json=data)
-                return res
+                return res.req_id
             else:
                 url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/actions.playAction'
                 res = requests.post(url=url, json=data)
