@@ -27,7 +27,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from pyicub.rest import iCubRESTApp
+from pyicub.rest import iCubRESTSubscriber
 
 def on_enter_foo(args):
     print("on enter ", args)
@@ -35,6 +35,6 @@ def on_enter_foo(args):
 def on_exit_foo(args):
     print("on exit ", args)
 
-app = iCubRESTApp()
-app.rest_manager.subscribe(topic_uri="http://localhost:9001/pyicub/icubSim/Publisher/foo", on_enter=on_enter_foo, on_exit=on_exit_foo)
-app.rest_manager.run_forever()
+serv = iCubRESTSubscriber()
+serv.subscribe_topic(topic_uri="http://localhost:9001/pyicub/icubSim/Publisher/foo", on_enter=on_enter_foo, on_exit=on_exit_foo)
+serv.run_forever()
