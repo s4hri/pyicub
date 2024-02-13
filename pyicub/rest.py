@@ -119,11 +119,17 @@ class iCubRESTServer(metaclass=SingletonMeta):
         self._host_ = host
         self._port_ = port
         self._rule_prefix_ = rule_prefix
+        self._on_enter_callbacks_ = {}
+        self._on_exit_callbacks_ = {}
         self._flaskapp_.add_url_rule("/", methods=['GET'], view_func=self.info)
         self._flaskapp_.add_url_rule("/%s" % self._rule_prefix_, methods=['GET'], view_func=self.get_robots)
         self._flaskapp_.add_url_rule("/%s/tree" % self._rule_prefix_, methods=['GET'], view_func=self.get_tree)
         self._flaskapp_.add_url_rule("/%s/register" % self._rule_prefix_, methods=['POST'], view_func=self.remote_register)
         self._flaskapp_.add_url_rule("/%s/unregister" % self._rule_prefix_, methods=['POST'], view_func=self.remote_unregister)
+        self._flaskapp_.add_url_rule("/%s/notify" % self._rule_prefix_, methods=['POST'], view_func=self.remote_notify)
+        self._flaskapp_.add_url_rule("/%s/subscribe" % self._rule_prefix_, methods=['POST'], view_func=self.remote_subscribe)
+        self._flaskapp_.add_url_rule("/%s/unsubscribe" % self._rule_prefix_, methods=['POST'], view_func=self.remote_unsubscribe)
+        self._flaskapp_.add_url_rule("/%s/subscribers" % self._rule_prefix_, methods=['GET'], view_func=self.subscribers)
 
         self._flaskapp_.add_url_rule("/%s/<robot_name>" % self._rule_prefix_, methods=['GET'], view_func=self.get_apps)
         self._flaskapp_.add_url_rule("/%s/<robot_name>/<app_name>" % self._rule_prefix_, methods=['GET'], view_func=self.get_services)
@@ -156,6 +162,9 @@ class iCubRESTServer(metaclass=SingletonMeta):
                 stop = True
             except:
                 self._port_ += 1
+        for topic_uri in self._on_enter_callbacks_.keys():
+            self.unsubscribe(topic_uri)
+
      
     def shutdown(self):
         func = request.environ.get('werkzeug.server.shutdown')
@@ -246,6 +255,52 @@ class iCubRESTServer(metaclass=SingletonMeta):
             del self._app_services_[robot_name][app_name]
         del self._services_[url]
 
+    def remote_subscribe(self):
+        res = request.get_json(force=True)
+        topic = RESTTopic(json_dict=res)
+        self.subscribe_topic(robot_name=topic.robot_name, app_name=topic.app_name, target_name=topic.name, subscriber_rule=topic.subscriber_rule)
+        return res
+
+    def remote_unsubscribe(self):
+        res = request.get_json(force=True)
+        topic = RESTTopic(json_dict=res)
+        self.unsubscribe_topic(robot_name=topic.robot_name, app_name=topic.app_name, target_name=topic.name, subscriber_rule=topic.subscriber_rule)
+        return res
+
+    def remote_notify(self):
+        res = request.get_json(force=True)
+        thread = None
+        if res["topic_uri"] in self._on_enter_callbacks_.keys() and res["event"] == "enter":
+            thread = threading.Thread(target=self._on_enter_callbacks_[res["topic_uri"]], args=(res,))
+            thread.start()
+        if res["topic_uri"] in self._on_exit_callbacks_.keys() and res["event"] == "exit":
+            thread = threading.Thread(target=self._on_exit_callbacks_[res["topic_uri"]], args=(res,))
+            thread.start()
+        thread.join()
+        return res
+
+    def subscribe(self, topic_uri, on_enter, on_exit):
+        split_url = urlsplit(topic_uri)
+        publisher_rule = f"{split_url.scheme}://{split_url.netloc}{split_url.path.split('/')[0]}/{split_url.path.split('/')[1]}"
+        robot_name = split_url.path.split('/')[2]
+        app_name = split_url.path.split('/')[3]
+        target_name = split_url.path.split('/')[4]
+        topic = RESTTopic(name=target_name, robot_name=robot_name, app_name=app_name, subscriber_rule=self.server_rule())
+        self._on_enter_callbacks_[topic_uri] = on_enter
+        self._on_exit_callbacks_[topic_uri] = on_exit
+        res = requests.post('%s/subscribe' % publisher_rule, json=topic.toJSON())
+        return res.content
+
+    def unsubscribe(self, topic_uri):
+        split_url = urlsplit(topic_uri)
+        publisher_rule = f"{split_url.scheme}://{split_url.netloc}{split_url.path.split('/')[0]}/{split_url.path.split('/')[1]}"
+        robot_name = split_url.path.split('/')[2]
+        app_name = split_url.path.split('/')[3]
+        target_name = split_url.path.split('/')[4]
+        topic = RESTTopic(name=target_name, robot_name=robot_name, app_name=app_name, subscriber_rule=self.server_rule())
+        res = requests.post('%s/unsubscribe' % publisher_rule, json=topic.toJSON())
+        return res.content
+
 class iCubRESTManager(iCubRESTServer):
 
     def __init__(self, icubrequestmanager, rule_prefix, host, port, proxy_host, proxy_port):
@@ -254,24 +309,15 @@ class iCubRESTManager(iCubRESTServer):
         self._proxy_port_ = proxy_port
         self._requests_ = {}
         self._subscribers_ = {}
-        self._on_enter_callbacks_ = {}
-        self._on_exit_callbacks_ = {}
         self._request_manager_ = icubrequestmanager
         self._flaskapp_.add_url_rule("/%s/requests" % self._rule_prefix_, methods=['GET'], view_func=self.requests)
         self._flaskapp_.add_url_rule("/%s/<robot_name>/<app_name>/<target_name>/<local_id>" % (self._rule_prefix_), methods=['GET'], view_func=self.single_req_info)
-        self._flaskapp_.add_url_rule("/%s/subscribe" % self._rule_prefix_, methods=['POST'], view_func=self.remote_subscribe)
-        self._flaskapp_.add_url_rule("/%s/unsubscribe" % self._rule_prefix_, methods=['POST'], view_func=self.remote_unsubscribe)
-        self._flaskapp_.add_url_rule("/%s/subscribers" % self._rule_prefix_, methods=['GET'], view_func=self.subscribers)
-        self._flaskapp_.add_url_rule("/%s/notify" % self._rule_prefix_, methods=['POST'], view_func=self.remote_notify)
     
     def __del__(self):
         for robot in self.get_robots():
             for app in self.get_apps(robot['name']):
                 for service in self.get_services(robot['name'],app['name']).values():
                     self.unregister_target(robot['name'], app['name'], service['name'], self._host_, self._port_)
-        for topic_uri in self._on_enter_callbacks_.keys():
-            self.unsubscribe(topic_uri)
-
 
     @property
     def request_manager(self):
@@ -301,30 +347,6 @@ class iCubRESTManager(iCubRESTServer):
         if req_id in self._requests_.keys():
             return jsonify(self._requests_[req_id]['request'].info())
         return jsonify([])
-
-    def remote_notify(self):
-        res = request.get_json(force=True)
-        thread = None
-        if res["topic_uri"] in self._on_enter_callbacks_.keys() and res["event"] == "enter":
-            thread = threading.Thread(target=self._on_enter_callbacks_[res["topic_uri"]], args=(res,))
-            thread.start()
-        if res["topic_uri"] in self._on_exit_callbacks_.keys() and res["event"] == "exit":
-            thread = threading.Thread(target=self._on_exit_callbacks_[res["topic_uri"]], args=(res,))
-            thread.start()
-        thread.join()
-        return res
-
-    def remote_subscribe(self):
-        res = request.get_json(force=True)
-        topic = RESTTopic(json_dict=res)
-        self.subscribe_topic(robot_name=topic.robot_name, app_name=topic.app_name, target_name=topic.name, subscriber_rule=topic.subscriber_rule)
-        return res
-
-    def remote_unsubscribe(self):
-        res = request.get_json(force=True)
-        topic = RESTTopic(json_dict=res)
-        self.unsubscribe_topic(robot_name=topic.robot_name, app_name=topic.app_name, target_name=topic.name, subscriber_rule=topic.subscriber_rule)
-        return res
 
     def single_req_info(self, robot_name, app_name, target_name, local_id):
         req_id = self.target_rule(robot_name, app_name, target_name) + '/' + str(local_id)
@@ -435,28 +457,6 @@ class iCubRESTManager(iCubRESTServer):
             rs = RESTService(service=service)
             res = requests.post('%s/unregister' % self.proxy_rule(), json=rs.toJSON())
             return res.content
-
-    def subscribe(self, topic_uri, on_enter, on_exit):
-        split_url = urlsplit(topic_uri)
-        publisher_rule = f"{split_url.scheme}://{split_url.netloc}{split_url.path.split('/')[0]}/{split_url.path.split('/')[1]}"
-        robot_name = split_url.path.split('/')[2]
-        app_name = split_url.path.split('/')[3]
-        target_name = split_url.path.split('/')[4]
-        topic = RESTTopic(name=target_name, robot_name=robot_name, app_name=app_name, subscriber_rule=self.server_rule())
-        self._on_enter_callbacks_[topic_uri] = on_enter
-        self._on_exit_callbacks_[topic_uri] = on_exit
-        res = requests.post('%s/subscribe' % publisher_rule, json=topic.toJSON())
-        return res.content
-
-    def unsubscribe(self, topic_uri):
-        split_url = urlsplit(topic_uri)
-        publisher_rule = f"{split_url.scheme}://{split_url.netloc}{split_url.path.split('/')[0]}/{split_url.path.split('/')[1]}"
-        robot_name = split_url.path.split('/')[2]
-        app_name = split_url.path.split('/')[3]
-        target_name = split_url.path.split('/')[4]
-        topic = RESTTopic(name=target_name, robot_name=robot_name, app_name=app_name, subscriber_rule=self.server_rule())
-        res = requests.post('%s/unsubscribe' % publisher_rule, json=topic.toJSON())
-        return res.content
 
 
 class PyiCubApp(metaclass=SingletonMeta):
@@ -709,10 +709,10 @@ class iCubRESTApp:
         return self.__app__.rest_manager
 
 
-class iCubRESTSubscriber(iCubRESTApp):
+class iCubRESTSubscriber(PyiCubApp):
 
     def __init__(self):
-        iCubRESTApp.__init__(self, app_name=iCubRESTSubscriber.__name__)
+        PyiCubApp.__init__(self)
 
     def __on_enter_fsm_state__(self, args):
         self.on_enter_fsm(trigger=args["input_json"]["trigger"])
@@ -729,6 +729,12 @@ class iCubRESTSubscriber(iCubRESTApp):
     def subscribe_fsm(self, server_host, server_port, robot_name, app_name):
         topic_uri = "http://" + server_host + ":" + str(server_port) + "/pyicub/" + robot_name + "/" + app_name + "/fsm.runStep"
         self.rest_manager.subscribe(topic_uri=topic_uri, on_enter=self.__on_enter_fsm_state__, on_exit=self.__on_exit_fsm_state__)
+
+    def subscribe_topic(self, topic_uri, on_enter, on_exit):
+        self.rest_manager.subscribe(topic_uri=topic_uri, on_enter=on_enter, on_exit=on_exit)
+
+    def run_forever(self):
+        self.rest_manager.run_forever()
 
 
 class iCubFSM(FSM):
