@@ -27,16 +27,21 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from pyicub.rest import iCubRESTSubscriber
+from pyicub.rest import iCubRESTSubscriberFSM
 
-class Subscriber(iCubRESTSubscriber):
+class Subscriber(iCubRESTSubscriberFSM):
 
-    def on_enter_fsm(self, trigger):
-        print("on enter ", trigger)
+    def on_enter_state(self, state):
+        print("on enter state: ", state)
 
-    def on_exit_fsm(self, trigger):
-        print("on exit ", trigger)
+    def on_exit_state(self, state):
+        print("on exit state: ", state)
 
-app = Subscriber()
-app.subscribe_fsm(server_host="localhost", server_port=9001, robot_name="icubSim", app_name="iCubRESTApp")
+    def on_enter_fsm(self, args):
+        print("on enter fsm: ", args)
+
+    def on_exit_fsm(self, args):
+        print("on exit fsm: ", args)
+
+app = Subscriber(server_host="localhost", server_port=9001, robot_name="icubSim", app_name="Publisher")
 app.rest_manager.run_forever()

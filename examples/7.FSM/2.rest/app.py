@@ -26,20 +26,26 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.rest import iCubRESTApp
+from pyicub.rest import iCubRESTApp, iCubFSM
+from pyicub.actions import iCubFullbodyAction
+
 import os
 
-app = iCubRESTApp()
-head_action = app.importAction("actions/HeadAction.json")
-lookat_action = app.importAction("actions/LookAtAction.json")
+app = iCubRESTApp(action_repository_path='./actions')
 
-app.fsm.addAction(head_action)
-app.fsm.addAction(lookat_action)
-app.fsm.addTransition("start", "init", head_action)
-app.fsm.addTransition("next", head_action, lookat_action)
-app.fsm.addTransition("reset", lookat_action, "init")
+head_action = iCubFullbodyAction(JSON_file="actions/HeadAction.json")
+lookat_action = iCubFullbodyAction(JSON_file="actions/LookAtAction.json")
 
-app.fsm.draw('diagram.png')
-app.fsm.exportJSONFile('myFSM.json')
+fsm = iCubFSM(app=app)
+head_state = fsm.addAction(action=head_action)
+lookat_state = fsm.addAction(action=lookat_action)
 
+fsm.addTransition("start", "init", head_state)
+fsm.addTransition("next", head_state, lookat_state)
+fsm.addTransition("reset", lookat_state, "init")
+
+fsm.draw('diagram.png')
+fsm.exportJSONFile('fsm.json')
+
+app.setFSM(fsm)
 app.rest_manager.run_forever()

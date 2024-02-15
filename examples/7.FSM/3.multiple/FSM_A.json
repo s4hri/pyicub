@@ -2,7 +2,7 @@
     "name": "FSM_A",
     "states": [
         {
-            "name": "MultipleFSM.LookAtAction",
+            "name": "LookAtAction",
             "description": "empty"
         }
     ],
@@ -10,7 +10,7 @@
         {
             "trigger": "start",
             "source": "init",
-            "dest": "MultipleFSM.LookAtAction"
+            "dest": "LookAtAction"
         }
     ],
     "initial_state": "init"

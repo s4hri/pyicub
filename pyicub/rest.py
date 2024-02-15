@@ -257,6 +257,7 @@ class iCubRESTServer(metaclass=SingletonMeta):
 
     def remote_subscribe(self):
         res = request.get_json(force=True)
+        print(res)
         topic = RESTTopic(json_dict=res)
         self.subscribe_topic(robot_name=topic.robot_name, app_name=topic.app_name, target_name=topic.name, subscriber_rule=topic.subscriber_rule)
         return res
@@ -354,6 +355,7 @@ class iCubRESTManager(iCubRESTServer):
 
     def subscribe_topic(self, robot_name, app_name, target_name, subscriber_rule):
         target_rule = self.target_rule(robot_name, app_name, target_name)
+        print(target_rule)
         if not target_rule in self._subscribers_.keys():
             self._subscribers_[target_rule] = []
         self._subscribers_[target_rule].append(subscriber_rule)
@@ -554,7 +556,6 @@ class iCubRESTApp:
         self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self)
         self.__args_template__ = kargs
         self.__args__ = {}
-        self.__imported_actions__ = {}
         self.__configure_default_args__()
 
         if action_repository_path:
@@ -576,6 +577,7 @@ class iCubRESTApp:
             self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__playAction__, target_name='actions.playAction')
             self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__getActions__, target_name='actions.getActions')
             self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__importActionFromJSONDict__, target_name='actions.importAction')
+            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.getArgsTemplate, target_name='getArgsTemplate')
         if self.icub.gaze:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.gaze, class_name='gaze')
         if self.icub.speech:
@@ -625,7 +627,6 @@ class iCubRESTApp:
             name_prefix = self.__class__.__name__
         if self.icub:
             action_id = self.icub.importActionFromJSONDict(JSON_dict, name_prefix=name_prefix)
-            action_desc = self.icub.getAction(action_id).description
         else:
             data = {}
             data['JSON_dict'] = JSON_dict
@@ -634,8 +635,6 @@ class iCubRESTApp:
             res = requests.post(url=url, json=data)
             res = requests.get(res.json())
             action_id = res.json()['retval']
-            action_desc = JSON_dict["description"]
-        self.__imported_actions__[action_id] = action_desc
         return action_id
 
     def __playAction__(self, action_id: str, wait_for_completed=True):
@@ -660,14 +659,12 @@ class iCubRESTApp:
 
     def __configure__(self, input_args):
         pass
-    
+
     @property
     def name(self):
         return self._name_
 
     def configure(self):
-        self.__fsm__ = iCubFSM(self)
-        self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
         self.__configure__(self.__args__)
 
     def importAction(self, JSON_file):
@@ -684,6 +681,16 @@ class iCubRESTApp:
             self.__args__[k] = v
         self.configure()
         return True
+
+    def setFSM(self, fsm: FSM):
+        print("SETFSM open")
+        actions = self.__getActions__()
+        for state in fsm.getStates():
+            if not self.name + '.' + state['name'] in actions:
+                raise Exception("FSM state %s does not correspond to any imported actions!" % state['name'])
+        self.__fsm__ = fsm
+        self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
+        print("SETFSM close")
 
     def getArg(self, name: str):
         return self.__args__[name]
@@ -714,22 +721,6 @@ class iCubRESTSubscriber(PyiCubApp):
     def __init__(self):
         PyiCubApp.__init__(self)
 
-    def __on_enter_fsm_state__(self, args):
-        self.on_enter_fsm(trigger=args["input_json"]["trigger"])
-
-    def __on_exit_fsm_state__(self, args):
-        self.on_exit_fsm(trigger=args["input_json"]["trigger"])
-
-    def on_enter_fsm(self, trigger):
-        raise Exception("Method iCubRESTSubscriber.on_enter_fsm is not implemented!")
-
-    def on_exit_fsm(self, trigger):
-        raise Exception("Method iCubRESTSubscriber.on_exit_fsm is not implemented!")
-
-    def subscribe_fsm(self, server_host, server_port, robot_name, app_name):
-        topic_uri = "http://" + server_host + ":" + str(server_port) + "/pyicub/" + robot_name + "/" + app_name + "/fsm.runStep"
-        self.rest_manager.subscribe(topic_uri=topic_uri, on_enter=self.__on_enter_fsm_state__, on_exit=self.__on_exit_fsm_state__)
-
     def subscribe_topic(self, topic_uri, on_enter, on_exit):
         self.rest_manager.subscribe(topic_uri=topic_uri, on_enter=on_enter, on_exit=on_exit)
 
@@ -737,41 +728,70 @@ class iCubRESTSubscriber(PyiCubApp):
         self.rest_manager.run_forever()
 
 
+class iCubRESTSubscriberFSM(iCubRESTSubscriber):
+
+    def __init__(self, server_host, server_port, robot_name, app_name):
+        iCubRESTSubscriber.__init__(self)
+        self.__server_host__ = server_host
+        self.__server_port__ = server_port
+        self.__robot_name__ = robot_name
+        self.__app_name__ = app_name
+        self.__triggers__ = {}
+        self.__subscribe__()
+
+    def __on_enter_state__(self, args):
+        trigger = args["input_json"]["trigger"]
+        state = self.__triggers__[trigger]
+        self.on_enter_state(state=state)
+
+    def __on_exit_state__(self, args):
+        trigger = args["input_json"]["trigger"]
+        state = self.__triggers__[trigger]
+        self.on_exit_state(state=state)
+
+    def __on_enter_fsm__(self, args):
+        target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
+        res = requests.post(target, json={})
+        transitions = list(res.json()['transitions'])
+        for transition in transitions:
+            self.__triggers__[transition['trigger']] = transition['dest']
+        self.on_enter_fsm(args)
+
+    def __on_exit_fsm__(self, args):
+        self.on_exit_fsm(args)
+
+    def __subscribe__(self):
+        topic_uri = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.runStep", host=self.__server_host__, port=self.__server_port__)
+        self.subscribe_topic(topic_uri=topic_uri, on_enter=self.__on_enter_state__, on_exit=self.__on_exit_state__)
+        topic_uri = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.getTransitions", host=self.__server_host__, port=self.__server_port__)
+        self.subscribe_topic(topic_uri=topic_uri, on_enter=self.__on_enter_fsm__, on_exit=self.__on_exit_fsm__)
+
+    def on_exit_state(self, state_name):
+        raise Exception("Method iCubRESTSubscriberFSM.on_exit_state is not implemented!")
+
+    def on_enter_state(self, state_name):
+        raise Exception("Method iCubRESTSubscriberFSM.on_enter_state is not implemented!")
+
+    def on_exit_fsm(self, args):
+        raise Exception("Method iCubRESTSubscriberFSM.on_exit_fsm is not implemented!")
+
+    def on_enter_fsm(self, args):
+        raise Exception("Method iCubRESTSubscriberFSM.on_enter_fsm is not implemented!")
+
+
 class iCubFSM(FSM):
 
-    def __init__(self, app: iCubRESTApp):
-        FSM.__init__(self, name=self.__class__.__name__)
+    def __init__(self, app: iCubRESTApp, JSON_dict=None, JSON_file=None):
+        FSM.__init__(self, name=self.__class__.__name__, JSON_dict=JSON_dict, JSON_file=JSON_file)
         self._app_ = app
-  
-    def addAction(self, action_id):
-        description = self._app_.__imported_actions__[action_id]
-        self.addState(name=action_id, description=description, on_enter_callback=self.__on_enter_action__)
 
-    def exportJSONFile(self, filepath):
-        exportJSONFile(filepath, self)
-
-    def importFromJSONDict(self, data):
-        name = data.get("name", "")
-        states = data.get("states", [])
-        transitions = data.get("transitions", [])
-
-        for state_data in states:
-            self.addState(name=state_data["name"], description=state_data["description"], on_enter_callback=self.__on_enter_action__)
-
-        for transition_data in transitions:
-            self.addTransition(trigger=transition_data["trigger"], source=transition_data["source"], dest=transition_data["dest"])
-
-        initial_state = data.get("initial_state", FSM.INIT_STATE)
-        self._machine_.set_state(initial_state)
-
-    def importFromJSONFile(self, filepath):
-        data = importFromJSONFile(filepath)
-        self.importFromJSONDict(data)
+    def addAction(self, action):
+        self.addState(name=action.name, description=action.description, on_enter_callback=self.__on_enter_action__)
+        return action.name
 
     def __on_enter_action__(self):
-        action_id = self.getCurrentState()
-        self._app_.__playAction__(action_id)
-
+        current_state = self.getCurrentState()
+        self._app_.__playAction__(self._app_.name + '.' + current_state)
 
    
 class PyiCubRESTfulClient:

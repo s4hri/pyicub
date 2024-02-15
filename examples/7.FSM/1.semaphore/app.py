@@ -64,4 +64,6 @@ print("\nSTATES: ", fsm.getStates())
 print("\nTRANSITIONS: ", fsm.getTransitions())
 print("\nFSM: ", fsm.toJSON())
 
+fsm.exportJSONFile("fsm.json")
+
 

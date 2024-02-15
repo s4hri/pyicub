@@ -27,54 +27,50 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from pyicub.rest import iCubRESTApp, iCubFSM
+from pyicub.actions import iCubFullbodyAction
 import os
 
+
+head_action = iCubFullbodyAction(JSON_file="actions/HeadAction.json")
+lookat_action = iCubFullbodyAction(JSON_file="actions/LookAtAction.json")
 
 class FSM_A(iCubFSM):
 
     def __init__(self, app: iCubRESTApp):
         iCubFSM.__init__(self, app)
-        action_id = "MultipleFSM.LookAtAction"
-        self.addAction(action_id)
-        self.addTransition("start", "init", action_id)
+        lookat_state = self.addAction(lookat_action)
+        self.addTransition("start", "init", lookat_state)
         self.exportJSONFile("FSM_A.json")
-        self.draw('FSM_A.png')
+        self.draw("FSM_A.png")
 
 
 class FSM_B(iCubFSM):
 
     def __init__(self, app: iCubRESTApp):
         iCubFSM.__init__(self, app)
-        head_action = "MultipleFSM.HeadAction"
-        lookat_action = "MultipleFSM.LookAtAction"
-
-        self.addTransition("start", "init", head_action)
-        self.addTransition("next", head_action, lookat_action)
-        self.addTransition("reset", lookat_action, "init")
+        head_state = self.addAction(head_action)
+        lookat_state = self.addAction(lookat_action)
+        self.addTransition("start", "init", head_state)
+        self.addTransition("next", head_state, lookat_state)
+        self.addTransition("reset", lookat_state, "init")
         self.exportJSONFile("FSM_B.json")
-        self.draw('FSM_B.png')
+        self.draw("FSM_B.png")
 
 
 
 class MultipleFSM(iCubRESTApp):
 
     def __init__(self, action_repository_path, machine_id):
+        self.FSM_A = FSM_A(self)
+        self.FSM_B = FSM_B(self)
         iCubRESTApp.__init__(self, action_repository_path=action_repository_path, machine_id=machine_id)
 
     def __configure__(self, input_args):
         machine_id = int(input_args['machine_id'])
-
-        print("configure ", machine_id)
-
         if machine_id == 1:
-            self.fsm.importFromJSONFile("FSM_A.json")
+            self.setFSM(self.FSM_A)
         elif machine_id == 2:
-            self.fsm.importFromJSONFile("FSM_B.json")
-
+            self.setFSM(self.FSM_B)
 
 app = MultipleFSM(action_repository_path='./actions', machine_id=[1,2])
-
-FSM_A(app)
-FSM_B(app)
-
 app.rest_manager.run_forever()

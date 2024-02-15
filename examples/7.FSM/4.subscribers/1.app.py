@@ -26,17 +26,17 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.rest import iCubRESTApp
+from pyicub.rest import iCubRESTApp, iCubFSM
 import os
 
-app = iCubRESTApp()
-head_action = app.importAction("actions/HeadAction.json")
-lookat_action = app.importAction("actions/LookAtAction.json")
+class Publisher(iCubRESTApp):
 
-app.fsm.addAction(head_action)
-app.fsm.addAction(lookat_action)
-app.fsm.addTransition("start", "init", head_action)
-app.fsm.addTransition("next", head_action, lookat_action)
-app.fsm.addTransition("reset", lookat_action, "init")
+    def __init__(self, action_repository_path=None):
+        iCubRESTApp.__init__(self, action_repository_path=action_repository_path)
 
+    def __configure__(self, input_args):
+        fsm = iCubFSM(app=self, JSON_file="fsm.json")
+        self.setFSM(fsm)
+
+app = Publisher(action_repository_path='./actions')
 app.rest_manager.run_forever()
