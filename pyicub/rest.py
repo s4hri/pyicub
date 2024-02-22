@@ -323,6 +323,10 @@ class iCubRESTManager(iCubRESTServer):
     def request_manager(self):
         return self._request_manager_
 
+    @property
+    def proxy_host(self):
+        return self._proxy_host_
+
     def proxy_rule(self):
         return self.server_rule(self._proxy_host_, self._proxy_port_)
 
@@ -532,12 +536,21 @@ class PyiCubRESTfulServer(PyiCubApp):
         PyiCubApp.__init__(self)
         self._name_ = self.__class__.__name__
         self.__robot_name__ = robot_name
-        self.__register_class__(robot_name=robot_name, app_name=self._name_, cls=self)
+        self.__register_class__(robot_name=robot_name, app_name=self._name_, cls=self, class_name=self._name_)
+        self.__register_utils__()
         self.__args_template__ = kargs
         self.__args__ = {}
         self.__configure_default_args__()
 
-        self.configure(self.__args__)
+        self.__configure_app__(self.__args__)
+
+    def __register_utils__(self):
+        self.__register_method__(robot_name=self.robot_name, app_name=self.name, method=self.__configure_app__, target_name='configure')
+        self.__register_method__(robot_name=self.robot_name, app_name=self.name, method=self.__getArgsTemplate__, target_name='getArgsTemplate')
+        self.__register_method__(robot_name=self.robot_name, app_name=self.name, method=self.__getArgs__, target_name='getArgs')
+        self.__register_method__(robot_name=self.robot_name, app_name=self.name, method=self.__setArgs__, target_name='setArgs')
+        self.__register_method__(robot_name=self.robot_name, app_name=self.name, method=self.__getArg__, target_name='getArg')
+        self.__register_method__(robot_name=self.robot_name, app_name=self.name, method=self.__setArg__, target_name='setArg')        
 
     def __configure__(self, input_args):
         return {}
@@ -561,7 +574,9 @@ class PyiCubRESTfulServer(PyiCubApp):
     def __register_method__(self, robot_name, app_name, method, target_name: str=''):
         if not target_name:
             target_name = method.__name__
-        self.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_name, target=method, target_signature=str(inspect.signature(method)) )
+        signature = inspect.signature(method)
+        args_dict = {param.name: param.default for param in signature.parameters.values() if param.default is not param.empty}
+        self.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_name, target=method, target_signature=args_dict)
 
     def __register_class__(self, robot_name, app_name, cls, class_name: str=''):
         target_prefix = class_name
@@ -572,26 +587,29 @@ class PyiCubRESTfulServer(PyiCubApp):
                 target_name = getattr(cls, method).__name__
             else:
                 target_name = str(method)
-            self.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_prefix+target_name, target=getattr(cls, method), target_signature=str(inspect.signature(getattr(cls, method))) )
+            signature = inspect.signature(getattr(cls, method))
+            args_dict = {param.name: param.default for param in signature.parameters.values() if param.default is not param.empty}
+            self.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_prefix+target_name, target=getattr(cls, method), target_signature=args_dict)
 
-    def configure(self, input_args):
-        return self.__configure__(input_args)
+    def __configure_app__(self, input_args):
+        self.__configure__(input_args)
+        return list(self.rest_manager.get_services(self.robot_name, self.name).keys())
 
-    def getArgsTemplate(self):
+    def __getArgsTemplate__(self):
         return self.__args_template__
 
-    def getArgs(self):
+    def __getArgs__(self):
         return self.__args__
 
-    def setArgs(self, input_args: dict):
+    def __setArgs__(self, input_args: dict):
         for k,v in input_args.items():
             self.__args__[k] = v
-        return self.configure(self.__args__)
+        return self.__configure_app__(self.__args__)
 
-    def getArg(self, name: str):
+    def __getArg__(self, name: str):
         return self.__args__[name]
 
-    def setArg(self, name: str, value: object):
+    def __setArg__(self, name: str, value: object):
         self.__args__[name] = value
         return True
 
@@ -614,7 +632,7 @@ class iCubRESTApp(PyiCubRESTfulServer):
         if self.__is_icub_managed__():
             self.__icub__ = None
         else:
-            self.__icub__ = iCub(robot_name=robot_name, request_manager=self.request_manager)
+            self.__icub__ = iCub(robot_name=robot_name, request_manager=self.request_manager, proxy_host=self.rest_manager.proxy_host)
             if self.__icub__.exists():
                 self.__register_icub_helper__()
         

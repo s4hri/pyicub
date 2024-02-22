@@ -79,7 +79,7 @@ class iCubSingleton(type):
 
 class iCub(metaclass=iCubSingleton):
 
-    def __init__(self, robot_name="icub", request_manager: iCubRequestsManager=None, action_repository_path=''):
+    def __init__(self, robot_name="icub", request_manager: iCubRequestsManager=None, action_repository_path='', proxy_host=None):
         SIMULATION = os.getenv('ICUB_SIMULATION')
 
         self._position_controllers_   = {}
@@ -96,6 +96,7 @@ class iCub(metaclass=iCubSingleton):
         self._request_manager_        = request_manager
         self._actions_manager_        = ActionsManager()
         self._action_repository_path_ = action_repository_path
+        self._proxy_host_             = proxy_host
 
         self._icub_parts_                           = {}
         self._icub_parts_[ICUB_PARTS.FACE       ]   = iCubPart(ICUB_PARTS.FACE      , 1)
@@ -191,7 +192,7 @@ class iCub(metaclass=iCubSingleton):
     def cam_right(self):
         if self._cam_right_ is None:
             try:
-                self._cam_right_ = cameraPyCtrl(self._robot_name_, side="right")
+                self._cam_right_ = cameraPyCtrl(self._robot_name_, side="right", proxy_host=self._proxy_host_)
             except:
                 self._logger_.warning('cameraPyCtrl (right) not correctly initialized!')
                 return None
@@ -201,7 +202,7 @@ class iCub(metaclass=iCubSingleton):
     def cam_left(self):
         if self._cam_left_ is None:
             try:
-                self._cam_left_ = cameraPyCtrl(self._robot_name_, side="left")
+                self._cam_left_ = cameraPyCtrl(self._robot_name_, side="left", proxy_host=self._proxy_host_)
             except:
                 self._logger_.warning('cameraPyCtrl (left) not correctly initialized!')
                 return None

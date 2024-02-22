@@ -24,10 +24,11 @@ import yarp
 
 class cameraPyCtrl:
 
-   def __init__(self, robot, side="right"):
+   def __init__(self, robot, side="right", proxy_host=None):
         self.__portImg__ = yarp.BufferedPortImageRgb()
         self.__portImg__.open("/read/image:o")
         self.__portCamera__ = []
+        self._proxy_host_ = proxy_host
         if robot == "icubSim":
            self.__portCamera__ = "/" + robot + "/cam/" + side
         elif robot == "icub":
@@ -51,6 +52,8 @@ class cameraPyCtrl:
          return False
 
    def getHost(self):
+      if self._proxy_host_:
+         return self._proxy_host_
       portcam = yarp.Network.queryName(self.__portCamera__)
       if portcam:
          return portcam.getHost()
