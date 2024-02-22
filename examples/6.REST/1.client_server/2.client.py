@@ -28,8 +28,8 @@
 
 from pyicub.rest import PyiCubRESTfulClient
 
-robot_name='icubSim'
-app_name='myRESTApp'
+robot_name='generic'
+app_name='myServer'
 
 client = PyiCubRESTfulClient(host='localhost', port=9001)
 

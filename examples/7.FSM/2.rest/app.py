@@ -40,9 +40,9 @@ fsm = iCubFSM(app=app)
 head_state = fsm.addAction(action=head_action)
 lookat_state = fsm.addAction(action=lookat_action)
 
-fsm.addTransition("start", "init", head_state)
+fsm.addTransition("start", iCubFSM.INIT_STATE, head_state)
 fsm.addTransition("next", head_state, lookat_state)
-fsm.addTransition("reset", lookat_state, "init")
+fsm.addTransition("reset", lookat_state, iCubFSM.INIT_STATE)
 
 fsm.draw('diagram.png')
 fsm.exportJSONFile('fsm.json')

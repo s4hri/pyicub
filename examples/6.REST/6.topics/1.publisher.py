@@ -26,12 +26,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.rest import iCubRESTApp
+from pyicub.rest import PyiCubRESTfulServer
 from datetime import date
 
 import time
 
-class Publisher(iCubRESTApp):
+class Publisher(PyiCubRESTfulServer):
 
     def hello_world(self, name: str='you'):
         return "Hello world %s!" % name

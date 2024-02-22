@@ -37,11 +37,8 @@ class Subscriber(iCubRESTSubscriberFSM):
     def on_exit_state(self, state):
         print("on exit state: ", state)
 
-    def on_enter_fsm(self, args):
-        print("on enter fsm: ", args)
-
-    def on_exit_fsm(self, args):
-        print("on exit fsm: ", args)
+    def on_init_fsm(self, args):
+        print("on init fsm: ", args)
 
 app = Subscriber(server_host="localhost", server_port=9001, robot_name="icubSim", app_name="Publisher")
 app.rest_manager.run_forever()

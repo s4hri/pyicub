@@ -26,12 +26,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.rest import iCubRESTApp
+from pyicub.rest import PyiCubRESTfulServer
 from datetime import date
 
 import time
 
-class myRESTApp(iCubRESTApp):
+class myServer(PyiCubRESTfulServer):
 
     def hello_world(self, name: str='you'):
         return "Hello world %s!" % name
@@ -44,7 +44,7 @@ class myRESTApp(iCubRESTApp):
         time.sleep(5)
         return "I've done a lot of stuff!"
 
-app = myRESTApp()
+app = myServer()
 app.rest_manager.run_forever()
 
 
