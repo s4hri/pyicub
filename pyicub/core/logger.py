@@ -26,7 +26,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import yarp
 import logging
 import datetime
 import os
@@ -125,3 +124,14 @@ class PyicubLogger(_Logger):
         ch.setFormatter(formatter)
         self._logger.addHandler(ch)
 
+
+try:
+    import yarp
+except ImportError:
+    class YarpLogger(PyicubLogger):
+
+        @staticmethod
+        def getLogger():
+            if YarpLogger._instance == None:
+                YarpLogger()
+            return YarpLogger._instance

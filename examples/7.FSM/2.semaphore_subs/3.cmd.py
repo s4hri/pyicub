@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,44 +26,16 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.rest import PyiCubRESTfulServer
-from pyicub.fsm import FSM
-from datetime import date
+from pyicub.rest import PyiCubRESTfulClient
 
-import time
+client = PyiCubRESTfulClient(host='localhost', port=9001)
 
-class Semaphore(FSM):
+print("PyiCub ver: ", client.get_version())
 
-    def __init__(self):
-        FSM.__init__(self)
-        self.addState(name="RED", on_enter_callback=self.on_RED)
-        self.addState(name="YELLOW", on_enter_callback=self.on_YELLOW)
-        self.addState(name="GREEN", on_enter_callback=self.on_GREEN)
+triggers = ["start", "go", "slowdown", "stop"]
 
-        self.addTransition("start", "init", "RED")
-        self.addTransition("go", "RED", "GREEN")
-        self.addTransition("slowdown", "GREEN", "YELLOW")
-        self.addTransition("stop", "YELLOW", "init")
-
-    def on_RED(self):
-        print("RED STATE: Stop!")
-        time.sleep(5)
-
-    def on_YELLOW(self):
-        print("YELLOW STATE: Slow down!")
-        time.sleep(1)
-
-    def on_GREEN(self):
-        print("GREEN STATE: Go!")
-        time.sleep(3)
-
-class Publisher(PyiCubRESTfulServer):
-
-    def hello_world(self, name: str='you'):
-        return "Hello world %s!" % name
-
-app = Publisher()
-fsm = Semaphore()
-app.setFSM(fsm)
-
-app.rest_manager.run_forever()
+while True:
+    input("Press ENTER to run the FSM (CTRL+C to exit): ")
+    for trigger in triggers:
+        res = client.fsm_runStep(robot_name='generic', app_name='Publisher', trigger=trigger)
+        print(res)

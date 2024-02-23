@@ -26,11 +26,16 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+try:
+    import yarp
+    from pyicub.helper import iCub
+except ImportError:
+    print("The 'yarp' module is not installed. Some functionality may be limited.")
+
 from pyicub.requests import iCubRequest
 from pyicub.utils import SingletonMeta, getPyiCubInfo, getPublicMethods, firstAvailablePort, importFromJSONFile, exportJSONFile
 from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequestsManager, iCubRequest
-from pyicub.helper import iCub
 from pyicub.fsm import FSM
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -158,7 +163,7 @@ class iCubRESTServer(metaclass=SingletonMeta):
         stop = False
         while not stop:
             try:
-                self._flaskapp_.run(self._host_, self._port_)
+                self._flaskapp_.run(self._host_, self._port_, threaded=True)
                 stop = True
             except:
                 self._port_ += 1
@@ -393,17 +398,17 @@ class iCubRESTManager(iCubRESTServer):
     def process_target(self, service):
         res = request.get_json(force=True)
         kwargs =  res
-        if 'sync' in request.args:
-            wait_for_completed=True
-        else:
-            wait_for_completed=False
+        wait_for_completed=False
         req = self.request_manager.create(timeout=iCubRequest.TIMEOUT_REQUEST, target=service.target, name=service.name, prefix=service.url)
         
         self._requests_[req.req_id] = {'robot_name': service.robot_name,
                                        'app_name': service.app_name,
                                        'request': req}
         self.request_manager.run_request(req, wait_for_completed, **kwargs)
-
+        if 'sync' in request.args:
+            wait_for_completed=True
+        else:
+            wait_for_completed=False
         target_rule = self.target_rule(service.robot_name, service.app_name, service.name)
         if target_rule in self._subscribers_.keys():
             for subscriber in self._subscribers_[target_rule]:
@@ -411,6 +416,7 @@ class iCubRESTManager(iCubRESTServer):
                 thread.start()
 
         if wait_for_completed:
+            req.wait_for_completed()
             return jsonify(req.retval)
         return jsonify(req.req_id)
 
@@ -825,7 +831,17 @@ class PyiCubRESTfulClient:
             url += '?sync'
         res = requests.post(url=url, json=data)
         return res.json()
-    
+
+    def fsm_runStep(self, robot_name, app_name, trigger):
+        data = {}
+        data['trigger'] = trigger
+        res = requests.post(url=self._header_ + '/' + robot_name + '/' + app_name + '/fsm.runStep?sync', json=data)
+        return res.json()
+
+    def get_fsm(self, robot_name, app_name):
+        res = requests.post(url=self._header_ + '/' + robot_name + '/' + app_name + '/fsm.toJSON?sync', json={})
+        return res.json()
+        
     def get_version(self):
         res = requests.get(url="http://%s:%d" % (self._host_, self._port_))
         return res.json()['Version']
