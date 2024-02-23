@@ -33,7 +33,7 @@
         {
             "trigger": "stop",
             "source": "YELLOW",
-            "dest": "RED"
+            "dest": "init"
         }
     ],
     "initial_state": "init"

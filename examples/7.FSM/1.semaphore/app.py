@@ -48,10 +48,13 @@ fsm.addState(name="RED", on_enter_callback=on_RED)
 fsm.addState(name="YELLOW", on_enter_callback=on_YELLOW)
 fsm.addState(name="GREEN", on_enter_callback=on_GREEN)
 
+# The initial state is always "init"
 fsm.addTransition("start", "init", "RED")
 fsm.addTransition("go", "RED", "GREEN")
 fsm.addTransition("slowdown", "GREEN", "YELLOW")
-fsm.addTransition("stop", "YELLOW", "RED")
+
+# If a closed-loop is required, the final state has to be connected always with the "init"
+fsm.addTransition("stop", "YELLOW", "init")
 
 fsm.draw('diagram.png')
 

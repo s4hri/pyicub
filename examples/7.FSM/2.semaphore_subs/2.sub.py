@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -27,9 +27,21 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-__name__ = 'PyiCub'
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = '8.0.3'
-__description__ = 'Developing iCub applications using Python'
+from pyicub.rest import RESTSubscriberFSM
+
+class Subscriber(RESTSubscriberFSM):
+
+    def on_enter_state(self, state):
+        print("on enter state: ", state)
+
+    def on_exit_state(self, state):
+        print("on exit state: ", state)
+
+    def on_enter_fsm(self, args):
+        print("on enter fsm: ", args)
+
+    def on_exit_fsm(self, args):
+        print("on exit fsm: ", args)
+
+app = Subscriber(server_host="localhost", server_port=9001, robot_name="generic", app_name="Publisher")
+app.rest_manager.run_forever()

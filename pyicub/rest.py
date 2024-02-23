@@ -536,12 +536,12 @@ class PyiCubRESTfulServer(PyiCubApp):
         PyiCubApp.__init__(self)
         self._name_ = self.__class__.__name__
         self.__robot_name__ = robot_name
+        self.__fsm__ = None
         self.__register_class__(robot_name=robot_name, app_name=self._name_, cls=self, class_name=self._name_)
         self.__register_utils__()
         self.__args_template__ = kargs
         self.__args__ = {}
         self.__configure_default_args__()
-
         self.__configure_app__(self.__args__)
 
     def __register_utils__(self):
@@ -553,6 +553,8 @@ class PyiCubRESTfulServer(PyiCubApp):
         self.__register_method__(robot_name=self.robot_name, app_name=self.name, method=self.__setArg__, target_name='setArg')        
 
     def __configure__(self, input_args):
+        fsm = FSM()
+        self.setFSM(fsm)
         return {}
 
     @property
@@ -562,6 +564,10 @@ class PyiCubRESTfulServer(PyiCubApp):
     @property
     def robot_name(self):
         return self.__robot_name__
+
+    @property
+    def fsm(self):
+        return self.__fsm__
 
     def __configure_default_args__(self):
         for k,v in self.__args_template__.items():
@@ -613,11 +619,14 @@ class PyiCubRESTfulServer(PyiCubApp):
         self.__args__[name] = value
         return True
 
+    def setFSM(self, fsm: FSM):
+        self.__fsm__ = fsm
+        self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
+
 
 class iCubRESTApp(PyiCubRESTfulServer):
 
     def __init__(self, robot_name="icub", action_repository_path='', **kargs):
-        self.__fsm__ = None
         self.__icub__ = None
 
         SIMULATION = os.getenv('ICUB_SIMULATION')
@@ -717,14 +726,6 @@ class iCubRESTApp(PyiCubRESTfulServer):
     def importAction(self, JSON_file):
         return self.__importActionFromJSONFile__(JSON_file=JSON_file)
 
-    def setFSM(self, fsm: FSM):
-        self.__fsm__ = fsm
-        self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
-
-    @property
-    def fsm(self):
-        return self.__fsm__
-
     @property
     def icub(self):
         return self.__icub__
@@ -737,8 +738,7 @@ class iCubRESTSubscriber(PyiCubApp):
     def run_forever(self):
         self.rest_manager.run_forever()
 
-
-class iCubRESTSubscriberFSM(iCubRESTSubscriber):
+class RESTSubscriberFSM(iCubRESTSubscriber):
 
     def __init__(self, server_host, server_port, robot_name, app_name):
         iCubRESTSubscriber.__init__(self)
@@ -747,32 +747,39 @@ class iCubRESTSubscriberFSM(iCubRESTSubscriber):
         self.__robot_name__ = robot_name
         self.__app_name__ = app_name
         self.__triggers__ = {}
+        self.__root_state__ = None
+        self.__leaf_states__ = []
         self.__subscribe__()
+
 
     def __on_enter_state__(self, args):
         trigger = args["input_json"]["trigger"]
         state = self.__triggers__[trigger]
-        if not state == iCubFSM.INIT_STATE:
+        if not state == FSM.INIT_STATE:
+            if state == self.__root_state__:
+                self.on_enter_fsm(args)
             self.on_enter_state(state=state)
 
     def __on_exit_state__(self, args):
         trigger = args["input_json"]["trigger"]
         state = self.__triggers__[trigger]
-        if not state == iCubFSM.INIT_STATE:
+        if not state == FSM.INIT_STATE:
             self.on_exit_state(state=state)
-
-    def __on_init_fsm__(self, args):
-        self.on_init_fsm(args)
+            if state in self.__leaf_states__:
+                self.on_exit_fsm(args)
 
     def __subscribe__(self):
         topic_uri = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.runStep", host=self.__server_host__, port=self.__server_port__)
         self.subscribe_topic(topic_uri=topic_uri, on_enter=self.__on_enter_state__, on_exit=self.__on_exit_state__)
-        topic_uri = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.getTransitions", host=self.__server_host__, port=self.__server_port__)
-        self.subscribe_topic(topic_uri=topic_uri, on_enter=self.__on_init_fsm__)
         target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
         res = requests.post(target, json={})
         transitions = list(res.json()['transitions'])
+        self.__leaf_states__ = []
         for transition in transitions:
+            if transition['source'] == FSM.INIT_STATE:
+                self.__root_state__ = transition['dest']
+            if transition['dest'] == FSM.INIT_STATE:
+                self.__leaf_states__.append(transition['source'])
             self.__triggers__[transition['trigger']] = transition['dest']
 
     def on_exit_state(self, state_name):
@@ -781,8 +788,11 @@ class iCubRESTSubscriberFSM(iCubRESTSubscriber):
     def on_enter_state(self, state_name):
         raise Exception("Method iCubRESTSubscriberFSM.on_enter_state is not implemented!")
 
-    def on_init_fsm(self, args):
-        raise Exception("Method iCubRESTSubscriberFSM.on_init_fsm is not implemented!")
+    def on_enter_fsm(self, args):
+        raise Exception("Method iCubRESTSubscriberFSM.on_enter_fsm is not implemented!")
+
+    def on_exit_fsm(self, args):
+        raise Exception("Method iCubRESTSubscriberFSM.on_exit_fsm is not implemented!")
 
 
 class iCubFSM(FSM):

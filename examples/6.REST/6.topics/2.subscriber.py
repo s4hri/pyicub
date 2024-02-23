@@ -36,5 +36,5 @@ def on_exit_foo(args):
     print("on exit ", args)
 
 serv = iCubRESTSubscriber()
-serv.subscribe_topic(topic_uri="http://localhost:9001/pyicub/generic/Publisher/foo", on_enter=on_enter_foo, on_exit=on_exit_foo)
+serv.subscribe_topic(topic_uri="http://localhost:9001/pyicub/generic/Publisher/Publisher.foo", on_enter=on_enter_foo, on_exit=on_exit_foo)
 serv.run_forever()

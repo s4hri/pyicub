@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,10 +26,43 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from pyicub.rest import PyiCubRESTfulServer
+from pyicub.fsm import FSM
+from datetime import date
 
-__name__ = 'PyiCub'
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = '8.0.3'
-__description__ = 'Developing iCub applications using Python'
+import time
+
+class Semaphore(FSM):
+
+    def __init__(self):
+        FSM.__init__(self)
+        self.addState(name="RED", on_enter_callback=self.on_RED)
+        self.addState(name="YELLOW", on_enter_callback=self.on_YELLOW)
+        self.addState(name="GREEN", on_enter_callback=self.on_GREEN)
+
+        self.addTransition("start", "init", "RED")
+        self.addTransition("go", "RED", "GREEN")
+        self.addTransition("slowdown", "GREEN", "YELLOW")
+        self.addTransition("stop", "YELLOW", "init")
+
+    def on_RED(self):
+        print("Stop!")
+        time.sleep(5)
+
+    def on_YELLOW(self):
+        print("Slow down!")
+        time.sleep(1)
+
+    def on_GREEN(self):
+        print("Go!")
+        time.sleep(3)
+
+class Publisher(PyiCubRESTfulServer):
+
+    def hello_world(self, name: str='you'):
+        return "Hello world %s!" % name
+
+app = Publisher()
+fsm = Semaphore()
+app.setFSM(fsm)
+app.rest_manager.run_forever()
