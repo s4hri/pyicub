@@ -625,8 +625,9 @@ class PyiCubRESTfulServer(PyiCubApp):
         self.__args__[name] = value
         return True
 
-    def setFSM(self, fsm: FSM):
+    def setFSM(self, fsm: FSM, session_id=0):
         self.__fsm__ = fsm
+        fsm.setSessionID(session_id)
         self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
 
 
@@ -763,7 +764,9 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
         state = self.__triggers__[trigger]
         if not state == FSM.INIT_STATE:
             if state == self.__root_state__:
-                self.on_enter_fsm(args)
+                target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
+                res = requests.post(target, json={})
+                self.on_enter_fsm(res.json())
             self.on_enter_state(state=state)
 
     def __on_exit_state__(self, args):
@@ -772,7 +775,9 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
         if not state == FSM.INIT_STATE:
             self.on_exit_state(state=state)
             if state in self.__leaf_states__:
-                self.on_exit_fsm(args)
+                target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
+                res = requests.post(target, json={})
+                self.on_exit_fsm(res.json())
 
     def __subscribe__(self):
         topic_uri = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.runStep", host=self.__server_host__, port=self.__server_port__)

@@ -27,5 +27,7 @@
             "dest": "init"
         }
     ],
-    "initial_state": "init"
+    "initial_state": "init",
+    "session_id": 0,
+    "session_count": 0
 }
