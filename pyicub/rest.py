@@ -768,22 +768,26 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
     def __on_enter_state__(self, args):
         trigger = args["input_json"]["trigger"]
         state = self.__triggers__[trigger]
+        target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
+        res = requests.post(target, json={})
+        session_id = res.json()['session_id']
+        session_count = res.json()['session_count']
         if not state == FSM.INIT_STATE:
-            if state == self.__root_state__:
-                target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
-                res = requests.post(target, json={})
-                self.on_enter_fsm(res.json())
-            self.on_enter_state(state=state)
+            if state == self.__root_state__:                
+                self.on_enter_fsm(session_id=session_id, session_count=session_count)
+            self.on_enter_state(session_id=session_id, session_count=session_count, state_name=state)
 
     def __on_exit_state__(self, args):
         trigger = args["input_json"]["trigger"]
         state = self.__triggers__[trigger]
+        target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
+        res = requests.post(target, json={})
+        session_id = res.json()['session_id']
+        session_count = res.json()['session_count']
         if not state == FSM.INIT_STATE:
-            self.on_exit_state(state=state)
+            self.on_exit_state(session_id=session_id, session_count=session_count, state_name=state)
             if state in self.__leaf_states__:
-                target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
-                res = requests.post(target, json={})
-                self.on_exit_fsm(res.json())
+                self.on_exit_fsm(session_id=session_id, session_count=session_count)
 
     def __subscribe__(self):
         topic_uri = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.runStep", host=self.__server_host__, port=self.__server_port__)
@@ -799,16 +803,16 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
                 self.__leaf_states__.append(transition['source'])
             self.__triggers__[transition['trigger']] = transition['dest']
 
-    def on_exit_state(self, state_name):
-        raise Exception("Method iCubRESTSubscriberFSM.on_exit_state is not implemented!")
-
-    def on_enter_state(self, state_name):
+    def on_enter_state(self, session_id, session_count, state_name):
         raise Exception("Method iCubRESTSubscriberFSM.on_enter_state is not implemented!")
 
-    def on_enter_fsm(self, args):
+    def on_exit_state(self, session_id, session_count, state_name):
+        raise Exception("Method iCubRESTSubscriberFSM.on_exit_state is not implemented!")
+
+    def on_enter_fsm(self, session_id, session_count):
         raise Exception("Method iCubRESTSubscriberFSM.on_enter_fsm is not implemented!")
 
-    def on_exit_fsm(self, args):
+    def on_exit_fsm(self, session_id, session_count, state_name):
         raise Exception("Method iCubRESTSubscriberFSM.on_exit_fsm is not implemented!")
 
 
