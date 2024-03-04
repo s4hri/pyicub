@@ -587,7 +587,7 @@ class PyiCubRESTfulServer(PyiCubApp):
             target_name = method.__name__
         signature = inspect.signature(method)
         args_dict = {param.name: param.default for param in signature.parameters.values() if param.default is not param.empty}
-        args_dict.update({param.name: '' for param in signature.parameters.values() if param.default is param.empty})
+        args_dict.update({param.name: '' for param in signature.parameters.values() if param.default is param.empty or param.default is None})
         self.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_name, target=method, target_signature=args_dict)
 
     def __register_class__(self, robot_name, app_name, cls, class_name: str=''):
@@ -601,7 +601,7 @@ class PyiCubRESTfulServer(PyiCubApp):
                 target_name = str(method)
             signature = inspect.signature(getattr(cls, method))
             args_dict = {param.name: param.default for param in signature.parameters.values() if param.default is not param.empty}
-            args_dict.update({param.name: '' for param in signature.parameters.values() if param.default is param.empty})
+            args_dict.update({param.name: '' for param in signature.parameters.values() if param.default is param.empty or param.default is None})
             self.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_prefix+target_name, target=getattr(cls, method), target_signature=args_dict)
 
     def __configure_app__(self, input_args: dict):
@@ -676,23 +676,21 @@ class iCubRESTApp(PyiCubRESTfulServer):
         return self.icub
         
     def __register_icub_helper__(self):
-        prefix_target = "helper/"
-        self.__register_method__(robot_name=self.__robot_name__, app_name=self.name, method=self.__info__, target_name=prefix_target + 'info')
-        self.__register_utils__(app_name="helper")
+        app_name = "helper"
         if self.icub.actions_manager:
-            self.__register_method__(robot_name=self.__robot_name__, app_name=self.name, method=self.__playAction__, target_name=prefix_target + 'actions.playAction')
-            self.__register_method__(robot_name=self.__robot_name__, app_name=self.name, method=self.__getActions__, target_name=prefix_target + 'actions.getActions')
-            self.__register_method__(robot_name=self.__robot_name__, app_name=self.name, method=self.__importActionFromJSONDict__, target_name=prefix_target + 'actions.importAction')
+            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__playAction__, target_name='actions.playAction')
+            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__getActions__, target_name='actions.getActions')
+            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__importActionFromJSONDict__, target_name='actions.importAction')
         if self.icub.gaze:
-            self.__register_class__(robot_name=self.__robot_name__, app_name=self.name, cls=self.icub.gaze, class_name=prefix_target + 'gaze')
+            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.gaze, class_name='gaze')
         if self.icub.speech:
-            self.__register_class__(robot_name=self.__robot_name__, app_name=self.name, cls=self.icub.speech, class_name=prefix_target + 'speech')
+            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.speech, class_name='speech')
         if self.icub.emo:
-            self.__register_class__(robot_name=self.__robot_name__, app_name=self.name, cls=self.icub.emo, class_name=prefix_target + 'emo')
+            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.emo, class_name='emo')
         if self.icub.cam_right:
-            self.__register_class__(robot_name=self.__robot_name__, app_name=self.name, cls=self.icub.cam_right, class_name=prefix_target + 'cam_right')
+            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.cam_right, class_name='cam_right')
         if self.icub.cam_left:
-            self.__register_class__(robot_name=self.__robot_name__, app_name=self.name, cls=self.icub.cam_left, class_name=prefix_target + 'cam_left')
+            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.cam_left, class_name='cam_left')
 
     def __importActionFromJSONFile__(self, JSON_file):
         JSON_dict = importFromJSONFile(JSON_file)
