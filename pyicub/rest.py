@@ -677,6 +677,8 @@ class iCubRESTApp(PyiCubRESTfulServer):
         
     def __register_icub_helper__(self):
         app_name = "helper"
+        self.__register_utils__(app_name="helper")
+        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__info__, target_name='info')
         if self.icub.actions_manager:
             self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__playAction__, target_name='actions.playAction')
             self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__getActions__, target_name='actions.getActions')
