@@ -31,17 +31,17 @@ from pyicub.rest import RESTSubscriberFSM
 
 class Subscriber(RESTSubscriberFSM):
 
-    def on_enter_state(self, session_id, session_count, state_name):
-        print("on enter state: ", session_id, session_count, state_name)
+    def on_enter_state(self, fsm_name, session_id, session_count, state_name):
+        print("on enter state: ", fsm_name, session_id, session_count, state_name)
 
-    def on_exit_state(self, session_id, session_count, state_name):
-        print("on exit state: ", session_id, session_count, state_name)
+    def on_exit_state(self, fsm_name, session_id, session_count, state_name):
+        print("on exit state: ", fsm_name, session_id, session_count, state_name)
 
-    def on_enter_fsm(self, session_id, session_count):
-        print("on enter fsm: ", session_id, session_count)
+    def on_enter_fsm(self, fsm_name, session_id, session_count):
+        print("on enter fsm: ", fsm_name, session_id, session_count)
 
-    def on_exit_fsm(self, session_id, session_count):
-        print("on exit fsm: ", session_id, session_count)
+    def on_exit_fsm(self, fsm_name, session_id, session_count):
+        print("on exit fsm: ", fsm_name, session_id, session_count)
 
 app = Subscriber(server_host="localhost", server_port=9001, robot_name="generic", app_name="Publisher")
 app.rest_manager.run_forever()
