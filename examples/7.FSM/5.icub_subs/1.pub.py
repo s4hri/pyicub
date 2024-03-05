@@ -36,7 +36,7 @@ class Publisher(iCubRESTApp):
 
     def __configure__(self, input_args):
         fsm = iCubFSM(app=self, JSON_file="fsm.json")
-        self.setFSM(fsm)
+        self.__setFSM__(fsm)
 
 app = Publisher(action_repository_path='./actions')
 app.rest_manager.run_forever()

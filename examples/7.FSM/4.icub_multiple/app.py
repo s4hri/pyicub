@@ -68,9 +68,9 @@ class MultipleFSM(iCubRESTApp):
     def __configure__(self, input_args):
         machine_id = int(input_args['machine_id'])
         if machine_id == 1:
-            self.setFSM(self.FSM_A)
+            self.__setFSM__(self.FSM_A)
         elif machine_id == 2:
-            self.setFSM(self.FSM_B)
+            self.__setFSM__(self.FSM_B)
 
 app = MultipleFSM(action_repository_path='./actions', machine_id=[1,2])
 app.rest_manager.run_forever()

@@ -47,5 +47,5 @@ fsm.addTransition("reset", lookat_state, iCubFSM.INIT_STATE)
 fsm.draw('diagram.png')
 fsm.exportJSONFile('fsm.json')
 
-app.setFSM(fsm)
+app.__setFSM__(fsm)
 app.rest_manager.run_forever()

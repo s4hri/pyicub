@@ -64,6 +64,6 @@ class Publisher(PyiCubRESTfulServer):
 
 app = Publisher()
 fsm = Semaphore()
-app.setFSM(fsm)
+app.__setFSM__(fsm)
 
 app.rest_manager.run_forever()

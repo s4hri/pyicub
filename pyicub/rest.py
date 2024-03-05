@@ -544,23 +544,22 @@ class PyiCubRESTfulServer(PyiCubApp):
         self.__robot_name__ = robot_name
         self.__fsm__ = None
         self.__register_class__(robot_name=robot_name, app_name=self._name_, cls=self, class_name=self._name_)
-        self.__register_utils__()
+        self.__register_utils__(app_name=self._name_)
         self.__args_template__ = kargs
         self.__args__ = {}
         self.__configure_default_args__()
         self.__configure_app__(self.__args__)
 
-    def __register_utils__(self):
-        self.__register_method__(robot_name=self.robot_name, app_name=self.name, method=self.__configure_app__, target_name='configure')
-        self.__register_method__(robot_name=self.robot_name, app_name=self.name, method=self.__getArgsTemplate__, target_name='getArgsTemplate')
-        self.__register_method__(robot_name=self.robot_name, app_name=self.name, method=self.__getArgs__, target_name='getArgs')
-        self.__register_method__(robot_name=self.robot_name, app_name=self.name, method=self.__setArgs__, target_name='setArgs')
-        self.__register_method__(robot_name=self.robot_name, app_name=self.name, method=self.__getArg__, target_name='getArg')
-        self.__register_method__(robot_name=self.robot_name, app_name=self.name, method=self.__setArg__, target_name='setArg')        
+    def __register_utils__(self, app_name):
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__configure_app__, target_name='utils.configure')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__getServices__, target_name='utils.getServices')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__getArgsTemplate__, target_name='utils.getArgsTemplate')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__getArgs__, target_name='utils.getArgs')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__setArgs__, target_name='utils.setArgs')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__getArg__, target_name='utils.getArg')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__setArg__, target_name='utils.setArg')
 
     def __configure__(self, input_args):
-        fsm = FSM()
-        self.setFSM(fsm)
         return {}
 
     @property
@@ -588,6 +587,7 @@ class PyiCubRESTfulServer(PyiCubApp):
             target_name = method.__name__
         signature = inspect.signature(method)
         args_dict = {param.name: param.default for param in signature.parameters.values() if param.default is not param.empty}
+        args_dict.update({param.name: '' for param in signature.parameters.values() if param.default is param.empty or param.default is None})
         self.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_name, target=method, target_signature=args_dict)
 
     def __register_class__(self, robot_name, app_name, cls, class_name: str=''):
@@ -601,10 +601,15 @@ class PyiCubRESTfulServer(PyiCubApp):
                 target_name = str(method)
             signature = inspect.signature(getattr(cls, method))
             args_dict = {param.name: param.default for param in signature.parameters.values() if param.default is not param.empty}
+            args_dict.update({param.name: '' for param in signature.parameters.values() if param.default is param.empty or param.default is None})
             self.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_prefix+target_name, target=getattr(cls, method), target_signature=args_dict)
 
-    def __configure_app__(self, input_args):
+    def __configure_app__(self, input_args: dict):
+        self.__setArgs__(input_args)
         self.__configure__(input_args)
+        return True
+    
+    def __getServices__(self):
         return list(self.rest_manager.get_services(self.robot_name, self.name).keys())
 
     def __getArgsTemplate__(self):
@@ -616,7 +621,7 @@ class PyiCubRESTfulServer(PyiCubApp):
     def __setArgs__(self, input_args: dict):
         for k,v in input_args.items():
             self.__args__[k] = v
-        return self.__configure_app__(self.__args__)
+        return
 
     def __getArg__(self, name: str):
         return self.__args__[name]
@@ -624,8 +629,8 @@ class PyiCubRESTfulServer(PyiCubApp):
     def __setArg__(self, name: str, value: object):
         self.__args__[name] = value
         return True
-
-    def setFSM(self, fsm: FSM, session_id=0):
+    
+    def __setFSM__(self, fsm: FSM, session_id=0):
         self.__fsm__ = fsm
         fsm.setSessionID(session_id)
         self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
@@ -657,20 +662,23 @@ class iCubRESTApp(PyiCubRESTfulServer):
         
 
     def __configure__(self, input_args):
-        fsm = iCubFSM(app=self)
-        self.setFSM(fsm)
         return {}
 
     def __is_icub_managed__(self):
-        url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper'
+        url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/info'
         try:
             res = requests.get(url, json={})
             return res.status_code == 200
         except:
             return False
+
+    def __info__(self):
+        return self.icub
         
     def __register_icub_helper__(self):
         app_name = "helper"
+        self.__register_utils__(app_name="helper")
+        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__info__, target_name='info')
         if self.icub.actions_manager:
             self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__playAction__, target_name='actions.playAction')
             self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__getActions__, target_name='actions.getActions')
@@ -730,12 +738,15 @@ class iCubRESTApp(PyiCubRESTfulServer):
     def __getActions__(self):
         return list(self.icub.getActions())
 
+    """
     def importAction(self, JSON_file):
         return self.__importActionFromJSONFile__(JSON_file=JSON_file)
+    """
 
     @property
     def icub(self):
         return self.__icub__
+
 
 class iCubRESTSubscriber(PyiCubApp):
 
@@ -762,22 +773,28 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
     def __on_enter_state__(self, args):
         trigger = args["input_json"]["trigger"]
         state = self.__triggers__[trigger]
+        target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
+        res = requests.post(target, json={})
+        session_id = res.json()['session_id']
+        session_count = res.json()['session_count']
+        fsm_name = res.json()['name']
         if not state == FSM.INIT_STATE:
-            if state == self.__root_state__:
-                target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
-                res = requests.post(target, json={})
-                self.on_enter_fsm(res.json())
-            self.on_enter_state(state=state)
+            if state == self.__root_state__:                
+                self.on_enter_fsm(fsm_name=fsm_name, session_id=session_id, session_count=session_count)
+            self.on_enter_state(fsm_name=fsm_name, session_id=session_id, session_count=session_count, state_name=state)
 
     def __on_exit_state__(self, args):
         trigger = args["input_json"]["trigger"]
         state = self.__triggers__[trigger]
+        target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
+        res = requests.post(target, json={})
+        session_id = res.json()['session_id']
+        session_count = res.json()['session_count']
+        fsm_name = res.json()['name']
         if not state == FSM.INIT_STATE:
-            self.on_exit_state(state=state)
+            self.on_exit_state(fsm_name=fsm_name, session_id=session_id, session_count=session_count, state_name=state)
             if state in self.__leaf_states__:
-                target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
-                res = requests.post(target, json={})
-                self.on_exit_fsm(res.json())
+                self.on_exit_fsm(fsm_name=fsm_name, session_id=session_id, session_count=session_count)
 
     def __subscribe__(self):
         topic_uri = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.runStep", host=self.__server_host__, port=self.__server_port__)
@@ -793,16 +810,16 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
                 self.__leaf_states__.append(transition['source'])
             self.__triggers__[transition['trigger']] = transition['dest']
 
-    def on_exit_state(self, state_name):
-        raise Exception("Method iCubRESTSubscriberFSM.on_exit_state is not implemented!")
-
-    def on_enter_state(self, state_name):
+    def on_enter_state(self, fsm_name, session_id, session_count, state_name):
         raise Exception("Method iCubRESTSubscriberFSM.on_enter_state is not implemented!")
 
-    def on_enter_fsm(self, args):
+    def on_exit_state(self, fsm_name, session_id, session_count, state_name):
+        raise Exception("Method iCubRESTSubscriberFSM.on_exit_state is not implemented!")
+
+    def on_enter_fsm(self, fsm_name, session_id, session_count):
         raise Exception("Method iCubRESTSubscriberFSM.on_enter_fsm is not implemented!")
 
-    def on_exit_fsm(self, args):
+    def on_exit_fsm(self, fsm_name, session_id, session_count, state_name):
         raise Exception("Method iCubRESTSubscriberFSM.on_exit_fsm is not implemented!")
 
 
