@@ -35,7 +35,7 @@ import time
 class Semaphore(FSM):
 
     def __init__(self):
-        FSM.__init__(self)
+        FSM.__init__(self, name="Semaphore")
         self.addState(name="RED", on_enter_callback=self.on_RED)
         self.addState(name="YELLOW", on_enter_callback=self.on_YELLOW)
         self.addState(name="GREEN", on_enter_callback=self.on_GREEN)
@@ -64,6 +64,6 @@ class Publisher(PyiCubRESTfulServer):
 
 app = Publisher()
 fsm = Semaphore()
-app.__setFSM__(fsm)
+app.setFSM(fsm)
 
 app.rest_manager.run_forever()

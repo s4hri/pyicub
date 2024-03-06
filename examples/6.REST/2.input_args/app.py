@@ -26,12 +26,13 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.rest import iCubRESTApp
+from pyicub.rest import iCubRESTApp, rest_service
 
 class myRESTApp(iCubRESTApp):
 
+    @rest_service
     def process(self):
-        return "I am processing my arguments ... " + str(self.__getArgs__())
+        return "I am processing my arguments ... " + str(self.getArgs())
 
 app = myRESTApp(arg1="your-arg1-value", arg2=[1,2,3,4], arg3=["option1", "option2"], arg4={"key1": 1, "key2": [1,2]})
 app.rest_manager.run_forever()

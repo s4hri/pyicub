@@ -33,7 +33,7 @@ except ImportError:
     print("The 'yarp' module is not installed. Some functionality may be limited.")
 
 from pyicub.requests import iCubRequest
-from pyicub.utils import SingletonMeta, getPyiCubInfo, getPublicMethods, firstAvailablePort, importFromJSONFile, exportJSONFile
+from pyicub.utils import SingletonMeta, getPyiCubInfo, getPublicMethods, getDecoratedMethods, firstAvailablePort, importFromJSONFile, exportJSONFile
 from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequestsManager, iCubRequest
 from pyicub.fsm import FSM
@@ -47,7 +47,7 @@ import time
 import os
 import inspect
 import threading
-
+import functools
 
 class RESTJSON:
 
@@ -468,7 +468,6 @@ class iCubRESTManager(iCubRESTServer):
             res = requests.post('%s/unregister' % self.proxy_rule(), json=rs.toJSON())
             return res.content
 
-
 class PyiCubApp(metaclass=SingletonMeta):
 
     def __init__(self, logging=False, logging_path=None, restmanager_proxy_host=None, restmanager_proxy_port=None):
@@ -536,30 +535,40 @@ class PyiCubApp(metaclass=SingletonMeta):
     def rest_manager(self):
         return self._rest_manager_
 
+
+def rest_service(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    setattr(wrapper, '__decorators__', ['rest_service'])
+    return wrapper
+
 class PyiCubRESTfulServer(PyiCubApp):
+
+    custom_rest_services = {}
 
     def __init__(self, robot_name='generic', **kargs):
         PyiCubApp.__init__(self)
         self._name_ = self.__class__.__name__
         self.__robot_name__ = robot_name
         self.__fsm__ = None
-        self.__register_class__(robot_name=robot_name, app_name=self._name_, cls=self, class_name=self._name_)
         self.__register_utils__(app_name=self._name_)
+        self.__register_custom_methods__(robot_name=robot_name, app_name=self.name, cls=self, class_name=self.name)
         self.__args_template__ = kargs
         self.__args__ = {}
         self.__configure_default_args__()
-        self.__configure_app__(self.__args__)
+        self.__configure__(self.__args__)
 
     def __register_utils__(self, app_name):
-        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__configure_app__, target_name='utils.configure')
-        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__getServices__, target_name='utils.getServices')
-        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__getArgsTemplate__, target_name='utils.getArgsTemplate')
-        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__getArgs__, target_name='utils.getArgs')
-        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__setArgs__, target_name='utils.setArgs')
-        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__getArg__, target_name='utils.getArg')
-        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__setArg__, target_name='utils.setArg')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__configure__, target_name='utils.configure')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.getServices, target_name='utils.getServices')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.getArgsTemplate, target_name='utils.getArgsTemplate')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.getArgs, target_name='utils.getArgs')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.setArgs, target_name='utils.setArgs')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.getArg, target_name='utils.getArg')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.setArg, target_name='utils.setArg')
 
-    def __configure__(self, input_args):
+    def configure(self, input_args):
         return {}
 
     @property
@@ -604,33 +613,50 @@ class PyiCubRESTfulServer(PyiCubApp):
             args_dict.update({param.name: '' for param in signature.parameters.values() if param.default is param.empty or param.default is None})
             self.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_prefix+target_name, target=getattr(cls, method), target_signature=args_dict)
 
-    def __configure_app__(self, input_args: dict):
-        self.__setArgs__(input_args)
-        self.__configure__(input_args)
+    def __register_custom_methods__(self, robot_name, app_name, cls, class_name: str=''):
+        target_prefix = class_name
+        for method in getDecoratedMethods(cls, "rest_service"):
+            if class_name:
+                target_prefix = class_name + '.'
+            if "__name__" in getattr(cls, method).__dict__.keys():
+                target_name = getattr(cls, method).__name__
+            else:
+                target_name = str(method)
+            signature = inspect.signature(getattr(cls, method))
+            args_dict = {param.name: param.default for param in signature.parameters.values() if param.default is not param.empty}
+            args_dict.update({param.name: '' for param in signature.parameters.values() if param.default is param.empty or param.default is None})
+            self.rest_manager.register_target(robot_name=robot_name, app_name=app_name, target_name=target_prefix+target_name, target=getattr(cls, method), target_signature=args_dict)
+
+    def __configure__(self, input_args: dict):
+        self.setArgs(input_args)
+        self.configure(input_args)
         return True
     
-    def __getServices__(self):
+    def getServices(self):
         return list(self.rest_manager.get_services(self.robot_name, self.name).keys())
 
-    def __getArgsTemplate__(self):
+    def getArgsTemplate(self):
         return self.__args_template__
 
-    def __getArgs__(self):
+    def initHelper(self):
+        return {}
+
+    def getArgs(self):
         return self.__args__
 
-    def __setArgs__(self, input_args: dict):
+    def setArgs(self, input_args: dict):
         for k,v in input_args.items():
             self.__args__[k] = v
         return
 
-    def __getArg__(self, name: str):
+    def getArg(self, name: str):
         return self.__args__[name]
 
-    def __setArg__(self, name: str, value: object):
+    def setArg(self, name: str, value: object):
         self.__args__[name] = value
         return True
     
-    def __setFSM__(self, fsm: FSM, session_id=0):
+    def setFSM(self, fsm: FSM, session_id=0):
         self.__fsm__ = fsm
         fsm.setSessionID(session_id)
         self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
@@ -658,10 +684,10 @@ class iCubRESTApp(PyiCubRESTfulServer):
                 self.__register_icub_helper__()
         
         if action_repository_path:
-            self.__importActions__(path=action_repository_path)
+            self.importActions(path=action_repository_path)
         
 
-    def __configure__(self, input_args):
+    def configure(self, input_args):
         return {}
 
     def __is_icub_managed__(self):
@@ -672,17 +698,18 @@ class iCubRESTApp(PyiCubRESTfulServer):
         except:
             return False
 
-    def __info__(self):
+    def info(self):
         return self.icub
         
     def __register_icub_helper__(self):
         app_name = "helper"
-        self.__register_utils__(app_name="helper")
-        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__info__, target_name='info')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.initHelper, target_name='utils.getArgsTemplate')
+        self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.initHelper, target_name='utils.configure')
+        self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.info, target_name='info')
         if self.icub.actions_manager:
-            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__playAction__, target_name='actions.playAction')
-            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__getActions__, target_name='actions.getActions')
-            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.__importActionFromJSONDict__, target_name='actions.importAction')
+            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.playAction, target_name='actions.playAction')
+            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.getActions, target_name='actions.getActions')
+            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.importActionFromJSONDict, target_name='actions.importAction')
         if self.icub.gaze:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.gaze, class_name='gaze')
         if self.icub.speech:
@@ -694,16 +721,16 @@ class iCubRESTApp(PyiCubRESTfulServer):
         if self.icub.cam_left:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.cam_left, class_name='cam_left')
 
-    def __importActionFromJSONFile__(self, JSON_file):
+    def importActionFromJSONFile(self, JSON_file):
         JSON_dict = importFromJSONFile(JSON_file)
-        return self.__importActionFromJSONDict__(JSON_dict=JSON_dict)
+        return self.importActionFromJSONDict(JSON_dict=JSON_dict)
   
-    def __importActions__(self, path):
+    def importActions(self, path):
         json_files = [pos_json for pos_json in os.listdir(path) if pos_json.endswith('.json')]
         for f in json_files:
-            self.__importActionFromJSONFile__(os.path.join(path, f))
+            self.importActionFromJSONFile(os.path.join(path, f))
 
-    def __importActionFromJSONDict__(self, JSON_dict, name_prefix=None):
+    def importActionFromJSONDict(self, JSON_dict, name_prefix=None):
         if not name_prefix:
             name_prefix = self.__class__.__name__
         if self.icub:
@@ -718,7 +745,7 @@ class iCubRESTApp(PyiCubRESTfulServer):
             action_id = res.json()['retval']
         return action_id
 
-    def __playAction__(self, action_id: str, wait_for_completed=True):
+    def playAction(self, action_id: str, wait_for_completed=True):
         if self.icub:
             req = self.icub.playAction(action_id=action_id, wait_for_completed=wait_for_completed)
             return 
@@ -735,13 +762,13 @@ class iCubRESTApp(PyiCubRESTfulServer):
                 res = requests.get(res.json())
                 return res
     
-    def __getActions__(self):
+    def getActions(self):
         return list(self.icub.getActions())
 
-    def __importAction__(self, action):
+    def importAction(self, action):
         json_string = json.dumps(action, default=lambda x: x.toJSON(), indent=2)
         json_dict = json.loads(json_string)
-        return self.__importActionFromJSONDict__(JSON_dict=json_dict)
+        return self.importActionFromJSONDict(JSON_dict=json_dict)
 
     @property
     def icub(self):
@@ -835,7 +862,7 @@ class iCubFSM(FSM):
 
     def __on_enter_action__(self):
         current_state = self.getCurrentState()
-        self._app_.__playAction__(self._app_.name + '.' + current_state)
+        self._app_.playAction(self._app_.name + '.' + current_state)
 
    
 class PyiCubRESTfulClient:

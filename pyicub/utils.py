@@ -65,6 +65,18 @@ def getPublicMethods(obj):
     public_object_methods = list(filter(lambda x: not x.startswith('_'), object_methods))
     return public_object_methods
 
+def getDecoratedMethods(obj, decorator_name):
+    decorated_methods = []
+
+    for method_name in dir(obj):
+        method = getattr(obj, method_name)
+        if callable(method) and hasattr(method, '__call__'):
+            decorators = getattr(method, '__decorators__', [])
+            if decorator_name in decorators:
+                decorated_methods.append(method_name)
+
+    return decorated_methods
+
 def getPyiCubInfo():
     info = {
         'Name': pyicub.__name__,

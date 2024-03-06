@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -29,7 +29,7 @@
 from pyicub.helper import TemplateParameter
 
 w1 = TemplateParameter(name="welcome_msg", value="hello world")
-w1.exportJSONFile("json/msg1.json")
+w1.exportJSONFile("msg1.json")
 
 w2 = TemplateParameter(name="welcome_msg", value="welcome world")
-w2.exportJSONFile("json/msg2.json")
+w2.exportJSONFile("msg2.json")

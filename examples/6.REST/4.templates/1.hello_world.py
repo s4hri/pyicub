@@ -45,7 +45,7 @@ template.setParam(JSON_file="template/params/msg2.json")
 action2 = template.getAction(action_name="Welcome2")
 
 app = iCubRESTApp()
-app.__importAction__(action1)
-app.__importAction__(action2)
+app.importAction(action1)
+app.importAction(action2)
 app.rest_manager.run_forever()
 

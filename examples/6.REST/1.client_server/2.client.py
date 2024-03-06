@@ -33,12 +33,12 @@ app_name='myServer'
 
 client = PyiCubRESTfulClient(host='localhost', port=9001)
 
-req_id = client.run_target_async(robot_name, app_name, target_name='foo')
+req_id = client.run_target_async(robot_name, app_name, target_name='myServer.foo')
 
-res = client.run_target(robot_name, app_name, target_name='hello_world', name='Johnny')
+res = client.run_target(robot_name, app_name, target_name='myServer.hello_world', name='Johnny')
 print(res)
 
-res = client.run_target(robot_name, app_name, target_name='date', date_format='%b-%d-%Y')
+res = client.run_target(robot_name, app_name, target_name='myServer.date', date_format='%b-%d-%Y')
 print(res)
 
 print(client.wait_until_completed(req_id))

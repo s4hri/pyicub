@@ -26,20 +26,23 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.rest import PyiCubRESTfulServer
+from pyicub.rest import PyiCubRESTfulServer, rest_service
 from datetime import date
 
 import time
 
 class myServer(PyiCubRESTfulServer):
 
+    @rest_service
     def hello_world(self, name: str='you'):
         return "Hello world %s!" % name
 
+    @rest_service
     def date(self, date_format: str="%d/%m/%Y"):
         today = date.today()
         return today.strftime(date_format)
 
+    @rest_service
     def foo(self):
         time.sleep(5)
         return "I've done a lot of stuff!"
