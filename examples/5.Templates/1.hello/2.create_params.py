@@ -26,7 +26,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import JointsTrajectoryCheckpoint, LimbMotion, JointPose, ICUB_PARTS, iCubFullbodyStep
+from pyicub.helper import JointsTrajectoryCheckpoint, LimbMotion, JointPose, ICUB_PARTS, iCubFullbodyStep, TemplateParameter
 from pyicub.utils import exportJSONFile
 
 class Step(iCubFullbodyStep):
@@ -40,11 +40,8 @@ class Step(iCubFullbodyStep):
         motion.createJointsTrajectory(pose_down, duration=3.0)
         motion.createJointsTrajectory(pose_home, duration=3.0)
 
+param1 = TemplateParameter(name="step_bodymotion", value=Step())
+param1.exportJSONFile("json/step1.json")
 
-step = {}
-step["step_bodymotion"] = Step()
-exportJSONFile("json/step1.json", step)
-
-msg = {}
-msg["welcome_msg"] = "hello world"
-exportJSONFile("json/msg1.json", msg)
+param2 = TemplateParameter(name="welcome_msg", value="hello world")
+param2.exportJSONFile("json/msg1.json")

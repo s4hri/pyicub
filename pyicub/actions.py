@@ -31,6 +31,7 @@ from pyicub.controllers.position import JointPose, DEFAULT_TIMEOUT
 
 import importlib
 import inspect
+import json
 
 class JointsTrajectoryCheckpoint:
 
@@ -195,7 +196,25 @@ class iCubFullbodyAction:
 
     def toJSON(self):
         return self.__dict__
-                    
+
+class TemplateParameter:
+
+    def __init__(self, name: str, value: object):
+        self._param_ = {}
+        self._name_ = name
+        self._param_[name] = value
+    
+    def value(self):
+        return self._param_
+
+    def name(self):
+        return self._name_
+
+    def exportJSONFile(self, filepath):
+        exportJSONFile(filepath, self)
+
+    def toJSON(self):
+        return self._param_
 
 class iCubActionTemplate(iCubFullbodyAction):
 
@@ -219,10 +238,12 @@ class iCubActionTemplate(iCubFullbodyAction):
     def setParams(self, params):
         self.params = params
 
-    def setParam(self, name, value=None, JSON_file=None):
-        if JSON_file:
-            value = importFromJSONFile(JSON_file)[name]
+    def setParam(self, JSON_file):
+        value = importFromJSONFile(JSON_file)
+        name = list(value.keys())[0]
+        value = value[name]
         self.params[name] = value
+
 
 class iCubActionTemplateImportedJSON(iCubActionTemplate):
 

@@ -738,10 +738,10 @@ class iCubRESTApp(PyiCubRESTfulServer):
     def __getActions__(self):
         return list(self.icub.getActions())
 
-    """
-    def importAction(self, JSON_file):
-        return self.__importActionFromJSONFile__(JSON_file=JSON_file)
-    """
+    def __importAction__(self, action):
+        json_string = json.dumps(action, default=lambda x: x.toJSON(), indent=2)
+        json_dict = json.loads(json_string)
+        return self.__importActionFromJSONDict__(JSON_dict=json_dict)
 
     @property
     def icub(self):
