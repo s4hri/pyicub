@@ -50,6 +50,8 @@ class LimbMotion:
         self.checkpoints = []
 
     def createJointsTrajectory(self, pose: JointPose, duration: float=0.0, timeout: float=DEFAULT_TIMEOUT):
+        if not pose.joints_list:
+            pose.joints_list = self.part.joints_list
         checkpoint = JointsTrajectoryCheckpoint(pose=pose, duration=duration, timeout=timeout)
         self.checkpoints.append(checkpoint)
         return checkpoint
@@ -140,13 +142,16 @@ class iCubFullbodyStep:
         self.importFromJSONDict(JSON_dict)
 
 
-    """
-
-    def mergeStep(self, step: iCubFullbodyStep):
-        self.name += '+' + step.name
-        for k,v in step.limb_motions:
-            if not k in self.limb_motion:
-    """
+    def join(self, step):
+        for k,v in step.limb_motions.items():
+            if k in self.limb_motions.keys():
+                raise Exception("Cannot join currest step because part %s is already present." % k)
+            else:
+                self.limb_motions[k] = v
+        if step.custom_calls:
+            self.custom_calls.extend(step.custom_calls)
+        if step.gaze_motion:
+            self.gaze_motion = step.gaze_motion
     
     def setLimbMotion(self, limb_motion: LimbMotion):
         self.limb_motions[limb_motion.part.name] = limb_motion
