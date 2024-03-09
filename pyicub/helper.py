@@ -30,7 +30,7 @@ import yarp
 yarp.Network().init()
 
 from pyicub.controllers.gaze import GazeController
-from pyicub.controllers.position import PositionController, JointPose
+from pyicub.controllers.position import PositionController, JointPose, iCubPart, ICUB_HEAD, ICUB_EYELIDS, ICUB_EYES, ICUB_NECK, ICUB_TORSO, ICUB_RIGHTARM_FULL, ICUB_LEFTARM_FULL
 from pyicub.actions import PyiCubCustomCall, LimbMotion, GazeMotion, iCubFullbodyStep, iCubFullbodyAction, JointsTrajectoryCheckpoint, iCubActionTemplate, ActionsManager, TemplateParameter
 from pyicub.modules.emotions import emotionsPyCtrl
 from pyicub.modules.speech import iSpeakPyCtrl
@@ -49,21 +49,6 @@ import os
 import time
 import inspect
 
-
-class ICUB_PARTS:
-    HEAD       = 'head'
-    FACE       = 'face'
-    TORSO      = 'torso'
-    LEFT_ARM   = 'left_arm'
-    RIGHT_ARM  = 'right_arm'
-    LEFT_LEG   = 'left_leg'
-    RIGHT_LEG  = 'right_leg'
-
-class iCubPart:
-    def __init__(self, name, joints_n):
-        self.name = name
-        self.joints_n = joints_n
-        self.joints_list = range(0, joints_n)
 
 
 class iCubSingleton(type):
@@ -99,13 +84,15 @@ class iCub(metaclass=iCubSingleton):
         self._proxy_host_             = proxy_host
 
         self._icub_parts_                           = {}
-        self._icub_parts_[ICUB_PARTS.FACE       ]   = iCubPart(ICUB_PARTS.FACE      , 1)
-        self._icub_parts_[ICUB_PARTS.HEAD       ]   = iCubPart(ICUB_PARTS.HEAD      , 6)
-        self._icub_parts_[ICUB_PARTS.LEFT_ARM   ]   = iCubPart(ICUB_PARTS.LEFT_ARM  , 16)
-        self._icub_parts_[ICUB_PARTS.RIGHT_ARM  ]   = iCubPart(ICUB_PARTS.RIGHT_ARM , 16)
-        self._icub_parts_[ICUB_PARTS.TORSO      ]   = iCubPart(ICUB_PARTS.TORSO     , 3)
-        self._icub_parts_[ICUB_PARTS.LEFT_LEG   ]   = iCubPart(ICUB_PARTS.LEFT_LEG  , 6)
-        self._icub_parts_[ICUB_PARTS.RIGHT_LEG  ]   = iCubPart(ICUB_PARTS.RIGHT_LEG , 6)
+
+        self._icub_parts_[ICUB_EYELIDS.name             ]   = ICUB_EYELIDS
+        self._icub_parts_[ICUB_HEAD.name                ]   = ICUB_HEAD
+        self._icub_parts_[ICUB_EYES.name                ]   = ICUB_EYES
+        self._icub_parts_[ICUB_NECK.name                ]   = ICUB_NECK
+        self._icub_parts_[ICUB_TORSO.name               ]   = ICUB_TORSO
+        self._icub_parts_[ICUB_LEFTARM_FULL.name        ]   = ICUB_LEFTARM_FULL
+        self._icub_parts_[ICUB_RIGHTARM_FULL.name       ]   = ICUB_RIGHTARM_FULL
+
 
         if SIMULATION:
             if SIMULATION == 'true':
@@ -134,16 +121,18 @@ class iCub(metaclass=iCubSingleton):
             self.importAction(os.path.join(path, f))
     
     def _initPositionControllers_(self):
-        for part_name in self._icub_parts_.keys():
-            self._initPositionController_(part_name)
+        for part in self._icub_parts_.values():
+            self._initPositionController_(part)
 
-    def _initPositionController_(self, part_name):
-        ctrl = PositionController(self._robot_name_, part_name, self._logger_)
+    def _initPositionController_(self, part: iCubPart):
+        if part.robot_part in self._position_controllers_:
+            return
+        ctrl = PositionController(self._robot_name_, part.robot_part, self._logger_)
         if ctrl.isValid():
-            self._position_controllers_[part_name] = ctrl
-            self._position_controllers_[part_name].init()
+            self._position_controllers_[part.robot_part] = ctrl
+            self._position_controllers_[part.robot_part].init()
         else:
-            self._logger_.warning('PositionController <%s> not callable! Are you sure the robot part is available?' % part_name)
+            self._logger_.warning('PositionController <%s> not callable! Are you sure the robot part is available?' % part.robot_part)
 
     def _initGazeController_(self):
         gaze_ctrl = GazeController(self._robot_name_, self._logger_)
@@ -249,10 +238,10 @@ class iCub(metaclass=iCubSingleton):
     def exists(self):
         return len(self._position_controllers_.keys()) > 0
 
-    def getPositionController(self, part_name):
-        if part_name in self._position_controllers_.keys():
-            return self._position_controllers_[part_name]
-        self._logger_.error('PositionController <%s> non callable! Are you sure the robot part is available?' % part_name)
+    def getPositionController(self, part: iCubPart):
+        if part.robot_part in self._position_controllers_.keys():
+            return self._position_controllers_[part.robot_part]
+        self._logger_.error('PositionController <%s> non callable! Are you sure the robot part is available?' % part.name)
         return None
         
     def portmonitor(self, yarp_src_port, activate_function, callback):
@@ -308,20 +297,21 @@ class iCub(metaclass=iCubSingleton):
 
     def movePart(self, limb_motion: LimbMotion, prefix='', ts_ref=0.0):
         requests = []
-        ctrl = self.getPositionController(limb_motion.part_name)
+        ctrl = self.getPositionController(limb_motion.part)
         for i in range(0, len(limb_motion.checkpoints)):
             if ctrl is None:
-                self._logger_.warning('movePart <%s> ignored!' % limb_motion.part_name)
+                self._logger_.warning('movePart <%s> ignored!' % limb_motion.part.name)
             else:
-                req = self.request_manager.create(timeout=limb_motion.checkpoints[i].timeout, 
+                req = self.request_manager.create(timeout=iCubRequest.TIMEOUT_REQUEST, 
                                                   target=ctrl.move,
-                                                  name=prefix + '/' + limb_motion.part_name,
+                                                  name=prefix + '/' + limb_motion.part.name,
                                                   ts_ref=ts_ref)
 
                 self.request_manager.run_request(req,
                                                  wait_for_completed=True,
                                                  pose=limb_motion.checkpoints[i].pose,
                                                  req_time=limb_motion.checkpoints[i].duration,
+                                                 timeout=limb_motion.checkpoints[i].timeout,
                                                  tag=req.tag)
                 
                 requests.append(req)
