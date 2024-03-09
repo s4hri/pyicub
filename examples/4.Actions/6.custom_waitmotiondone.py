@@ -27,7 +27,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from pyicub.helper import iCub, JointPose, ICUB_PARTS, iCubFullbodyAction, iCubFullbodyStep
+from pyicub.helper import iCub, JointPose, iCubFullbodyAction, iCubFullbodyStep, ICUB_HEAD
 
 class Step(iCubFullbodyStep):
 
@@ -36,7 +36,7 @@ class Step(iCubFullbodyStep):
         pose_down = JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
         pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
         
-        lm = self.createLimbMotion(ICUB_PARTS.HEAD)
+        lm = self.createLimbMotion(ICUB_HEAD)
         lm.createJointsTrajectory(pose_up, duration=2.0)
         lm.createJointsTrajectory(pose_down, duration=2.0, timeout=1.0)
         lm.createJointsTrajectory(pose_home, duration=2.0)
@@ -51,5 +51,5 @@ action = GenericPoses()
 icub = iCub()
 action_id = icub.addAction(action)
 icub.playAction(action_id)
-icub.getPositionController(ICUB_PARTS.HEAD).setCustomWaitMotionDone(motion_complete_at=0.8)
+icub.getPositionController(ICUB_HEAD).setCustomWaitMotionDone(motion_complete_at=0.8)
 icub.playAction(action_id)

@@ -2,8 +2,20 @@
     "step_bodymotion": {
         "name": "Step",
         "limb_motions": {
-            "head": {
-                "part_name": "head",
+            "HEAD": {
+                "part": {
+                    "name": "HEAD",
+                    "robot_part": "head",
+                    "joints_nr": 6,
+                    "joints_list": [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5
+                    ]
+                },
                 "checkpoints": [
                     {
                         "pose": {

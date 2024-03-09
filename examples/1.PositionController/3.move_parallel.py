@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,11 +26,11 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, ICUB_PARTS
+from pyicub.helper import iCub, JointPose, ICUB_HEAD, ICUB_TORSO
 
 icub = iCub()
-head_ctrl = icub.getPositionController(ICUB_PARTS.HEAD)
-torso_ctrl = icub.getPositionController(ICUB_PARTS.TORSO)
+head_ctrl = icub.getPositionController(ICUB_HEAD)
+torso_ctrl = icub.getPositionController(ICUB_TORSO)
 
 head_up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 head_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
@@ -38,8 +38,11 @@ head_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 torso_down = JointPose(target_joints=[0.0, 0.0, 20.0])
 torso_home = JointPose(target_joints=[0.0, 0.0, 0.0])
 
-head_ctrl.move(head_up, waitMotionDone=False)
-torso_ctrl.move(torso_down, waitMotionDone=False)
+head_ctrl.move(head_home)
+torso_ctrl.move(torso_home)
+
+head_ctrl.move(head_up, req_time=1.0, waitMotionDone=False)
+torso_ctrl.move(torso_down, req_time=5.0, waitMotionDone=False)
 
 head_ctrl.waitMotionDone(timeout=10.0)
 torso_ctrl.waitMotionDone(timeout=10.0)

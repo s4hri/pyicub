@@ -3,8 +3,30 @@
         {
             "name": "Step1",
             "limb_motions": {
-                "right_arm": {
-                    "part_name": "right_arm",
+                "RIGHTARM_FULL": {
+                    "part": {
+                        "name": "RIGHTARM_FULL",
+                        "robot_part": "right_arm",
+                        "joints_nr": 16,
+                        "joints_list": [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            12,
+                            13,
+                            14,
+                            15
+                        ]
+                    },
                     "checkpoints": [
                         {
                             "pose": {
@@ -58,8 +80,30 @@
                         }
                     ]
                 },
-                "left_arm": {
-                    "part_name": "left_arm",
+                "LEFTARM_FULL": {
+                    "part": {
+                        "name": "LEFTARM_FULL",
+                        "robot_part": "left_arm",
+                        "joints_nr": 16,
+                        "joints_list": [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            12,
+                            13,
+                            14,
+                            15
+                        ]
+                    },
                     "checkpoints": [
                         {
                             "pose": {
@@ -134,8 +178,30 @@
         {
             "name": "Step2",
             "limb_motions": {
-                "left_arm": {
-                    "part_name": "left_arm",
+                "LEFTARM_FULL": {
+                    "part": {
+                        "name": "LEFTARM_FULL",
+                        "robot_part": "left_arm",
+                        "joints_nr": 16,
+                        "joints_list": [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            12,
+                            13,
+                            14,
+                            15
+                        ]
+                    },
                     "checkpoints": [
                         {
                             "pose": {
@@ -197,8 +263,30 @@
         {
             "name": "Step3",
             "limb_motions": {
-                "right_arm": {
-                    "part_name": "right_arm",
+                "RIGHTARM_FULL": {
+                    "part": {
+                        "name": "RIGHTARM_FULL",
+                        "robot_part": "right_arm",
+                        "joints_nr": 16,
+                        "joints_list": [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            12,
+                            13,
+                            14,
+                            15
+                        ]
+                    },
                     "checkpoints": [
                         {
                             "pose": {
@@ -252,8 +340,30 @@
                         }
                     ]
                 },
-                "left_arm": {
-                    "part_name": "left_arm",
+                "LEFTARM_FULL": {
+                    "part": {
+                        "name": "LEFTARM_FULL",
+                        "robot_part": "left_arm",
+                        "joints_nr": 16,
+                        "joints_list": [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            12,
+                            13,
+                            14,
+                            15
+                        ]
+                    },
                     "checkpoints": [
                         {
                             "pose": {

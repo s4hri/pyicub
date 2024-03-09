@@ -26,18 +26,18 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, LimbMotion, ICUB_PARTS, iCubFullbodyAction, iCubFullbodyStep
+from pyicub.helper import iCub, JointPose, LimbMotion, iCubFullbodyAction, iCubFullbodyStep, ICUB_RIGHTARM_FULL, ICUB_LEFTARM_FULL
 
 import os
 
 arm_down = JointPose(target_joints=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 20.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 arm_up = JointPose(target_joints=[-90.0, 20.0, 10.0, 90.0, 0.0, 0.0, 0.0, 60.0, 20.0, 20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0])
 
-right_arm_motion = LimbMotion(ICUB_PARTS.RIGHT_ARM)
+right_arm_motion = LimbMotion(ICUB_RIGHTARM_FULL)
 right_arm_motion.createJointsTrajectory(arm_up, duration=1.0)
 right_arm_motion.createJointsTrajectory(arm_down, duration=1.0)
 
-left_arm_motion = LimbMotion(ICUB_PARTS.LEFT_ARM)
+left_arm_motion = LimbMotion(ICUB_LEFTARM_FULL)
 left_arm_motion.createJointsTrajectory(arm_up, duration=1.0)
 left_arm_motion.createJointsTrajectory(arm_down, duration=1.0)
 
