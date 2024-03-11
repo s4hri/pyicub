@@ -177,14 +177,8 @@ class PositionController:
         t0 = time.perf_counter()
         if joints_list is None:
             joints_list = range(0, self.__joints__)
-        encs  = yarp.Vector(self.__joints__)
-        while not self.__IEncoders__.getEncoders(encs.data()):
-            yarp.delay(0.1)
-        i = 0
         for j in joints_list:
-            self.__IPositionControl__.positionMove(j, encs[i])
             self.__IPositionControl__.setRefSpeed(j, 0.0)
-            i+=1
         return 0.0
 
 
