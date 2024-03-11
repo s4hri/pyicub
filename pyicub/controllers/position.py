@@ -166,10 +166,11 @@ class PositionController:
                 else:
                     speeds[i] = speed
                     times[i] = disp[i]/speeds[i]
-                    req_time = max(req_time, times[i])
                 self.__IPositionControl__.setRefSpeed(j, speeds[i])
                 self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
+        if req_time == 0:
+            req_time = max(times)
         return req_time
 
     def stop(self, joints_list=None):
