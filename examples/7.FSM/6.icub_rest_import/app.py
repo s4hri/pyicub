@@ -28,49 +28,13 @@
 
 from pyicub.rest import iCubRESTApp, iCubFSM
 from pyicub.actions import iCubFullbodyAction
+
 import os
 
+app = iCubRESTApp()
 
-head_action = iCubFullbodyAction(JSON_file="actions/HeadAction.json")
-lookat_action = iCubFullbodyAction(JSON_file="actions/LookAtAction.json")
+fsm = iCubFSM()
+fsm.importFromJSONFile('fsm.json')
 
-class FSM_A(iCubFSM):
-
-    def __init__(self):
-        iCubFSM.__init__(self)
-        lookat_state = self.addAction(lookat_action)
-        self.addTransition("start", "init", lookat_state)
-        self.exportJSONFile("FSM_A.json")
-        self.draw("FSM_A.png")
-
-
-class FSM_B(iCubFSM):
-
-    def __init__(self):
-        iCubFSM.__init__(self)
-        head_state = self.addAction(head_action)
-        lookat_state = self.addAction(lookat_action)
-        self.addTransition("start", "init", head_state)
-        self.addTransition("next", head_state, lookat_state)
-        self.addTransition("reset", lookat_state, "init")
-        self.exportJSONFile("FSM_B.json")
-        self.draw("FSM_B.png")
-
-
-
-class MultipleFSM(iCubRESTApp):
-
-    def __init__(self, machine_id):
-        self.FSM_A = FSM_A()
-        self.FSM_B = FSM_B()
-        iCubRESTApp.__init__(self, machine_id=machine_id)
-
-    def configure(self, input_args):
-        machine_id = int(input_args['machine_id'])
-        if machine_id == 1:
-            self.setFSM(self.FSM_A)
-        elif machine_id == 2:
-            self.setFSM(self.FSM_B)
-
-app = MultipleFSM(machine_id=[1,2])
+app.setFSM(fsm)
 app.rest_manager.run_forever()

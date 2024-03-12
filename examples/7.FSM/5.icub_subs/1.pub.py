@@ -31,12 +31,12 @@ import os
 
 class Publisher(iCubRESTApp):
 
-    def __init__(self, action_repository_path=None):
-        iCubRESTApp.__init__(self, action_repository_path=action_repository_path)
+    def __init__(self):
+        self.myFSM = iCubFSM(JSON_file="fsm.json")
+        iCubRESTApp.__init__(self)
 
-    def configure(self, input_args):
-        fsm = iCubFSM(app=self, JSON_file="fsm.json")
-        self.setFSM(fsm)
+    def configure(self, input_args):        
+        self.setFSM(self.myFSM)
 
-app = Publisher(action_repository_path='./actions')
+app = Publisher()
 app.rest_manager.run_forever()

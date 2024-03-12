@@ -37,6 +37,7 @@ from pyicub.utils import SingletonMeta, getPyiCubInfo, getPublicMethods, getDeco
 from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequestsManager, iCubRequest
 from pyicub.fsm import FSM
+from pyicub.actions import iCubFullbodyAction
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from urllib.parse import urlparse, urlsplit
@@ -48,6 +49,7 @@ import os
 import inspect
 import threading
 import functools
+import importlib
 
 class RESTJSON:
 
@@ -557,7 +559,6 @@ class PyiCubRESTfulServer(PyiCubApp):
         self.__args_template__ = kargs
         self.__args__ = {}
         self.__configure_default_args__()
-        self.__configure__(self.__args__)
 
     def __register_utils__(self, app_name):
         self.__register_method__(robot_name=self.robot_name, app_name=app_name, method=self.__configure__, target_name='utils.configure')
@@ -658,6 +659,7 @@ class PyiCubRESTfulServer(PyiCubApp):
     
     def setFSM(self, fsm: FSM, session_id=0):
         self.__fsm__ = fsm
+        fsm.setApp(self)
         fsm.setSessionID(session_id)
         self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
 
@@ -685,7 +687,14 @@ class iCubRESTApp(PyiCubRESTfulServer):
         
         if action_repository_path:
             self.importActions(path=action_repository_path)
-        
+    
+    def __configure__(self, input_args: dict):
+        self.setArgs(input_args)
+        self.configure(input_args)
+        if self.fsm:
+            for action in self.fsm.actions.values():
+                self.importAction(action, name_prefix=self.name + '.' + self.fsm.name)
+        return True
 
     def configure(self, input_args):
         return {}
@@ -765,10 +774,12 @@ class iCubRESTApp(PyiCubRESTfulServer):
     def getActions(self):
         return list(self.icub.getActions())
 
-    def importAction(self, action):
+    def importAction(self, action: iCubFullbodyAction, name_prefix=None):
+        if not name_prefix:
+            name_prefix = self.__class__.__name__        
         json_string = json.dumps(action, default=lambda x: x.toJSON(), indent=2)
         json_dict = json.loads(json_string)
-        return self.importActionFromJSONDict(JSON_dict=json_dict)
+        return self.importActionFromJSONDict(JSON_dict=json_dict, name_prefix=name_prefix)
 
     @property
     def icub(self):
@@ -852,18 +863,56 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
 
 class iCubFSM(FSM):
 
-    def __init__(self, app: iCubRESTApp, JSON_dict=None, JSON_file=None):
+    def __init__(self, JSON_dict=None, JSON_file=None):
+        self._app_ = None
+        self._actions_ = {}
         FSM.__init__(self, name=self.__class__.__name__, JSON_dict=JSON_dict, JSON_file=JSON_file)
-        self._app_ = app
 
-    def addAction(self, action):
-        self.addState(name=action.name, description=action.description, on_enter_callback=self.__on_enter_action__)
-        return action.name
+    @property
+    def actions(self):
+        return self._actions_
 
     def __on_enter_action__(self):
         current_state = self.getCurrentState()
-        self._app_.playAction(self._app_.name + '.' + current_state)
+        self._app_.playAction(self._app_.name + '.' + self.name + '.' + current_state)
 
+    def setApp(self, app: iCubRESTApp):
+        self._app_ = app
+
+    def addAction(self, action: iCubFullbodyAction):
+        self._actions_[action.name] = action
+        self.addState(name=action.name, description=action.description, on_enter_callback=self.__on_enter_action__)
+        return action.name
+
+    def importFromJSONDict(self, data):
+        name = data.get("name", "")
+        states = data.get("states", [])
+        transitions = data.get("transitions", [])
+        actions = data.get("actions", {})
+
+        for state_data in states:
+            self.addState(name=state_data["name"], description=state_data["description"], on_enter_callback=self.__on_enter_action__)
+
+        for transition_data in transitions:
+            self.addTransition(trigger=transition_data["trigger"], source=transition_data["source"], dest=transition_data["dest"])
+
+        for action in actions.values():
+            self.addAction(iCubFullbodyAction(JSON_dict=action))
+
+        initial_state = data.get("initial_state", FSM.INIT_STATE)
+        self._machine_.set_state(initial_state)
+
+    def exportJSONFile(self, filepath):
+        data = {
+                "name": self._name_,
+                "states": self._states_,
+                "transitions": self._transitions_,
+                "initial_state": self._machine_.initial,
+                "session_id": self._session_id_,
+                "session_count": self._session_count_,
+                "actions": self._actions_
+            }
+        exportJSONFile(filepath, data)
    
 class PyiCubRESTfulClient:
 
@@ -948,3 +997,60 @@ class PyiCubRESTfulClient:
             if req['status'] != iCubRequest.RUNNING:
                 return req['retval']
             time.sleep(0.01)
+
+
+class FSMsManager:
+
+    def __init__(self):
+        self.__machines__ = {}
+
+    def __get_subclasses__(self, module, base_class):
+        subclasses = []
+        for name, obj in inspect.getmembers(module):
+            if inspect.isclass(obj) and issubclass(obj, base_class) and obj != base_class:
+                subclasses.append(obj)
+        return subclasses
+
+    def __instantiate_machines__(self, module):
+        try:
+            module = importlib.import_module(module)
+            clsmembers = self.__get_subclasses__(module, iCubFSM)
+            machines = []
+
+            for class_ in clsmembers:
+                machines.append( class_() )
+            
+            return machines
+
+        except (ImportError, AttributeError) as e:
+            print(f"Error: {e}")
+            print(f"Could not import or instantiate classes for module: {module}")
+
+        return None
+
+    def addFSM(self, machine: iCubFSM, machine_id=None):
+        if not machine_id:
+            machine_id = machine.name
+        if machine_id in self.__machines__.keys():
+            raise Exception("An error occurred adding a new FSM! Class name '%s' already present! Please choose different names for each machine class." % machine_id)
+        self.__machines__[machine_id] = machine
+        return machine_id
+
+    def importFSMsFromModule(self, module):
+        machines = self.__instantiate_machines__(module)
+        for machine in machines:
+            self.addFSM(machine)
+
+    def getFSM(self, machine_id: str):
+        if machine_id in self.__machines__.keys():
+            return self.__machines__[machine_id]
+        raise Exception("machine_id '%s' not found! Please provide a machine identifier previously imported!" % machine_id)
+
+    def getFSMs(self):
+        return self.__machines__.keys()
+
+    def exportFSMs(self, path):
+        for k, machine in self.__machines__.items():
+            machine.exportJSONFile('%s/%s.json' % (path, k))
+            machine.draw('%s/%s.png' % (path, k))
+

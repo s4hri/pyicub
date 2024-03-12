@@ -42,7 +42,7 @@ def main():
 
     execute_parser = subparsers.add_parser("run", help="Running process")
     execute_parser.add_argument("--actions", nargs="+", required=True, help="List of actions to process (action id)")
-    execute_parser.add_argument("--source", nargs="+", required=True, help="Source path")
+    execute_parser.add_argument("--source", nargs="+", required=True, help="Source path JSON repository")
 
     args = parser.parse_args()
 
@@ -55,7 +55,7 @@ def main():
         for action in args.actions:
             icub.playAction(action)
     else:
-        print("Invalid command. Choose 'build' or 'execute'.")
+        print("Invalid command. Choose 'build' or 'run'.")
     
 
 if __name__ == "__main__":

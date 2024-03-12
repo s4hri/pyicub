@@ -185,6 +185,9 @@ class iCubFullbodyAction:
     def prepare(self):
         raise NotImplementedError("The method 'prepare' contains definition for creating custom actions.")
 
+    def addAction(self, action):
+        self.steps.extend(action.steps)
+
     def addStep(self, step: iCubFullbodyStep):
         self.steps.append(step)
 

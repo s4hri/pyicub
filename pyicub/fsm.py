@@ -21,6 +21,10 @@ class FSM:
             else:
                 self.importFromJSONFile(JSON_file)
 
+    @property
+    def name(self):
+        return self._name_
+    
     def addState(self, name, description='', on_enter_callback=None):
         s = State(name=name, on_enter=on_enter_callback)
         self._machine_.add_state(s)
@@ -108,4 +112,5 @@ class FSM:
             "session_count": self._session_count_
         }
         return data
-        
+
+
