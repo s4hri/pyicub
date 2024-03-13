@@ -45,28 +45,29 @@ class ICUB_PARTS:
     RIGHT_LEG  = 'right_leg'
 
 class iCubPart:
-    def __init__(self, name, robot_part, joints_nr, joints_list):
+    def __init__(self, name, robot_part, joints_nr, joints_list, default_vel):
         self.name = name
         self.robot_part = robot_part
         self.joints_nr = joints_nr
         self.joints_list = joints_list
+        self.default_vel = default_vel
 
     def toJSON(self):
         return self.__dict__
 
-ICUB_EYELIDS        = iCubPart('EYELIDS',       ICUB_PARTS.FACE       ,  1,  [0] )
-ICUB_HEAD           = iCubPart('HEAD',          ICUB_PARTS.HEAD       ,  6,  [0, 1, 2, 3, 4, 5])
-ICUB_EYES           = iCubPart('EYES',          ICUB_PARTS.HEAD       ,  3,  [3, 4, 5])
-ICUB_NECK           = iCubPart('NECK',          ICUB_PARTS.HEAD       ,  3,  [0, 1, 2])
-ICUB_LEFTARM_FULL   = iCubPart('LEFTARM_FULL',  ICUB_PARTS.LEFT_ARM   , 16,  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
-ICUB_LEFTHAND       = iCubPart('LEFTHAND',      ICUB_PARTS.LEFT_ARM   , 16,  [8, 9, 10, 11, 12, 13, 14, 15])
-ICUB_LEFTARM        = iCubPart('LEFTARM',       ICUB_PARTS.LEFT_ARM   , 16,  [0, 1, 2, 3, 4, 5, 6, 7])
-ICUB_RIGHTARM_FULL  = iCubPart('RIGHTARM_FULL', ICUB_PARTS.RIGHT_ARM  , 16,  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
-ICUB_RIGHTHAND      = iCubPart('RIGHTHAND',     ICUB_PARTS.RIGHT_ARM  , 16,  [8, 9, 10, 11, 12, 13, 14, 15])
-ICUB_RIGHTARM       = iCubPart('RIGHTARM',      ICUB_PARTS.RIGHT_ARM  , 16,  [0, 1, 2, 3, 4, 5, 6, 7])
-ICUB_TORSO          = iCubPart('TORSO',         ICUB_PARTS.TORSO      ,  3,  [0, 1, 2])
-ICUB_LEFTLEG        = iCubPart('LEFTLEG',       ICUB_PARTS.LEFT_LEG   ,  6,  [0, 1, 2, 3, 4, 5])
-ICUB_RIGHTLEG       = iCubPart('RIGHTLEG',      ICUB_PARTS.RIGHT_LEG  ,  6,  [0, 1, 2, 3, 4, 5])
+ICUB_EYELIDS        = iCubPart('EYELIDS',       ICUB_PARTS.FACE       ,  1,  [0], 10)
+ICUB_HEAD           = iCubPart('HEAD',          ICUB_PARTS.HEAD       ,  6,  [0, 1, 2, 3, 4, 5], 10)
+ICUB_EYES           = iCubPart('EYES',          ICUB_PARTS.HEAD       ,  3,  [3, 4, 5], 10)
+ICUB_NECK           = iCubPart('NECK',          ICUB_PARTS.HEAD       ,  3,  [0, 1, 2], 10)
+ICUB_LEFTARM_FULL   = iCubPart('LEFTARM_FULL',  ICUB_PARTS.LEFT_ARM   , 16,  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 10)
+ICUB_LEFTHAND       = iCubPart('LEFTHAND',      ICUB_PARTS.LEFT_ARM   , 16,  [8, 9, 10, 11, 12, 13, 14, 15], 10)
+ICUB_LEFTARM        = iCubPart('LEFTARM',       ICUB_PARTS.LEFT_ARM   , 16,  [0, 1, 2, 3, 4, 5, 6, 7], 10)
+ICUB_RIGHTARM_FULL  = iCubPart('RIGHTARM_FULL', ICUB_PARTS.RIGHT_ARM  , 16,  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 10)
+ICUB_RIGHTHAND      = iCubPart('RIGHTHAND',     ICUB_PARTS.RIGHT_ARM  , 16,  [8, 9, 10, 11, 12, 13, 14, 15], 10)
+ICUB_RIGHTARM       = iCubPart('RIGHTARM',      ICUB_PARTS.RIGHT_ARM  , 16,  [0, 1, 2, 3, 4, 5, 6, 7], 10)
+ICUB_TORSO          = iCubPart('TORSO',         ICUB_PARTS.TORSO      ,  3,  [0, 1, 2], 10)
+ICUB_LEFTLEG        = iCubPart('LEFTLEG',       ICUB_PARTS.LEFT_LEG   ,  6,  [0, 1, 2, 3, 4, 5], 10)
+ICUB_RIGHTLEG       = iCubPart('RIGHTLEG',      ICUB_PARTS.RIGHT_LEG  ,  6,  [0, 1, 2, 3, 4, 5], 10)
 
 
 class JointPose:
@@ -105,7 +106,7 @@ class RemoteControlboard:
 class PositionController:
 
     WAITMOTIONDONE_PERIOD = 0.1
-    MOTION_COMPLETE_AT = 0.9
+    MOTION_COMPLETE_AT = 0.90
 
     def __init__(self, robot_name, part, logger):
         self.__part_name__ = part
@@ -117,7 +118,7 @@ class PositionController:
         self.__IControlMode__   = None
         self.__IPositionControl__   = None
         self.__joints__   = None
-        self.__waitMotionDone__ = self.waitMotionDone2
+        self.__waitMotionDone__ = self.waitMotionDone
 
     def isValid(self):
         return self.PolyDriver.isValid()
@@ -196,7 +197,8 @@ class PositionController:
                                 req_time:%.2f,
                                 joints_list=%s,
                                 waitMotionDone=%s,
-                                timeout=%s""" %
+                                timeout=%s,
+                                speed=%s""" %
                                 (
                                   tag,
                                   self.__part_name__,
@@ -204,7 +206,8 @@ class PositionController:
                                   req_time                ,
                                   str(joints_list)        ,
                                   str(waitMotionDone)     ,
-                                  str(timeout)
+                                  str(timeout)            ,
+                                  str(speed)
                                 )
                             )
 
@@ -221,7 +224,8 @@ class PositionController:
                                 req_time:%.2f,
                                 joints_list=%s,
                                 waitMotionDone=%s,
-                                timeout=%s""" %
+                                timeout=%s,
+                                speed=%s""" %
                                 (
                                     time.perf_counter() - t0,
                                     tag,
@@ -230,7 +234,8 @@ class PositionController:
                                     req_time                ,
                                     str(joints_list)        ,
                                     str(waitMotionDone)     ,
-                                    str(timeout)
+                                    str(timeout),
+                                    str(speed)
                                 ))
             else:
                 self.stop()
@@ -242,7 +247,8 @@ class PositionController:
                                 req_time:%.2f,
                                 joints_list=%s,
                                 waitMotionDone=%s,
-                                timeout=%s""" %
+                                timeout=%s,
+                                speed=%s""" %
                                 (
                                     time.perf_counter() - t0,
                                     tag,
@@ -251,7 +257,8 @@ class PositionController:
                                     req_time                ,
                                     str(joints_list)        ,
                                     str(waitMotionDone)     ,
-                                    str(timeout)
+                                    str(timeout),
+                                    str(speed)
                                 ))
             return res
                 
@@ -281,6 +288,7 @@ class PositionController:
         self.__IPositionControl__.getTargetPositions(target_pos.data())
         count = 0
         deadline = min(timeout, req_time)
+        print(timeout, req_time)
         while (time.perf_counter() - t0) < deadline:
             while not self.__IEncoders__.getEncoders(encs.data()):
                 yarp.delay(0.05)
@@ -293,6 +301,8 @@ class PositionController:
                 tot_disp = utils.vector_distance(v, w)
             count+=1
             dist = utils.vector_distance(v, w)
+
+            print(dist, (1.0 - PositionController.MOTION_COMPLETE_AT)*tot_disp, tot_disp, PositionController.MOTION_COMPLETE_AT)
             if dist <= (1.0 - PositionController.MOTION_COMPLETE_AT)*tot_disp:
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
