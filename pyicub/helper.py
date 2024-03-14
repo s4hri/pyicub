@@ -312,7 +312,7 @@ class iCub(metaclass=iCubSingleton):
                                                  pose=limb_motion.checkpoints[i].pose,
                                                  req_time=limb_motion.checkpoints[i].duration,
                                                  timeout=limb_motion.checkpoints[i].timeout,
-                                                 speed=limb_motion.checkpoints[i].speed,
+                                                 joints_speed=limb_motion.checkpoints[i].joints_speed,
                                                  tag=req.tag)
                 
                 requests.append(req)

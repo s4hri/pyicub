@@ -45,29 +45,29 @@ class ICUB_PARTS:
     RIGHT_LEG  = 'right_leg'
 
 class iCubPart:
-    def __init__(self, name, robot_part, joints_nr, joints_list, default_vel):
+    def __init__(self, name, robot_part, joints_nr, joints_list, joints_speed):
         self.name = name
         self.robot_part = robot_part
         self.joints_nr = joints_nr
         self.joints_list = joints_list
-        self.default_vel = default_vel
+        self.joints_speed = joints_speed
 
     def toJSON(self):
         return self.__dict__
 
-ICUB_EYELIDS        = iCubPart('EYELIDS',       ICUB_PARTS.FACE       ,  1,  [0], 10)
-ICUB_HEAD           = iCubPart('HEAD',          ICUB_PARTS.HEAD       ,  6,  [0, 1, 2, 3, 4, 5], 10)
-ICUB_EYES           = iCubPart('EYES',          ICUB_PARTS.HEAD       ,  3,  [3, 4, 5], 10)
-ICUB_NECK           = iCubPart('NECK',          ICUB_PARTS.HEAD       ,  3,  [0, 1, 2], 10)
-ICUB_LEFTARM_FULL   = iCubPart('LEFTARM_FULL',  ICUB_PARTS.LEFT_ARM   , 16,  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 10)
-ICUB_LEFTHAND       = iCubPart('LEFTHAND',      ICUB_PARTS.LEFT_ARM   , 16,  [8, 9, 10, 11, 12, 13, 14, 15], 10)
-ICUB_LEFTARM        = iCubPart('LEFTARM',       ICUB_PARTS.LEFT_ARM   , 16,  [0, 1, 2, 3, 4, 5, 6, 7], 10)
-ICUB_RIGHTARM_FULL  = iCubPart('RIGHTARM_FULL', ICUB_PARTS.RIGHT_ARM  , 16,  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], 10)
-ICUB_RIGHTHAND      = iCubPart('RIGHTHAND',     ICUB_PARTS.RIGHT_ARM  , 16,  [8, 9, 10, 11, 12, 13, 14, 15], 10)
-ICUB_RIGHTARM       = iCubPart('RIGHTARM',      ICUB_PARTS.RIGHT_ARM  , 16,  [0, 1, 2, 3, 4, 5, 6, 7], 10)
-ICUB_TORSO          = iCubPart('TORSO',         ICUB_PARTS.TORSO      ,  3,  [0, 1, 2], 10)
-ICUB_LEFTLEG        = iCubPart('LEFTLEG',       ICUB_PARTS.LEFT_LEG   ,  6,  [0, 1, 2, 3, 4, 5], 10)
-ICUB_RIGHTLEG       = iCubPart('RIGHTLEG',      ICUB_PARTS.RIGHT_LEG  ,  6,  [0, 1, 2, 3, 4, 5], 10)
+ICUB_EYELIDS        = iCubPart('EYELIDS',       ICUB_PARTS.FACE       ,  1,  [0], [10])
+ICUB_HEAD           = iCubPart('HEAD',          ICUB_PARTS.HEAD       ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 20, 20, 20, 20])
+ICUB_EYES           = iCubPart('EYES',          ICUB_PARTS.HEAD       ,  3,  [3, 4, 5], [20, 20, 20])
+ICUB_NECK           = iCubPart('NECK',          ICUB_PARTS.HEAD       ,  3,  [0, 1, 2], [10, 10, 20])
+ICUB_LEFTARM_FULL   = iCubPart('LEFTARM_FULL',  ICUB_PARTS.LEFT_ARM   , 16,  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], [10, 10, 10, 10, 30, 30, 30, 100, 100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_LEFTHAND       = iCubPart('LEFTHAND',      ICUB_PARTS.LEFT_ARM   , 16,  [8, 9, 10, 11, 12, 13, 14, 15], [100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_LEFTARM        = iCubPart('LEFTARM',       ICUB_PARTS.LEFT_ARM   , 16,  [0, 1, 2, 3, 4, 5, 6, 7], [10, 10, 10, 10, 30, 30, 30, 100])
+ICUB_RIGHTARM_FULL  = iCubPart('RIGHTARM_FULL', ICUB_PARTS.RIGHT_ARM  , 16,  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], [10, 10, 10, 10, 30, 30, 30, 100, 100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_RIGHTHAND      = iCubPart('RIGHTHAND',     ICUB_PARTS.RIGHT_ARM  , 16,  [8, 9, 10, 11, 12, 13, 14, 15], [100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_RIGHTARM       = iCubPart('RIGHTARM',      ICUB_PARTS.RIGHT_ARM  , 16,  [0, 1, 2, 3, 4, 5, 6, 7], [10, 10, 10, 10, 30, 30, 30, 100])
+ICUB_TORSO          = iCubPart('TORSO',         ICUB_PARTS.TORSO      ,  3,  [0, 1, 2], [10, 10, 10])
+ICUB_LEFTLEG        = iCubPart('LEFTLEG',       ICUB_PARTS.LEFT_LEG   ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 10, 10, 10, 10])
+ICUB_RIGHTLEG       = iCubPart('RIGHTLEG',      ICUB_PARTS.RIGHT_LEG  ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 10, 10, 10, 10])
 
 
 class JointPose:
@@ -147,7 +147,7 @@ class PositionController:
     def isMoving(self):
         return self.__IPositionControl__.checkMotionDone()
 
-    def __move__(self, target_joints, joints_list, req_time, speed):
+    def __move__(self, target_joints, joints_list, req_time, joints_speed):
         disp  = [0]*len(joints_list)
         speeds = [0]*len(joints_list)
         times = [0]*len(joints_list)
@@ -165,7 +165,7 @@ class PositionController:
                 if req_time > 0.0:
                     speeds[i] = disp[i]/req_time
                 else:
-                    speeds[i] = speed
+                    speeds[i] = joints_speed[i]
                     times[i] = disp[i]/speeds[i]
                 self.__IPositionControl__.setRefSpeed(j, speeds[i])
                 self.__IPositionControl__.positionMove(j, tmp[i])
@@ -183,7 +183,7 @@ class PositionController:
         return 0.0
 
 
-    def move(self, pose: JointPose, req_time: float=0.0, timeout: float=DEFAULT_TIMEOUT, speed: float=10.0, waitMotionDone: bool=True, tag: str='default'):
+    def move(self, pose: JointPose, req_time: float=0.0, timeout: float=DEFAULT_TIMEOUT, joints_speed: list=[], waitMotionDone: bool=True, tag: str='default'):
         t0 = time.perf_counter()
         self.setPositionControlMode()
         target_joints = pose.target_joints
@@ -207,11 +207,11 @@ class PositionController:
                                   str(joints_list)        ,
                                   str(waitMotionDone)     ,
                                   str(timeout)            ,
-                                  str(speed)
+                                  str(joints_speed)
                                 )
                             )
 
-        req_time = self.__move__(target_joints, joints_list, req_time, speed)
+        req_time = self.__move__(target_joints, joints_list, req_time, joints_speed)
 
         if waitMotionDone is True:
             res = self.__waitMotionDone__(req_time=req_time, timeout=timeout)
@@ -235,7 +235,7 @@ class PositionController:
                                     str(joints_list)        ,
                                     str(waitMotionDone)     ,
                                     str(timeout),
-                                    str(speed)
+                                    str(joints_speed)
                                 ))
             else:
                 self.stop()
@@ -258,7 +258,7 @@ class PositionController:
                                     str(joints_list)        ,
                                     str(waitMotionDone)     ,
                                     str(timeout),
-                                    str(speed)
+                                    str(joints_speed)
                                 ))
             return res
                 

@@ -35,11 +35,11 @@ import json
 
 class JointsTrajectoryCheckpoint:
 
-    def __init__(self, pose: JointPose, duration: float=0.0, timeout: float=DEFAULT_TIMEOUT, speed=10.0):
+    def __init__(self, pose: JointPose, duration: float=0.0, timeout: float=DEFAULT_TIMEOUT, joints_speed=[]):
         self.pose = pose
         self.duration = duration
         self.timeout = timeout
-        self.speed = speed
+        self.joints_speed = joints_speed
 
     def toJSON(self):
         return self.__dict__
@@ -50,12 +50,12 @@ class LimbMotion:
         self.part = part
         self.checkpoints = []
 
-    def createJointsTrajectory(self, pose: JointPose, duration: float=0.0, timeout: float=DEFAULT_TIMEOUT, speed=None):
+    def createJointsTrajectory(self, pose: JointPose, duration: float=0.0, timeout: float=DEFAULT_TIMEOUT, joints_speed=[]):
         if not pose.joints_list:
             pose.joints_list = self.part.joints_list
-        if not speed:
-            speed = self.part.default_vel
-        checkpoint = JointsTrajectoryCheckpoint(pose=pose, duration=duration, timeout=timeout, speed=speed)
+        if not joints_speed:
+            joints_speed = self.part.joints_speed
+        checkpoint = JointsTrajectoryCheckpoint(pose=pose, duration=duration, timeout=timeout, joints_speed=joints_speed)
         self.checkpoints.append(checkpoint)
         return checkpoint
 
@@ -112,8 +112,8 @@ class iCubFullbodyStep:
         self.setGazeMotion(gm)
         return gm
     
-    def createPart(self, name, robot_part, joints_nr, joints_list, default_vel):
-        return iCubPart(name, robot_part, joints_nr, joints_list, default_vel)
+    def createPart(self, name, robot_part, joints_nr, joints_list, joints_speed):
+        return iCubPart(name, robot_part, joints_nr, joints_list, joints_speed)
 
     def createLimbMotion(self, part: iCubPart):
         lm = LimbMotion(part)
@@ -127,11 +127,11 @@ class iCubFullbodyStep:
         self.name = json_dict["name"]
         self.offset_ms = json_dict["offset_ms"]
         for part,pose in json_dict["limb_motions"].items():
-            part = self.createPart(pose["part"]["name"], pose["part"]["robot_part"], pose["part"]["joints_nr"], pose["part"]["joints_list"], pose["part"]["default_vel"])
+            part = self.createPart(pose["part"]["name"], pose["part"]["robot_part"], pose["part"]["joints_nr"], pose["part"]["joints_list"], pose["part"]["joints_speed"])
             lm = self.createLimbMotion(part)
             for v in pose["checkpoints"]:
                 pose = JointPose(target_joints=v['pose']['target_joints'], joints_list=v['pose']['joints_list'])
-                lm.createJointsTrajectory(pose, duration=v['duration'], timeout=v['timeout'], speed=v["speed"])
+                lm.createJointsTrajectory(pose, duration=v['duration'], timeout=v['timeout'], joints_speed=v["joints_speed"])
         if json_dict["gaze_motion"]:
             gaze = self.createGazeMotion(lookat_method=json_dict["gaze_motion"]["lookat_method"])
             for v in json_dict["gaze_motion"]["checkpoints"]:
