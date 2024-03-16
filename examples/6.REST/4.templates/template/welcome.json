@@ -1,6 +1,7 @@
 {
+    "name": "Welcome",
     "params": {
-        "welcome_msg": "$welcome_msg"
+        "welcome_msg": "pollo"
     },
     "steps": [
         {
@@ -19,7 +20,6 @@
             "offset_ms": null
         }
     ],
-    "name": "TemplateAction",
     "description": "empty",
     "offset_ms": null
 }

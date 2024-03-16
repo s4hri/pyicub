@@ -1024,7 +1024,6 @@ class FSMsManager:
                 machines.append( class_() )
             
             return machines
-
         except (ImportError, AttributeError) as e:
             print(f"Error: {e}")
             print(f"Could not import or instantiate classes for module: {module}")

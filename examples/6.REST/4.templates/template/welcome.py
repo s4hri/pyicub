@@ -47,5 +47,5 @@ class TemplateAction(iCubActionTemplate):
         welcome_msg = self.getParam("welcome_msg")
         self.addStep(Step(welcome_msg))
 
-template = TemplateAction()
+template = TemplateAction("Welcome")
 template.exportJSONFile("welcome.json")

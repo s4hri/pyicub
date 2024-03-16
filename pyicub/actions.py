@@ -148,7 +148,7 @@ class iCubFullbodyStep:
     def join(self, step):
         for k,v in step.limb_motions.items():
             if k in self.limb_motions.keys():
-                raise Exception("Cannot join currest step because part %s is already present." % k)
+                raise Exception("Cannot join current step because part %s is already present." % k)
             else:
                 self.limb_motions[k] = v
         if step.custom_calls:
@@ -242,55 +242,11 @@ class TemplateParameter:
 
 class iCubActionTemplate(iCubFullbodyAction):
 
-    def __init__(self, description='empty', name=None, offset_ms=None):
+    def __init__(self, name='TemplateAction', description='empty', offset_ms=None):
+        self.name = name
         self.params = {}
         self.prepare_params()
         iCubFullbodyAction.__init__(self, description=description, name=name, offset_ms=offset_ms)
-
-    def prepare_params(self):
-        raise NotImplementedError("The method 'prepare_params' contains definition for creating custom actions.")
-            
-    def createParam(self, name):
-        self.params[name] = '$' + name
-
-    def getParams(self):
-        return self.params
-
-    def getParam(self, name):
-        return self.params[name]
-    
-    def setParams(self, params):
-        self.params = params
-
-    def setParam(self, JSON_file):
-        value = importFromJSONFile(JSON_file)
-        name = list(value.keys())[0]
-        value = value[name]
-        self.params[name] = value
-
-
-class iCubActionTemplateImportedJSON(iCubActionTemplate):
-
-    def __init__(self, JSON_dict):
-        self._json_dict_ = JSON_dict
-        self.name = JSON_dict['name']
-        iCubActionTemplate.__init__(self, description=JSON_dict["description"], name=JSON_dict["name"], offset_ms=JSON_dict["offset_ms"])
-
-    def prepare_params(self):
-        for k in self._json_dict_['params'].keys():
-            self.createParam(name=k)
-
-    def prepare(self):
-        pass
-
-    def getActionDict(self):
-        return self.__replace_params__(self._json_dict_, self.params)
-
-    def getAction(self, action_name=None):
-        action_dict = self.getActionDict()
-        action = iCubFullbodyAction(JSON_dict=action_dict)
-        action.setName(action_name)
-        return action
 
     def __replace_params__(self, template_dict, params_dict):
         if isinstance(template_dict, dict):
@@ -304,6 +260,64 @@ class iCubActionTemplateImportedJSON(iCubActionTemplate):
             if param_key in params_dict:
                 return params_dict[param_key]
         return template_dict
+
+    def prepare_params(self):
+        raise NotImplementedError("The method 'prepare_params' contains definition for creating custom actions.")
+            
+    def createParam(self, name):
+        self.params[name] = '$' + name
+
+    def getActionDict(self):
+        res = json.dumps(self.__dict__, default=lambda o: o.toJSON(), indent=4)
+        return self.__replace_params__(json.loads(res), self.params)
+
+    def getAction(self, action_name=None):
+        action_dict = self.getActionDict()
+        action = iCubFullbodyAction(JSON_dict=action_dict)
+        if not action_name:
+            action_name = self.name    
+        action.setName(action_name)
+        return action
+
+    def getParams(self):
+        return self.params
+
+    def getParam(self, name):
+        return self.params[name]
+    
+    def setParams(self, params):
+        self.params = params
+
+    def setParam(self, name, value):
+        if name in self.params.keys():
+            self.params[name] = value
+        else:
+            raise Exception("The key %s is not present among the parameter names" % name)
+
+
+
+class iCubActionTemplateImportedJSON(iCubActionTemplate):
+
+    def __init__(self, JSON_dict):
+        self._json_dict_ = JSON_dict
+        self.name = JSON_dict['name']
+        iCubActionTemplate.__init__(self, description=JSON_dict["description"], name=JSON_dict["name"], offset_ms=JSON_dict["offset_ms"])
+
+    def getActionDict(self):
+        return self.__replace_params__(self._json_dict_, self.params)
+    
+    def prepare_params(self):
+        for k in self._json_dict_['params'].keys():
+            self.createParam(name=k)
+
+    def prepare(self):
+        pass
+
+    def setParam(self, JSON_file):
+        value = importFromJSONFile(JSON_file)
+        name = list(value.keys())[0]
+        value = value[name]
+        self.params[name] = value
 
 
 class ActionsManager:
