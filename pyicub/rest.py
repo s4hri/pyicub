@@ -659,7 +659,8 @@ class PyiCubRESTfulServer(PyiCubApp):
     
     def setFSM(self, fsm: FSM, session_id=0):
         self.__fsm__ = fsm
-        fsm.setApp(self)
+        if isinstance(fsm, iCubFSM):
+            fsm.setApp(self)
         fsm.setSessionID(session_id)
         self.__register_class__(robot_name=self.__robot_name__, app_name=self._name_, cls=self.__fsm__, class_name='fsm')
 
@@ -687,6 +688,8 @@ class iCubRESTApp(PyiCubRESTfulServer):
         
         if action_repository_path:
             self.importActions(path=action_repository_path)
+
+        self.__configure__(input_args=self.__args__)
     
     def __configure__(self, input_args: dict):
         self.setArgs(input_args)

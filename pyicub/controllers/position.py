@@ -129,6 +129,8 @@ class PositionController:
         self.__IControlMode__     = self.PolyDriver.viewIControlMode()
         self.__IPositionControl__ = self.PolyDriver.viewIPositionControl()
         self.__joints__           = self.__IPositionControl__.getAxes()
+        self.__joints_speed__     = yarp.DVector(self.__joints__)
+        self.__IPositionControl__.getRefSpeeds(self.__joints_speed__)
         self.__control_modes__    = yarp.IVector(self.__joints__, yarp.VOCAB_CM_POSITION)
 
     @property
@@ -188,8 +190,18 @@ class PositionController:
         self.setPositionControlMode()
         target_joints = pose.target_joints
         joints_list = pose.joints_list
+        
         if joints_list is None:
             joints_list = range(0, self.__joints__)
+    
+        if not joints_speed:
+            for j in joints_list:
+                ref_speed = self.__joints_speed__[j]
+                if ref_speed == 0.0:
+                    ref_speed = 10.0
+                joints_speed.append(ref_speed)
+                print(j, self.__joints_speed__[j])
+
         self.__logger__.info("""Motion STARTED!
                                 tag: %s,
                                 robot_part:%s,

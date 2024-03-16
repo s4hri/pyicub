@@ -35,7 +35,8 @@ class Publisher(iCubRESTApp):
         self.myFSM = iCubFSM(JSON_file="fsm.json")
         iCubRESTApp.__init__(self)
 
-    def configure(self, input_args):        
+    def configure(self, input_args):
+        print("configuring....") 
         self.setFSM(self.myFSM)
 
 app = Publisher()

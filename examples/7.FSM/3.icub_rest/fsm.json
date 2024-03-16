@@ -48,6 +48,14 @@
                                     3,
                                     4,
                                     5
+                                ],
+                                "joints_speed": [
+                                    10,
+                                    10,
+                                    20,
+                                    20,
+                                    20,
+                                    20
                                 ]
                             },
                             "checkpoints": [
@@ -71,7 +79,15 @@
                                         ]
                                     },
                                     "duration": 3.0,
-                                    "timeout": 30.0
+                                    "timeout": 30.0,
+                                    "joints_speed": [
+                                        10,
+                                        10,
+                                        20,
+                                        20,
+                                        20,
+                                        20
+                                    ]
                                 },
                                 {
                                     "pose": {
@@ -93,7 +109,15 @@
                                         ]
                                     },
                                     "duration": 3.0,
-                                    "timeout": 30.0
+                                    "timeout": 30.0,
+                                    "joints_speed": [
+                                        10,
+                                        10,
+                                        20,
+                                        20,
+                                        20,
+                                        20
+                                    ]
                                 },
                                 {
                                     "pose": {
@@ -115,7 +139,15 @@
                                         ]
                                     },
                                     "duration": 3.0,
-                                    "timeout": 30.0
+                                    "timeout": 30.0,
+                                    "joints_speed": [
+                                        10,
+                                        10,
+                                        20,
+                                        20,
+                                        20,
+                                        20
+                                    ]
                                 }
                             ]
                         }
