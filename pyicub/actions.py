@@ -173,6 +173,7 @@ class iCubFullbodyAction:
 
     def __init__(self, description='empty', name=None, offset_ms=None, JSON_dict=None, JSON_file=None):
         self.steps = []
+        self.wait_for_steps = []
         if not name:
             self.name = self.__class__.__name__
         self.description = description
@@ -190,17 +191,20 @@ class iCubFullbodyAction:
 
     def addAction(self, action):
         self.steps.extend(action.steps)
+        self.wait_for_steps.extend(action.wait_for_steps)
 
-    def addStep(self, step: iCubFullbodyStep):
+    def addStep(self, step: iCubFullbodyStep, wait_for_completed: bool=True):
         self.steps.append(step)
+        self.wait_for_steps.append(wait_for_completed)
 
     def importFromJSONDict(self, json_dict):
         self.name = json_dict["name"]
         self.offset_ms = json_dict["offset_ms"]
         self.description = json_dict["description"]
-        for step in json_dict["steps"]:
-            res = iCubFullbodyStep(JSON_dict=step)
-            self.addStep(res)
+        steps = json_dict["steps"]
+        for i in range(0, len(steps)):
+            res = iCubFullbodyStep(JSON_dict=steps[i])
+            self.addStep(res, json_dict["wait_for_steps"][i])
 
     def importFromJSONFile(self, JSON_file):
         JSON_dict = importFromJSONFile(JSON_file)

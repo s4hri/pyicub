@@ -365,19 +365,19 @@ class iCub(metaclass=iCubSingleton):
         self._logger_.debug('Step <%s> COMPLETED!' % step.name)
         return requests
     
-    def moveSteps(self, steps, prefix):
+    def moveSteps(self, steps, checkpoints, prefix):
         requests = []
         t0 = round(time.perf_counter(), 4)
-        for step in steps:
-            prefix = "%s/%s" % (prefix, step.name)
+        for i in range(0, len(steps)):
+            prefix = "%s/%s" % (prefix, steps[i].name)
             req = self.request_manager.create(timeout=iCubRequest.TIMEOUT_REQUEST,
                                               target=self.moveStep,
                                               name=prefix,
                                               ts_ref=t0)
             requests.append(req)
             self.request_manager.run_request(req,
-                                             True,
-                                             step,
+                                             checkpoints[i],
+                                             steps[i],
                                              req.tag,
                                              t0)
         self.request_manager.join_requests(requests)
@@ -399,6 +399,7 @@ class iCub(metaclass=iCubSingleton):
         self.request_manager.run_request(req,
                                          wait_for_completed,
                                          action.steps,
+                                         action.wait_for_steps,
                                          req.tag)
         if wait_for_completed:
             self._logger_.debug('Action <%s> finished!' % action.name)

@@ -44,8 +44,6 @@ left_arm_motion.createJointsTrajectory(arm_down, duration=1.0)
 class Step1(iCubFullbodyStep):
 
     def prepare(self):
-        self.setLimbMotion(right_arm_motion)
-        self.setLimbMotion(left_arm_motion)
         self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
         self.createCustomCall(target="emo.neutral")
 
@@ -69,7 +67,7 @@ class Step3(iCubFullbodyStep):
 class CompleteAction(iCubFullbodyAction):
 
     def prepare(self):
-        self.addStep(Step1())
+        self.addStep(Step1(), wait_for_completed=False)
         self.addStep(Step2())
         self.addStep(Step3(offset_ms=500))
 

@@ -200,7 +200,6 @@ class PositionController:
                 if ref_speed == 0.0:
                     ref_speed = 10.0
                 joints_speed.append(ref_speed)
-                print(j, self.__joints_speed__[j])
 
         self.__logger__.info("""Motion STARTED!
                                 tag: %s,

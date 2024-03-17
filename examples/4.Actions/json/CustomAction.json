@@ -41,6 +41,10 @@
             "offset_ms": null
         }
     ],
+    "wait_for_steps": [
+        true,
+        true
+    ],
     "name": "CustomAction",
     "description": "empty",
     "offset_ms": null

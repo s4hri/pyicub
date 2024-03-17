@@ -124,6 +124,9 @@
             "offset_ms": null
         }
     ],
+    "wait_for_steps": [
+        true
+    ],
     "name": "HeadAction",
     "description": "empty",
     "offset_ms": null
