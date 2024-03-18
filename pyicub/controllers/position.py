@@ -226,6 +226,7 @@ class PositionController:
 
         if waitMotionDone is True:
             res = self.__waitMotionDone__(req_time=req_time, timeout=timeout)
+            elapsed_time = time.perf_counter() - t0
             if res:
                 self.__logger__.info("""Motion COMPLETED!
                                 elapsed_time: %s,
@@ -238,7 +239,7 @@ class PositionController:
                                 timeout=%s,
                                 speed=%s""" %
                                 (
-                                    time.perf_counter() - t0,
+                                    elapsed_time,
                                     tag,
                                     self.__part_name__,
                                     str(target_joints)      ,
@@ -261,7 +262,7 @@ class PositionController:
                                 timeout=%s,
                                 speed=%s""" %
                                 (
-                                    time.perf_counter() - t0,
+                                    elapsed_time,
                                     tag,
                                     self.__part_name__,
                                     str(target_joints)      ,
@@ -286,10 +287,13 @@ class PositionController:
 
     def waitMotionDone(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
         t0 = time.perf_counter()
-        while (time.perf_counter() - t0) < timeout:
-            if self.__IPositionControl__.checkMotionDone():
+        elapsed_time = 0.0
+        while elapsed_time < timeout:
+            print(elapsed_time, self.__IPositionControl__.checkMotionDone())
+            if self.__IPositionControl__.checkMotionDone() and elapsed_time >= req_time:
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
+            elapsed_time = time.perf_counter() - t0
         return False
 
     def waitMotionDone2(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
