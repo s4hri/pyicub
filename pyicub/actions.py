@@ -240,10 +240,11 @@ class TemplateParameter:
         return self._name_
 
     def exportJSONFile(self, filepath):
-        exportJSONFile(filepath, self.toJSON())
+        exportJSONFile(filepath, self.toJSON() )
 
     def toJSON(self):
-        return self._param_
+        #return self._param_
+        return json.dumps(self._param_, default=lambda o: o.__dict__, indent=4)
 
 class iCubActionTemplate(iCubFullbodyAction):
 

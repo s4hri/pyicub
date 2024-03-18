@@ -34,8 +34,6 @@ arm_down = JointPose(target_joints=[0.0, 15.0, 0.0, 25.0, 0.0, 0.0, 0.0, 60.0, 2
 arm_up = JointPose(target_joints=[-90.0, 20.0, 10.0, 90.0, 0.0, 0.0, 0.0, 60.0, 20.0, 20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0])
 
 right_arm_motion = LimbMotion(ICUB_RIGHTARM_FULL)
-#right_arm_motion.createJointsTrajectory(arm_up, duration=1.0)
-#right_arm_motion.createJointsTrajectory(arm_down, duration=1.0)
 right_arm_motion.createJointsTrajectory(arm_up)
 right_arm_motion.createJointsTrajectory(arm_down)
 

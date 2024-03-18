@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -59,12 +59,12 @@ ICUB_EYELIDS        = iCubPart('EYELIDS',       ICUB_PARTS.FACE       ,  1,  [0]
 ICUB_HEAD           = iCubPart('HEAD',          ICUB_PARTS.HEAD       ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 20, 20, 20, 20])
 ICUB_EYES           = iCubPart('EYES',          ICUB_PARTS.HEAD       ,  3,  [3, 4, 5], [20, 20, 20])
 ICUB_NECK           = iCubPart('NECK',          ICUB_PARTS.HEAD       ,  3,  [0, 1, 2], [10, 10, 20])
-ICUB_LEFTARM_FULL   = iCubPart('LEFTARM_FULL',  ICUB_PARTS.LEFT_ARM   , 16,  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], [10, 10, 10, 10, 30, 30, 30, 100, 100, 100, 100, 100, 100, 100, 100, 100])
-ICUB_LEFTHAND       = iCubPart('LEFTHAND',      ICUB_PARTS.LEFT_ARM   , 16,  [8, 9, 10, 11, 12, 13, 14, 15], [100, 100, 100, 100, 100, 100, 100, 100])
-ICUB_LEFTARM        = iCubPart('LEFTARM',       ICUB_PARTS.LEFT_ARM   , 16,  [0, 1, 2, 3, 4, 5, 6, 7], [10, 10, 10, 10, 30, 30, 30, 100])
-ICUB_RIGHTARM_FULL  = iCubPart('RIGHTARM_FULL', ICUB_PARTS.RIGHT_ARM  , 16,  [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], [10, 10, 10, 10, 30, 30, 30, 100, 100, 100, 100, 100, 100, 100, 100, 100])
-ICUB_RIGHTHAND      = iCubPart('RIGHTHAND',     ICUB_PARTS.RIGHT_ARM  , 16,  [8, 9, 10, 11, 12, 13, 14, 15], [100, 100, 100, 100, 100, 100, 100, 100])
-ICUB_RIGHTARM       = iCubPart('RIGHTARM',      ICUB_PARTS.RIGHT_ARM  , 16,  [0, 1, 2, 3, 4, 5, 6, 7], [10, 10, 10, 10, 30, 30, 30, 100])
+ICUB_LEFTARM_FULL   = iCubPart('LEFTARM_FULL',  ICUB_PARTS.LEFT_ARM   ,  16, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], [10, 10, 10, 10, 30, 30, 30, 100, 100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_LEFTHAND       = iCubPart('LEFTHAND',      ICUB_PARTS.LEFT_ARM   ,  8,  [8, 9, 10, 11, 12, 13, 14, 15], [100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_LEFTARM        = iCubPart('LEFTARM',       ICUB_PARTS.LEFT_ARM   ,  8,  [0, 1, 2, 3, 4, 5, 6, 7], [10, 10, 10, 10, 30, 30, 30, 100])
+ICUB_RIGHTARM_FULL  = iCubPart('RIGHTARM_FULL', ICUB_PARTS.RIGHT_ARM  ,  16, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], [10, 10, 10, 10, 30, 30, 30, 100, 100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_RIGHTHAND      = iCubPart('RIGHTHAND',     ICUB_PARTS.RIGHT_ARM  ,  8,  [8, 9, 10, 11, 12, 13, 14, 15], [100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_RIGHTARM       = iCubPart('RIGHTARM',      ICUB_PARTS.RIGHT_ARM  ,  8,  [0, 1, 2, 3, 4, 5, 6, 7], [10, 10, 10, 10, 30, 30, 30, 100])
 ICUB_TORSO          = iCubPart('TORSO',         ICUB_PARTS.TORSO      ,  3,  [0, 1, 2], [10, 10, 10])
 ICUB_LEFTLEG        = iCubPart('LEFTLEG',       ICUB_PARTS.LEFT_LEG   ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 10, 10, 10, 10])
 ICUB_RIGHTLEG       = iCubPart('RIGHTLEG',      ICUB_PARTS.RIGHT_LEG  ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 10, 10, 10, 10])
@@ -83,9 +83,10 @@ class JointPose:
 
 class RemoteControlboard:
 
-    def __init__(self, port_name):
+    def __init__(self, robot_name, part):
+        self.__robot_name__ = robot_name
+        self.__part__ = part
         self.__pid__ = str(os.getpid())
-        self.__port_name__ = port_name
         self.__driver__ = None
         props  = self._getRobotPartProperties_()
         self.__driver__ = yarp.PolyDriver(props)
@@ -96,8 +97,8 @@ class RemoteControlboard:
     def _getRobotPartProperties_(self):
         props = yarp.Property()
         props.put("device","remote_controlboard")
-        props.put("local","/pyicub/" + self.__pid__ + self.__port_name__)
-        props.put("remote", self.__port_name__)
+        props.put("local","/pyicub/" + self.__pid__ + "/" + self.__robot_name__ + "/" + self.__part__.name)
+        props.put("remote", "/" + self.__robot_name__ + "/" + self.__part__.robot_part)
         return props
 
     def getDriver(self):
@@ -109,10 +110,9 @@ class PositionController:
     MOTION_COMPLETE_AT = 0.90
 
     def __init__(self, robot_name, part, logger):
-        self.__part_name__ = part
+        self.__part__ = part
         self.__logger__     = logger
-        port_name = "/" + robot_name + "/" + part
-        self.__driver__ = RemoteControlboard(port_name)
+        self.__driver__ = RemoteControlboard(robot_name, part)
         self.__IEncoders__        = None
         self.__IControlLimits__   = None
         self.__IControlMode__   = None
@@ -131,8 +131,7 @@ class PositionController:
         self.__joints__           = self.__IPositionControl__.getAxes()
         self.__joints_speed__     = yarp.DVector(self.__joints__)
         self.__IPositionControl__.getRefSpeeds(self.__joints_speed__)
-        self.__control_modes__    = yarp.IVector(self.__joints__, yarp.VOCAB_CM_POSITION)
-
+    
     @property
     def PolyDriver(self):
         return self.__driver__.getDriver()
@@ -187,9 +186,9 @@ class PositionController:
 
     def move(self, pose: JointPose, req_time: float=0.0, timeout: float=DEFAULT_TIMEOUT, joints_speed: list=[], waitMotionDone: bool=True, tag: str='default'):
         t0 = time.perf_counter()
-        self.setPositionControlMode()
         target_joints = pose.target_joints
         joints_list = pose.joints_list
+        self.setPositionControlMode(joints_list=joints_list)
         
         if joints_list is None:
             joints_list = range(0, self.__joints__)
@@ -212,7 +211,7 @@ class PositionController:
                                 speed=%s""" %
                                 (
                                   tag,
-                                  self.__part_name__,
+                                  self.__part__.name,
                                   str(target_joints)      ,
                                   req_time                ,
                                   str(joints_list)        ,
@@ -241,7 +240,7 @@ class PositionController:
                                 (
                                     elapsed_time,
                                     tag,
-                                    self.__part_name__,
+                                    self.__part__.name,
                                     str(target_joints)      ,
                                     req_time                ,
                                     str(joints_list)        ,
@@ -264,7 +263,7 @@ class PositionController:
                                 (
                                     elapsed_time,
                                     tag,
-                                    self.__part_name__,
+                                    self.__part__.name,
                                     str(target_joints)      ,
                                     req_time                ,
                                     str(joints_list)        ,
@@ -275,8 +274,9 @@ class PositionController:
             return res
                 
 
-    def setPositionControlMode(self):
-        self.__IControlMode__.setControlModes(self.__control_modes__)
+    def setPositionControlMode(self, joints_list):
+        for j in joints_list:
+            self.__IControlMode__.setControlMode(j, yarp.VOCAB_CM_POSITION)
 
     def setCustomWaitMotionDone(self, motion_complete_at=MOTION_COMPLETE_AT):
         self.__waitMotionDone__ = self.waitMotionDone2

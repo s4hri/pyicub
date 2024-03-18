@@ -92,7 +92,11 @@ class iCub(metaclass=iCubSingleton):
         self._icub_parts_[ICUB_TORSO.name               ]   = ICUB_TORSO
         self._icub_parts_[ICUB_LEFTARM_FULL.name        ]   = ICUB_LEFTARM_FULL
         self._icub_parts_[ICUB_RIGHTARM_FULL.name       ]   = ICUB_RIGHTARM_FULL
-
+        self._icub_parts_[ICUB_LEFTARM.name             ]   = ICUB_LEFTARM
+        self._icub_parts_[ICUB_RIGHTARM.name            ]   = ICUB_RIGHTARM
+        self._icub_parts_[ICUB_LEFTHAND.name            ]   = ICUB_LEFTHAND
+        self._icub_parts_[ICUB_RIGHTHAND.name           ]   = ICUB_RIGHTHAND
+        
 
         if SIMULATION:
             if SIMULATION == 'true':
@@ -125,12 +129,12 @@ class iCub(metaclass=iCubSingleton):
             self._initPositionController_(part)
 
     def _initPositionController_(self, part: iCubPart):
-        if part.robot_part in self._position_controllers_:
+        if part.name in self._position_controllers_.keys():
             return
-        ctrl = PositionController(self._robot_name_, part.robot_part, self._logger_)
+        ctrl = PositionController(self._robot_name_, part, self._logger_)
         if ctrl.isValid():
-            self._position_controllers_[part.robot_part] = ctrl
-            self._position_controllers_[part.robot_part].init()
+            self._position_controllers_[part.name] = ctrl
+            self._position_controllers_[part.name].init()
         else:
             self._logger_.warning('PositionController <%s> not callable! Are you sure the robot part is available?' % part.robot_part)
 
@@ -239,8 +243,8 @@ class iCub(metaclass=iCubSingleton):
         return len(self._position_controllers_.keys()) > 0
 
     def getPositionController(self, part: iCubPart):
-        if part.robot_part in self._position_controllers_.keys():
-            return self._position_controllers_[part.robot_part]
+        if part.name in self._position_controllers_.keys():
+            return self._position_controllers_[part.name]
         self._logger_.error('PositionController <%s> non callable! Are you sure the robot part is available?' % part.name)
         return None
         
