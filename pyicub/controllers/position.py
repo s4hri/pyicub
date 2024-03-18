@@ -53,7 +53,7 @@ class iCubPart:
         self.joints_speed = joints_speed
 
     def toJSON(self):
-        return self.__dict__
+        return json.dumps(self, default=lambda o: o.__dict__, indent=4)
 
 ICUB_EYELIDS        = iCubPart('EYELIDS',       ICUB_PARTS.FACE       ,  1,  [0], [10])
 ICUB_HEAD           = iCubPart('HEAD',          ICUB_PARTS.HEAD       ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 20, 20, 20, 20])
@@ -147,7 +147,7 @@ class PositionController:
         return self.__IControlLimits__
 
     def isMoving(self):
-        return self.__IPositionControl__.checkMotionDone()
+        return not self.__IPositionControl__.checkMotionDone()
 
     def __move__(self, target_joints, joints_list, req_time, joints_speed):
         disp  = [0]*len(joints_list)
@@ -289,8 +289,7 @@ class PositionController:
         t0 = time.perf_counter()
         elapsed_time = 0.0
         while elapsed_time < timeout:
-            print(elapsed_time, self.__IPositionControl__.checkMotionDone())
-            if self.__IPositionControl__.checkMotionDone() and elapsed_time >= req_time:
+            if not self.isMoving():
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
             elapsed_time = time.perf_counter() - t0
@@ -303,7 +302,6 @@ class PositionController:
         self.__IPositionControl__.getTargetPositions(target_pos.data())
         count = 0
         deadline = min(timeout, req_time)
-        print(timeout, req_time)
         while (time.perf_counter() - t0) < deadline:
             while not self.__IEncoders__.getEncoders(encs.data()):
                 yarp.delay(0.05)
@@ -316,8 +314,6 @@ class PositionController:
                 tot_disp = utils.vector_distance(v, w)
             count+=1
             dist = utils.vector_distance(v, w)
-
-            print(dist, (1.0 - PositionController.MOTION_COMPLETE_AT)*tot_disp, tot_disp, PositionController.MOTION_COMPLETE_AT)
             if dist <= (1.0 - PositionController.MOTION_COMPLETE_AT)*tot_disp:
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)

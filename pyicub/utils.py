@@ -107,6 +107,5 @@ def importFromJSONFile(JSON_file):
     return json.loads(data)
 
 def exportJSONFile(filepath, obj):
-    res = json.dumps(obj, default=lambda o: o.toJSON(), indent=4)
     with open(filepath, 'w', encoding='utf-8') as f:
-        f.write(res)
+        f.write(obj)

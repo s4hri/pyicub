@@ -37,7 +37,7 @@ from pyicub.utils import SingletonMeta, getPyiCubInfo, getPublicMethods, getDeco
 from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequestsManager, iCubRequest
 from pyicub.fsm import FSM
-from pyicub.actions import iCubFullbodyAction
+from pyicub.actions import iCubFullbodyAction, iCubActionTemplate, TemplateParameter
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from urllib.parse import urlparse, urlsplit
@@ -780,8 +780,7 @@ class iCubRESTApp(PyiCubRESTfulServer):
     def importAction(self, action: iCubFullbodyAction, name_prefix=None):
         if not name_prefix:
             name_prefix = self.__class__.__name__        
-        json_string = json.dumps(action, default=lambda x: x.toJSON(), indent=2)
-        json_dict = json.loads(json_string)
+        json_dict = json.loads(action.toJSON())
         return self.importActionFromJSONDict(JSON_dict=json_dict, name_prefix=name_prefix)
 
     @property
@@ -887,6 +886,11 @@ class iCubFSM(FSM):
         self.addState(name=action.name, description=action.description, on_enter_callback=self.__on_enter_action__)
         return action.name
 
+    def addTemplate(self, template: iCubActionTemplate, template_params: list):
+        template.setParams(template_params)
+        return self.addAction(template.getAction())
+
+
     def importFromJSONDict(self, data):
         name = data.get("name", "")
         states = data.get("states", [])
@@ -915,6 +919,7 @@ class iCubFSM(FSM):
                 "session_count": self._session_count_,
                 "actions": self._actions_
             }
+        data = json.dumps(data, default=lambda o: o.__dict__, indent=4)
         exportJSONFile(filepath, data)
    
 class PyiCubRESTfulClient:
