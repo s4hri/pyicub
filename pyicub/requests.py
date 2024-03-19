@@ -49,7 +49,7 @@ class iCubRequest:
     DONE    = 'DONE'
     FAILED  = 'FAILED'
 
-    TIMEOUT_REQUEST = 30.0
+    TIMEOUT_REQUEST = 120.0
 
     def __init__(self, req_id, timeout, target, logger, ts_ref=0.0, tag=''):
         self._ts_ref_ = ts_ref

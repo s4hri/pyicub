@@ -176,6 +176,8 @@ class iCubFullbodyAction:
         self.wait_for_steps = []
         if not name:
             self.name = self.__class__.__name__
+        else:
+            self.name = name
         self.description = description
         self.offset_ms = offset_ms
         if JSON_dict or JSON_file:
