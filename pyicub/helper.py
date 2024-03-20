@@ -213,9 +213,6 @@ class iCub(metaclass=iCubSingleton):
     def emo(self):
         if self._emo_ is None:
             self._emo_ = emotionsPyCtrl(self.robot_name)
-            if not self._emo_.isValid():
-                self._logger_.error('emotionsPyCtrl not correctly initialized!')
-                self._emo_ = None
         return self._emo_
 
     @property

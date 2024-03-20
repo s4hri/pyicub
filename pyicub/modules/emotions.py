@@ -28,23 +28,15 @@
 
 import yarp
 from pyicub.core.rpc import RpcClient
-
+from pyicub.core.ports import BufferedWritePort
 
 class emotionsPyCtrl:
 
     def __init__(self, robot):
-        self.__rpc__ = RpcClient("/%s/face/emotions/in" % robot)
+        self.__port__ = BufferedWritePort("/pyicub/emotions:o", "/%s/face/emotions/in" % robot)
 
-    def isValid(self):
-        return self.__rpc__.connection_result
-        
     def __emoCmd__(self, part, emo):
-        cmd = yarp.Bottle()
-        cmd.clear()
-        cmd.addString("set")
-        cmd.addString(part)
-        cmd.addString(emo)
-        return self.__rpc__.execute(cmd)
+        return self.__port__.write("set %s %s" % (part, emo))
 
     def smile(self):
         self.__emoCmd__("all", "hap")
