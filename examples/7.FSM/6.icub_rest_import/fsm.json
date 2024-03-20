@@ -1,5 +1,5 @@
 {
-    "name": "iCubFSM",
+    "name": "FSM_B",
     "states": [
         {
             "name": "HeadAction",
@@ -157,6 +157,9 @@
                     "offset_ms": null
                 }
             ],
+            "wait_for_steps": [
+                true
+            ],
             "name": "HeadAction",
             "description": "empty",
             "offset_ms": null
@@ -207,6 +210,10 @@
                     "custom_calls": [],
                     "offset_ms": null
                 }
+            ],
+            "wait_for_steps": [
+                true,
+                true
             ],
             "name": "LookAtAction",
             "description": "empty",

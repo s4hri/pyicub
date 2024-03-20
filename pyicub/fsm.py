@@ -2,6 +2,8 @@ from transitions import Machine, State
 from transitions.extensions import GraphMachine
 from pyicub.utils import importFromJSONFile, exportJSONFile
 
+import json
+
 class FSM:
 
     INIT_STATE = "init"
@@ -42,7 +44,8 @@ class FSM:
         self.get_graph().draw(filepath, prog='dot')
 
     def exportJSONFile(self, filepath):
-        exportJSONFile(filepath, self.toJSON())
+        data = json.dumps(self.toJSON(), default=lambda o: o.__dict__, indent=4)
+        exportJSONFile(filepath, data)
 
     def getCurrentState(self):
         return self.state

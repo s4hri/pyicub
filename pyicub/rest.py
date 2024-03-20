@@ -859,7 +859,7 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
     def on_enter_fsm(self, fsm_name, session_id, session_count):
         raise Exception("Method iCubRESTSubscriberFSM.on_enter_fsm is not implemented!")
 
-    def on_exit_fsm(self, fsm_name, session_id, session_count, state_name):
+    def on_exit_fsm(self, fsm_name, session_id, session_count):
         raise Exception("Method iCubRESTSubscriberFSM.on_exit_fsm is not implemented!")
 
 
