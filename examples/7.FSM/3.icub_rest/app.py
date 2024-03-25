@@ -31,14 +31,14 @@ from pyicub.actions import iCubFullbodyAction
 
 import os
 
-app = iCubRESTApp(action_repository_path='./actions')
+app = iCubRESTApp()
 
 head_action = iCubFullbodyAction(JSON_file="actions/HeadAction.json")
 lookat_action = iCubFullbodyAction(JSON_file="actions/LookAtAction.json")
 
-fsm = iCubFSM(app=app)
-head_state = fsm.addAction(action=head_action)
-lookat_state = fsm.addAction(action=lookat_action)
+fsm = iCubFSM()
+head_state = fsm.addAction(head_action)
+lookat_state = fsm.addAction(lookat_action)
 
 fsm.addTransition("start", iCubFSM.INIT_STATE, head_state)
 fsm.addTransition("next", head_state, lookat_state)
@@ -47,5 +47,5 @@ fsm.addTransition("reset", lookat_state, iCubFSM.INIT_STATE)
 fsm.draw('diagram.png')
 fsm.exportJSONFile('fsm.json')
 
-app.__setFSM__(fsm)
+app.setFSM(fsm)
 app.rest_manager.run_forever()

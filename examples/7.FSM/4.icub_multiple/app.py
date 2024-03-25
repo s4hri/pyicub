@@ -36,8 +36,8 @@ lookat_action = iCubFullbodyAction(JSON_file="actions/LookAtAction.json")
 
 class FSM_A(iCubFSM):
 
-    def __init__(self, app: iCubRESTApp):
-        iCubFSM.__init__(self, app)
+    def __init__(self):
+        iCubFSM.__init__(self)
         lookat_state = self.addAction(lookat_action)
         self.addTransition("start", "init", lookat_state)
         self.exportJSONFile("FSM_A.json")
@@ -46,8 +46,8 @@ class FSM_A(iCubFSM):
 
 class FSM_B(iCubFSM):
 
-    def __init__(self, app: iCubRESTApp):
-        iCubFSM.__init__(self, app)
+    def __init__(self):
+        iCubFSM.__init__(self)
         head_state = self.addAction(head_action)
         lookat_state = self.addAction(lookat_action)
         self.addTransition("start", "init", head_state)
@@ -60,17 +60,17 @@ class FSM_B(iCubFSM):
 
 class MultipleFSM(iCubRESTApp):
 
-    def __init__(self, action_repository_path, machine_id):
-        self.FSM_A = FSM_A(self)
-        self.FSM_B = FSM_B(self)
-        iCubRESTApp.__init__(self, action_repository_path=action_repository_path, machine_id=machine_id)
+    def __init__(self, machine_id):
+        self.FSM_A = FSM_A()
+        self.FSM_B = FSM_B()
+        iCubRESTApp.__init__(self, machine_id=machine_id)
 
-    def __configure__(self, input_args):
+    def configure(self, input_args):
         machine_id = int(input_args['machine_id'])
         if machine_id == 1:
-            self.__setFSM__(self.FSM_A)
+            self.setFSM(self.FSM_A)
         elif machine_id == 2:
-            self.__setFSM__(self.FSM_B)
+            self.setFSM(self.FSM_B)
 
-app = MultipleFSM(action_repository_path='./actions', machine_id=[1,2])
+app = MultipleFSM(machine_id=[1,2])
 app.rest_manager.run_forever()

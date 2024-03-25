@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,16 +26,23 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, LimbMotion, JointsTrajectoryCheckpoint, ICUB_PARTS
+from pyicub.helper import iCub, JointPose, LimbMotion, JointsTrajectoryCheckpoint, ICUB_HEAD, ICUB_EYES
 
 up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 down = JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
-motion = LimbMotion(ICUB_PARTS.HEAD)
-motion.createJointsTrajectory(up)
-motion.createJointsTrajectory(down)
-motion.createJointsTrajectory(home)
+head_motion = LimbMotion(ICUB_HEAD)
+head_motion.createJointsTrajectory(up)
+head_motion.createJointsTrajectory(down)
+head_motion.createJointsTrajectory(home)
+
+eyes_motion = LimbMotion(ICUB_EYES)
+eyes_motion.createJointsTrajectory(JointPose(target_joints=[0.0, 20.0, 5.0]))
+eyes_motion.createJointsTrajectory(JointPose(target_joints=[0.0, -20.0, 5.0]))
+eyes_motion.createJointsTrajectory(JointPose(target_joints=[0.0, 0.0, 0.0]))
+
 
 icub = iCub()
-icub.movePart(motion)
+icub.movePart(head_motion)
+icub.movePart(eyes_motion)

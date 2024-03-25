@@ -29,5 +29,195 @@
     ],
     "initial_state": "init",
     "session_id": 0,
-    "session_count": 0
+    "session_count": 0,
+    "actions": {
+        "HeadAction": {
+            "steps": [
+                {
+                    "name": "Step",
+                    "limb_motions": {
+                        "HEAD": {
+                            "part": {
+                                "name": "HEAD",
+                                "robot_part": "head",
+                                "joints_nr": 6,
+                                "joints_list": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    5
+                                ],
+                                "joints_speed": [
+                                    10,
+                                    10,
+                                    20,
+                                    20,
+                                    20,
+                                    20
+                                ]
+                            },
+                            "checkpoints": [
+                                {
+                                    "pose": {
+                                        "target_joints": [
+                                            20.0,
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            5.0
+                                        ],
+                                        "joints_list": [
+                                            0,
+                                            1,
+                                            2,
+                                            3,
+                                            4,
+                                            5
+                                        ]
+                                    },
+                                    "duration": 3.0,
+                                    "timeout": 30.0,
+                                    "joints_speed": [
+                                        10,
+                                        10,
+                                        20,
+                                        20,
+                                        20,
+                                        20
+                                    ]
+                                },
+                                {
+                                    "pose": {
+                                        "target_joints": [
+                                            -20.0,
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            5.0
+                                        ],
+                                        "joints_list": [
+                                            0,
+                                            1,
+                                            2,
+                                            3,
+                                            4,
+                                            5
+                                        ]
+                                    },
+                                    "duration": 3.0,
+                                    "timeout": 30.0,
+                                    "joints_speed": [
+                                        10,
+                                        10,
+                                        20,
+                                        20,
+                                        20,
+                                        20
+                                    ]
+                                },
+                                {
+                                    "pose": {
+                                        "target_joints": [
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            0.0,
+                                            5.0
+                                        ],
+                                        "joints_list": [
+                                            0,
+                                            1,
+                                            2,
+                                            3,
+                                            4,
+                                            5
+                                        ]
+                                    },
+                                    "duration": 3.0,
+                                    "timeout": 30.0,
+                                    "joints_speed": [
+                                        10,
+                                        10,
+                                        20,
+                                        20,
+                                        20,
+                                        20
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    "gaze_motion": null,
+                    "custom_calls": [],
+                    "offset_ms": null
+                }
+            ],
+            "wait_for_steps": [
+                true
+            ],
+            "name": "HeadAction",
+            "description": "empty",
+            "offset_ms": null
+        },
+        "LookAtAction": {
+            "steps": [
+                {
+                    "name": "Step1",
+                    "limb_motions": {},
+                    "gaze_motion": {
+                        "checkpoints": [
+                            [
+                                -1.0,
+                                -0.5,
+                                1.0
+                            ],
+                            [
+                                -1.0,
+                                -0.2,
+                                0.5
+                            ],
+                            [
+                                -1.0,
+                                0.2,
+                                0.1
+                            ]
+                        ],
+                        "lookat_method": "lookAtFixationPoint"
+                    },
+                    "custom_calls": [],
+                    "offset_ms": null
+                },
+                {
+                    "name": "Step2",
+                    "limb_motions": {},
+                    "gaze_motion": {
+                        "checkpoints": [
+                            [
+                                0.0,
+                                0.0,
+                                0.0,
+                                true,
+                                1.5
+                            ]
+                        ],
+                        "lookat_method": "lookAtAbsAngles"
+                    },
+                    "custom_calls": [],
+                    "offset_ms": null
+                }
+            ],
+            "wait_for_steps": [
+                true,
+                true
+            ],
+            "name": "LookAtAction",
+            "description": "empty",
+            "offset_ms": null
+        }
+    }
 }

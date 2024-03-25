@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,10 +26,38 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import TemplateParameter
+from pyicub.rest import FSMsManager
+from pyicub.helper import iCub
 
-w1 = TemplateParameter(name="welcome_msg", value="hello world")
-w1.exportJSONFile("msg1.json")
+import argparse
 
-w2 = TemplateParameter(name="welcome_msg", value="welcome world")
-w2.exportJSONFile("msg2.json")
+def main():
+    parser = argparse.ArgumentParser(description="PyiCub FSMizer")
+
+    subparsers = parser.add_subparsers(dest="command", help="Choose 'build' or 'run'.")
+
+    build_parser = subparsers.add_parser("build", help="Build process")
+    build_parser.add_argument("--module", nargs="+", required=True, help="Module name")
+    build_parser.add_argument("--target", nargs="+", required=True, help="Target path")
+
+    execute_parser = subparsers.add_parser("run", help="Running process")
+    execute_parser.add_argument("--fsm", nargs="+", required=True, help="FSM (name) to process")
+    execute_parser.add_argument("--source", nargs="+", required=True, help="Source path JSON repository")
+
+    args = parser.parse_args()
+
+    if args.command == "build":
+        mgr = FSMsManager()
+        mgr.importFSMsFromModule(args.module[0])
+        mgr.exportFSMs(args.target[0])
+    elif args.command == "run":
+        #icub = iCub(action_repository_path=args.source[0])
+        #for action in args.actions:
+        #    icub.playAction(action)
+        pass
+    else:
+        print("Invalid command. Choose 'build' or 'run'.")
+    
+
+if __name__ == "__main__":
+    main()

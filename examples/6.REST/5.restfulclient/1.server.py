@@ -26,7 +26,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.rest import iCubRESTApp, iCub
+from pyicub.rest import iCubRESTApp, iCub, rest_service
 from datetime import date
 
 import time
@@ -34,16 +34,20 @@ import os
 
 class myRESTApp(iCubRESTApp):
 
+    @rest_service
     def hello_world(self, name: str='you'):
         return "Hello world %s!" % name
 
+    @rest_service
     def date(self, date_format: str="%d/%m/%Y"):
         today = date.today()
         return today.strftime(date_format)
 
+    @rest_service
     def process(self):
         return "I am processing my arguments ... " + str(self.getArgs())
 
+    @rest_service
     def foo(self):
         time.sleep(5)
         return "I've done a lot of stuff!"
@@ -51,17 +55,16 @@ class myRESTApp(iCubRESTApp):
 icub = iCub()
 
 template = icub.importTemplate(JSON_file="template/welcome.json")
-template.setParam(name="welcome_msg", JSON_file="template/params/msg1.json")
-action = template.getAction(action_name="Welcome1")
-action.exportJSONFile(os.path.join(os.getcwd(), 'actions', 'welcome1.json'))
+template.setParam(JSON_file="template/params/msg1.json")
+action1 = template.getAction(action_name="Welcome1")
 
 template = icub.importTemplate(JSON_file="template/welcome.json")
-template.setParam(name="welcome_msg", JSON_file="template/params/msg2.json")
-action = template.getAction(action_name="Welcome2")
-action.exportJSONFile(os.path.join(os.getcwd(), 'actions', 'welcome2.json'))
+template.setParam(JSON_file="template/params/msg2.json")
+action2 = template.getAction(action_name="Welcome2")
 
-app = myRESTApp(action_repository_path=os.path.join(os.getcwd(), 'actions'), arg1="your-arg1-value",arg2=[1,2,3,4])
-
+app = iCubRESTApp()
+app.importAction(action1)
+app.importAction(action2)
 app.rest_manager.run_forever()
 
 

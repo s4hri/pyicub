@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,31 +26,52 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, JointsTrajectoryCheckpoint, LimbMotion, GazeMotion, iCubFullbodyAction, PyiCubCustomCall, iCubFullbodyStep, ICUB_HEAD
+from pyicub.helper import iCub, JointPose, ICUB_HEAD, iCubFullbodyAction, iCubFullbodyStep
 
-import time
+import os
 
 class Step(iCubFullbodyStep):
 
     def prepare(self):
-        pose_up = JointPose(target_joints=[30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
-        pose_down = JointPose(target_joints=[-30.0, 0.0, 0.0, 0.0, 0.0, 5.0])
-        pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
-        
-        lm = self.createLimbMotion(ICUB_HEAD)
-        lm.createJointsTrajectory(pose_up, duration=3.0)
-        lm.createJointsTrajectory(pose_down, duration=3.0, timeout=1.0)
-        lm.createJointsTrajectory(pose_home, duration=3.0)
 
-class GenericPoses(iCubFullbodyAction):
+        pose_up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+        pose_down = JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+        pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
+
+        motion = self.createLimbMotion(ICUB_HEAD)
+        motion.createJointsTrajectory(pose_up, duration=3.0)
+        motion.createJointsTrajectory(pose_down, duration=3.0)
+        motion.createJointsTrajectory(pose_home, duration=3.0)
+
+class HeadActionE(iCubFullbodyAction):
 
     def prepare(self):
-        self.addStep(Step())
+        step = Step()
+        self.addStep(step)
 
-action = GenericPoses()
+class Step1(iCubFullbodyStep):
+
+    def prepare(self):
+        self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 15.0, 0.0,))
+        self.createCustomCall(target="emo.neutral")
+
+class Step2(iCubFullbodyStep):
+
+    def prepare(self):
+        self.createCustomCall(target="gaze.lookAtAbsAngles", args=(0.0, 0.0, 0.0,))
+        self.createCustomCall(target="emo.smile")
+
+class CustomAction(iCubFullbodyAction):
+
+    def prepare(self):
+        self.addStep(Step1())
+        self.addStep(Step2())
+    
+action = HeadActionE()
+custom_action = CustomAction()
+action.addAction(custom_action)
+
 icub = iCub()
 action_id = icub.addAction(action)
-req = icub.playAction(action_id, wait_for_completed=False)
-print("Doing some stuff in parallel...")
-print("...waiting for action completation...")
-req.wait_for_completed()
+icub.playAction(action_id)
+icub.exportAction(action_id=action_id, path=os.path.join(os.getcwd(), 'json'))

@@ -31,5 +31,5 @@ from pyicub.helper import iCub
 
 icub = iCub(action_repository_path='./json')
 
-icub.playAction("HeadAction")
 icub.playAction("LookAtAction")
+icub.playAction("HeadAction")

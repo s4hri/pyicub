@@ -2,118 +2,7 @@
     "steps": [
         {
             "name": "Step1",
-            "limb_motions": {
-                "right_arm": {
-                    "part_name": "right_arm",
-                    "checkpoints": [
-                        {
-                            "pose": {
-                                "target_joints": [
-                                    -90.0,
-                                    20.0,
-                                    10.0,
-                                    90.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    60.0,
-                                    20.0,
-                                    20.0,
-                                    20.0,
-                                    10.0,
-                                    10.0,
-                                    10.0,
-                                    10.0,
-                                    10.0
-                                ],
-                                "joints_list": null
-                            },
-                            "duration": 1.0,
-                            "timeout": 30.0
-                        },
-                        {
-                            "pose": {
-                                "target_joints": [
-                                    0.0,
-                                    15.0,
-                                    0.0,
-                                    25.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    60.0,
-                                    20.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    0.0
-                                ],
-                                "joints_list": null
-                            },
-                            "duration": 1.0,
-                            "timeout": 30.0
-                        }
-                    ]
-                },
-                "left_arm": {
-                    "part_name": "left_arm",
-                    "checkpoints": [
-                        {
-                            "pose": {
-                                "target_joints": [
-                                    -90.0,
-                                    20.0,
-                                    10.0,
-                                    90.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    60.0,
-                                    20.0,
-                                    20.0,
-                                    20.0,
-                                    10.0,
-                                    10.0,
-                                    10.0,
-                                    10.0,
-                                    10.0
-                                ],
-                                "joints_list": null
-                            },
-                            "duration": 1.0,
-                            "timeout": 30.0
-                        },
-                        {
-                            "pose": {
-                                "target_joints": [
-                                    0.0,
-                                    15.0,
-                                    0.0,
-                                    25.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    60.0,
-                                    20.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    0.0,
-                                    0.0
-                                ],
-                                "joints_list": null
-                            },
-                            "duration": 1.0,
-                            "timeout": 30.0
-                        }
-                    ]
-                }
-            },
+            "limb_motions": {},
             "gaze_motion": null,
             "custom_calls": [
                 {
@@ -134,8 +23,48 @@
         {
             "name": "Step2",
             "limb_motions": {
-                "left_arm": {
-                    "part_name": "left_arm",
+                "LEFTARM_FULL": {
+                    "part": {
+                        "name": "LEFTARM_FULL",
+                        "robot_part": "left_arm",
+                        "joints_nr": 16,
+                        "joints_list": [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            12,
+                            13,
+                            14,
+                            15
+                        ],
+                        "joints_speed": [
+                            10,
+                            10,
+                            10,
+                            10,
+                            30,
+                            30,
+                            30,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100
+                        ]
+                    },
                     "checkpoints": [
                         {
                             "pose": {
@@ -157,10 +86,45 @@
                                     10.0,
                                     10.0
                                 ],
-                                "joints_list": null
+                                "joints_list": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    5,
+                                    6,
+                                    7,
+                                    8,
+                                    9,
+                                    10,
+                                    11,
+                                    12,
+                                    13,
+                                    14,
+                                    15
+                                ]
                             },
-                            "duration": 1.0,
-                            "timeout": 30.0
+                            "duration": 0.0,
+                            "timeout": 30.0,
+                            "joints_speed": [
+                                10,
+                                10,
+                                10,
+                                10,
+                                30,
+                                30,
+                                30,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100
+                            ]
                         },
                         {
                             "pose": {
@@ -182,10 +146,45 @@
                                     0.0,
                                     0.0
                                 ],
-                                "joints_list": null
+                                "joints_list": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    5,
+                                    6,
+                                    7,
+                                    8,
+                                    9,
+                                    10,
+                                    11,
+                                    12,
+                                    13,
+                                    14,
+                                    15
+                                ]
                             },
-                            "duration": 1.0,
-                            "timeout": 30.0
+                            "duration": 0.0,
+                            "timeout": 30.0,
+                            "joints_speed": [
+                                10,
+                                10,
+                                10,
+                                10,
+                                30,
+                                30,
+                                30,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100
+                            ]
                         }
                     ]
                 }
@@ -197,8 +196,48 @@
         {
             "name": "Step3",
             "limb_motions": {
-                "right_arm": {
-                    "part_name": "right_arm",
+                "RIGHTARM_FULL": {
+                    "part": {
+                        "name": "RIGHTARM_FULL",
+                        "robot_part": "right_arm",
+                        "joints_nr": 16,
+                        "joints_list": [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            12,
+                            13,
+                            14,
+                            15
+                        ],
+                        "joints_speed": [
+                            10,
+                            10,
+                            10,
+                            10,
+                            30,
+                            30,
+                            30,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100
+                        ]
+                    },
                     "checkpoints": [
                         {
                             "pose": {
@@ -220,10 +259,45 @@
                                     10.0,
                                     10.0
                                 ],
-                                "joints_list": null
+                                "joints_list": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    5,
+                                    6,
+                                    7,
+                                    8,
+                                    9,
+                                    10,
+                                    11,
+                                    12,
+                                    13,
+                                    14,
+                                    15
+                                ]
                             },
-                            "duration": 1.0,
-                            "timeout": 30.0
+                            "duration": 0.0,
+                            "timeout": 30.0,
+                            "joints_speed": [
+                                10,
+                                10,
+                                10,
+                                10,
+                                30,
+                                30,
+                                30,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100
+                            ]
                         },
                         {
                             "pose": {
@@ -245,15 +319,90 @@
                                     0.0,
                                     0.0
                                 ],
-                                "joints_list": null
+                                "joints_list": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    5,
+                                    6,
+                                    7,
+                                    8,
+                                    9,
+                                    10,
+                                    11,
+                                    12,
+                                    13,
+                                    14,
+                                    15
+                                ]
                             },
-                            "duration": 1.0,
-                            "timeout": 30.0
+                            "duration": 0.0,
+                            "timeout": 30.0,
+                            "joints_speed": [
+                                10,
+                                10,
+                                10,
+                                10,
+                                30,
+                                30,
+                                30,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100
+                            ]
                         }
                     ]
                 },
-                "left_arm": {
-                    "part_name": "left_arm",
+                "LEFTARM_FULL": {
+                    "part": {
+                        "name": "LEFTARM_FULL",
+                        "robot_part": "left_arm",
+                        "joints_nr": 16,
+                        "joints_list": [
+                            0,
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            12,
+                            13,
+                            14,
+                            15
+                        ],
+                        "joints_speed": [
+                            10,
+                            10,
+                            10,
+                            10,
+                            30,
+                            30,
+                            30,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100,
+                            100
+                        ]
+                    },
                     "checkpoints": [
                         {
                             "pose": {
@@ -275,10 +424,45 @@
                                     10.0,
                                     10.0
                                 ],
-                                "joints_list": null
+                                "joints_list": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    5,
+                                    6,
+                                    7,
+                                    8,
+                                    9,
+                                    10,
+                                    11,
+                                    12,
+                                    13,
+                                    14,
+                                    15
+                                ]
                             },
-                            "duration": 1.0,
-                            "timeout": 30.0
+                            "duration": 0.0,
+                            "timeout": 30.0,
+                            "joints_speed": [
+                                10,
+                                10,
+                                10,
+                                10,
+                                30,
+                                30,
+                                30,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100
+                            ]
                         },
                         {
                             "pose": {
@@ -300,10 +484,45 @@
                                     0.0,
                                     0.0
                                 ],
-                                "joints_list": null
+                                "joints_list": [
+                                    0,
+                                    1,
+                                    2,
+                                    3,
+                                    4,
+                                    5,
+                                    6,
+                                    7,
+                                    8,
+                                    9,
+                                    10,
+                                    11,
+                                    12,
+                                    13,
+                                    14,
+                                    15
+                                ]
                             },
-                            "duration": 1.0,
-                            "timeout": 30.0
+                            "duration": 0.0,
+                            "timeout": 30.0,
+                            "joints_speed": [
+                                10,
+                                10,
+                                10,
+                                10,
+                                30,
+                                30,
+                                30,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100,
+                                100
+                            ]
                         }
                     ]
                 }
@@ -336,6 +555,11 @@
             ],
             "offset_ms": 500
         }
+    ],
+    "wait_for_steps": [
+        false,
+        true,
+        true
     ],
     "name": "CompleteAction",
     "description": "empty",

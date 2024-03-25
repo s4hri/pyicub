@@ -1,4 +1,5 @@
 {
+    "name": "TemplateAction",
     "params": {
         "step_bodymotion": "$step_bodymotion",
         "welcome_msg": "$welcome_msg"
@@ -21,7 +22,10 @@
             "offset_ms": null
         }
     ],
-    "name": "TemplateAction",
+    "wait_for_steps": [
+        true,
+        true
+    ],
     "description": "empty",
     "offset_ms": null
 }

@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,10 +26,10 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, ICUB_PARTS
+from pyicub.helper import iCub, JointPose, ICUB_HEAD
 
 icub = iCub()
-head_ctrl = icub.getPositionController(ICUB_PARTS.HEAD)
+head_ctrl = icub.getPositionController(ICUB_HEAD)
 
 up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])

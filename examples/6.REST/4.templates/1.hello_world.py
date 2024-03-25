@@ -37,15 +37,15 @@ from pyicub.utils import importFromJSONFile
 icub = iCub()
 
 template = icub.importTemplate(JSON_file="template/welcome.json")
-template.setParam(name="welcome_msg", JSON_file="template/params/msg1.json")
-action = template.getAction(action_name="Welcome1")
-action.exportJSONFile(os.path.join(os.getcwd(), 'actions', 'welcome1.json'))
+template.setParam(JSON_file="template/params/msg1.json")
+action1 = template.getAction(action_name="Welcome1")
 
 template = icub.importTemplate(JSON_file="template/welcome.json")
-template.setParam(name="welcome_msg", JSON_file="template/params/msg2.json")
-action = template.getAction(action_name="Welcome2")
-action.exportJSONFile(os.path.join(os.getcwd(), 'actions', 'welcome2.json'))
+template.setParam(JSON_file="template/params/msg2.json")
+action2 = template.getAction(action_name="Welcome2")
 
-app = iCubRESTApp(action_repository_path=os.path.join(os.getcwd(), 'actions'))
+app = iCubRESTApp()
+app.importAction(action1)
+app.importAction(action2)
 app.rest_manager.run_forever()
 

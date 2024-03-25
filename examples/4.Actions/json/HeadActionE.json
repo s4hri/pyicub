@@ -122,12 +122,54 @@
             "gaze_motion": null,
             "custom_calls": [],
             "offset_ms": null
+        },
+        {
+            "name": "Step1",
+            "limb_motions": {},
+            "gaze_motion": null,
+            "custom_calls": [
+                {
+                    "target": "gaze.lookAtAbsAngles",
+                    "args": [
+                        0.0,
+                        15.0,
+                        0.0
+                    ]
+                },
+                {
+                    "target": "emo.neutral",
+                    "args": []
+                }
+            ],
+            "offset_ms": null
+        },
+        {
+            "name": "Step2",
+            "limb_motions": {},
+            "gaze_motion": null,
+            "custom_calls": [
+                {
+                    "target": "gaze.lookAtAbsAngles",
+                    "args": [
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                },
+                {
+                    "target": "emo.smile",
+                    "args": []
+                }
+            ],
+            "offset_ms": null
         }
     ],
     "wait_for_steps": [
+        true,
+        true,
         true
     ],
-    "name": "HeadAction",
+    "name": "HeadActionE",
     "description": "empty",
     "offset_ms": null
 }

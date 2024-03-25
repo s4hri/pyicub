@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,7 +26,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, ICUB_PARTS, iCubFullbodyAction, iCubFullbodyStep
+from pyicub.helper import iCub, JointPose, ICUB_HEAD, iCubFullbodyAction, iCubFullbodyStep
 
 import os
 
@@ -38,7 +38,7 @@ class Step(iCubFullbodyStep):
         pose_down = JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 5.0])
         pose_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 5.0])
 
-        motion = self.createLimbMotion(ICUB_PARTS.HEAD)
+        motion = self.createLimbMotion(ICUB_HEAD)
         motion.createJointsTrajectory(pose_up, duration=3.0)
         motion.createJointsTrajectory(pose_down, duration=3.0)
         motion.createJointsTrajectory(pose_home, duration=3.0)

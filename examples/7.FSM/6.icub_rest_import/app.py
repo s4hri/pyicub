@@ -26,10 +26,15 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import TemplateParameter
+from pyicub.rest import iCubRESTApp, iCubFSM
+from pyicub.actions import iCubFullbodyAction
 
-w1 = TemplateParameter(name="welcome_msg", value="hello world")
-w1.exportJSONFile("msg1.json")
+import os
 
-w2 = TemplateParameter(name="welcome_msg", value="welcome world")
-w2.exportJSONFile("msg2.json")
+app = iCubRESTApp()
+
+fsm = iCubFSM()
+fsm.importFromJSONFile('fsm.json')
+
+app.setFSM(fsm)
+app.rest_manager.run_forever()

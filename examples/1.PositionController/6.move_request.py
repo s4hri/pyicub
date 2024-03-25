@@ -26,7 +26,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from pyicub.helper import iCub, JointPose, LimbMotion, JointsTrajectoryCheckpoint, ICUB_PARTS, iCubFullbodyStep
+from pyicub.helper import iCub, JointPose, LimbMotion, JointsTrajectoryCheckpoint, ICUB_HEAD, ICUB_TORSO, iCubFullbodyStep
 
 class HeadTorsoStep(iCubFullbodyStep):
 
@@ -38,12 +38,12 @@ class HeadTorsoStep(iCubFullbodyStep):
         torso_down = JointPose(target_joints=[0.0, 0.0, 20.0])
         torso_home = JointPose(target_joints=[0.0, 0.0, 0.0])
 
-        head_motion = self.createLimbMotion(ICUB_PARTS.HEAD)
+        head_motion = self.createLimbMotion(ICUB_HEAD)
         head_motion.createJointsTrajectory(head_up)
         head_motion.createJointsTrajectory(head_down)
         head_motion.createJointsTrajectory(head_home)
 
-        torso_motion = self.createLimbMotion(ICUB_PARTS.TORSO)
+        torso_motion = self.createLimbMotion(ICUB_TORSO)
         torso_motion.createJointsTrajectory(torso_down)
         torso_motion.createJointsTrajectory(torso_home)
 

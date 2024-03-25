@@ -2,6 +2,8 @@ from transitions import Machine, State
 from transitions.extensions import GraphMachine
 from pyicub.utils import importFromJSONFile, exportJSONFile
 
+import json
+
 class FSM:
 
     INIT_STATE = "init"
@@ -21,6 +23,10 @@ class FSM:
             else:
                 self.importFromJSONFile(JSON_file)
 
+    @property
+    def name(self):
+        return self._name_
+    
     def addState(self, name, description='', on_enter_callback=None):
         s = State(name=name, on_enter=on_enter_callback)
         self._machine_.add_state(s)
@@ -38,7 +44,8 @@ class FSM:
         self.get_graph().draw(filepath, prog='dot')
 
     def exportJSONFile(self, filepath):
-        exportJSONFile(filepath, self.toJSON())
+        data = json.dumps(self.toJSON(), default=lambda o: o.__dict__, indent=4)
+        exportJSONFile(filepath, data)
 
     def getCurrentState(self):
         return self.state
@@ -108,4 +115,5 @@ class FSM:
             "session_count": self._session_count_
         }
         return data
-        
+
+

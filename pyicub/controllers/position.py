@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -26,14 +26,52 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+try:
+    import yarp
+except ImportError:
+    pass
+
 import os
 import time
-import yarp
-
 import pyicub.utils as utils
 
 
 DEFAULT_TIMEOUT = 30.0
+
+class ICUB_PARTS:
+    HEAD       = 'head'
+    FACE       = 'face'
+    TORSO      = 'torso'
+    LEFT_ARM   = 'left_arm'
+    RIGHT_ARM  = 'right_arm'
+    LEFT_LEG   = 'left_leg'
+    RIGHT_LEG  = 'right_leg'
+
+class iCubPart:
+    def __init__(self, name, robot_part, joints_nr, joints_list, joints_speed):
+        self.name = name
+        self.robot_part = robot_part
+        self.joints_nr = joints_nr
+        self.joints_list = joints_list
+        self.joints_speed = joints_speed
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, indent=4)
+
+ICUB_EYELIDS        = iCubPart('EYELIDS',       ICUB_PARTS.FACE       ,  1,  [0], [10])
+ICUB_HEAD           = iCubPart('HEAD',          ICUB_PARTS.HEAD       ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 20, 20, 20, 20])
+ICUB_EYES           = iCubPart('EYES',          ICUB_PARTS.HEAD       ,  3,  [3, 4, 5], [20, 20, 20])
+ICUB_NECK           = iCubPart('NECK',          ICUB_PARTS.HEAD       ,  3,  [0, 1, 2], [10, 10, 20])
+ICUB_LEFTARM_FULL   = iCubPart('LEFTARM_FULL',  ICUB_PARTS.LEFT_ARM   ,  16, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], [10, 10, 10, 10, 30, 30, 30, 100, 100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_LEFTHAND       = iCubPart('LEFTHAND',      ICUB_PARTS.LEFT_ARM   ,  8,  [8, 9, 10, 11, 12, 13, 14, 15], [100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_LEFTARM        = iCubPart('LEFTARM',       ICUB_PARTS.LEFT_ARM   ,  8,  [0, 1, 2, 3, 4, 5, 6, 7], [10, 10, 10, 10, 30, 30, 30, 100])
+ICUB_RIGHTARM_FULL  = iCubPart('RIGHTARM_FULL', ICUB_PARTS.RIGHT_ARM  ,  16, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], [10, 10, 10, 10, 30, 30, 30, 100, 100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_RIGHTHAND      = iCubPart('RIGHTHAND',     ICUB_PARTS.RIGHT_ARM  ,  8,  [8, 9, 10, 11, 12, 13, 14, 15], [100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_RIGHTARM       = iCubPart('RIGHTARM',      ICUB_PARTS.RIGHT_ARM  ,  8,  [0, 1, 2, 3, 4, 5, 6, 7], [10, 10, 10, 10, 30, 30, 30, 100])
+ICUB_TORSO          = iCubPart('TORSO',         ICUB_PARTS.TORSO      ,  3,  [0, 1, 2], [10, 10, 10])
+ICUB_LEFTLEG        = iCubPart('LEFTLEG',       ICUB_PARTS.LEFT_LEG   ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 10, 10, 10, 10])
+ICUB_RIGHTLEG       = iCubPart('RIGHTLEG',      ICUB_PARTS.RIGHT_LEG  ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 10, 10, 10, 10])
+
 
 class JointPose:
 
@@ -48,9 +86,10 @@ class JointPose:
 
 class RemoteControlboard:
 
-    def __init__(self, port_name):
+    def __init__(self, robot_name, part):
+        self.__robot_name__ = robot_name
+        self.__part__ = part
         self.__pid__ = str(os.getpid())
-        self.__port_name__ = port_name
         self.__driver__ = None
         props  = self._getRobotPartProperties_()
         self.__driver__ = yarp.PolyDriver(props)
@@ -61,8 +100,8 @@ class RemoteControlboard:
     def _getRobotPartProperties_(self):
         props = yarp.Property()
         props.put("device","remote_controlboard")
-        props.put("local","/pyicub/" + self.__pid__ + self.__port_name__)
-        props.put("remote", self.__port_name__)
+        props.put("local","/pyicub/" + self.__pid__ + "/" + self.__robot_name__ + "/" + self.__part__.name)
+        props.put("remote", "/" + self.__robot_name__ + "/" + self.__part__.robot_part)
         return props
 
     def getDriver(self):
@@ -71,19 +110,18 @@ class RemoteControlboard:
 class PositionController:
 
     WAITMOTIONDONE_PERIOD = 0.1
-    MOTION_COMPLETE_AT = 0.9
+    MOTION_COMPLETE_AT = 0.90
 
-    def __init__(self, robot_name, part_name, logger):
-        self.__part_name__ = part_name
+    def __init__(self, robot_name, part, logger):
+        self.__part__ = part
         self.__logger__     = logger
-        port_name = "/" + robot_name + "/" + part_name
-        self.__driver__ = RemoteControlboard(port_name)
+        self.__driver__ = RemoteControlboard(robot_name, part)
         self.__IEncoders__        = None
         self.__IControlLimits__   = None
         self.__IControlMode__   = None
         self.__IPositionControl__   = None
         self.__joints__   = None
-        self.__waitMotionDone__ = self.waitMotionDone2
+        self.__waitMotionDone__ = self.waitMotionDone
 
     def isValid(self):
         return self.PolyDriver.isValid()
@@ -94,8 +132,7 @@ class PositionController:
         self.__IControlMode__     = self.PolyDriver.viewIControlMode()
         self.__IPositionControl__ = self.PolyDriver.viewIPositionControl()
         self.__joints__           = self.__IPositionControl__.getAxes()
-        self.__control_modes__ = yarp.IVector(self.__joints__, yarp.VOCAB_CM_POSITION)
-
+    
     @property
     def PolyDriver(self):
         return self.__driver__.getDriver()
@@ -110,12 +147,58 @@ class PositionController:
         return self.__IControlLimits__
 
     def isMoving(self):
-        return self.__IPositionControl__.checkMotionDone()
+        return not self.__IPositionControl__.checkMotionDone()
 
-    def move(self, pose: JointPose, req_time: float=0.0, timeout: float=DEFAULT_TIMEOUT, speed: float=10.0, waitMotionDone: bool=True, tag: str='default'):
-        self.setPositionControlMode()
+    def __move__(self, target_joints, joints_list, req_time, joints_speed):
+        disp  = [0]*len(joints_list)
+        speeds = [0]*len(joints_list)
+        times = [0]*len(joints_list)
+        tmp   = yarp.Vector(self.__joints__)
+        encs  = yarp.Vector(self.__joints__)
+        while not self.__IEncoders__.getEncoders(encs.data()):
+            yarp.delay(0.1)
+        i = 0
+        for j in joints_list:
+            tmp.set(i, target_joints[i])
+            disp[i] = float(target_joints[i] - encs[j])
+            if disp[i] < 0.0:
+                disp[i] =- disp[i]
+            if abs(disp[i]) > 0.001:
+                if req_time > 0.0:
+                    speeds[i] = disp[i]/req_time
+                else:
+                    speeds[i] = joints_speed[i]
+                    times[i] = disp[i]/speeds[i]
+                self.__IPositionControl__.setRefSpeed(j, speeds[i])
+                self.__IPositionControl__.positionMove(j, tmp[i])
+            i+=1
+        if req_time == 0:
+            req_time = max(times)
+        return req_time
+
+    def stop(self, joints_list=None):
+        t0 = time.perf_counter()
+        if joints_list is None:
+            joints_list = range(0, self.__joints__)
+        for j in joints_list:
+            self.__IPositionControl__.setRefSpeed(j, 0.0)
+        return 0.0
+
+
+    def move(self, pose: JointPose, req_time: float=0.0, timeout: float=DEFAULT_TIMEOUT, joints_speed: list=[], waitMotionDone: bool=True, tag: str='default'):
+        t0 = time.perf_counter()
         target_joints = pose.target_joints
         joints_list = pose.joints_list
+        self.setPositionControlMode(joints_list=joints_list)
+        
+        if joints_list is None:
+            joints_list = range(0, self.__joints__)
+    
+        if not joints_speed:
+            for j in joints_list:
+                ref_speed = 10.0
+                joints_speed.append(ref_speed)
+
         self.__logger__.info("""Motion STARTED!
                                 tag: %s,
                                 robot_part:%s,
@@ -123,101 +206,76 @@ class PositionController:
                                 req_time:%.2f,
                                 joints_list=%s,
                                 waitMotionDone=%s,
-                                timeout=%s""" %
+                                timeout=%s,
+                                speed=%s""" %
                                 (
                                   tag,
-                                  self.__part_name__,
+                                  self.__part__.name,
                                   str(target_joints)      ,
                                   req_time                ,
                                   str(joints_list)        ,
                                   str(waitMotionDone)     ,
-                                  str(timeout)
+                                  str(timeout)            ,
+                                  str(joints_speed)
                                 )
                             )
-        if joints_list is None:
-            joints_list = range(0, self.__joints__)
 
-        if req_time > 0.0:
-            disp  = [0]*len(joints_list)
-            speeds = [0]*len(joints_list)
-            tmp   = yarp.Vector(self.__joints__)
-            encs  = yarp.Vector(self.__joints__)
-            while not self.__IEncoders__.getEncoders(encs.data()):
-                yarp.delay(0.1)
-            i = 0
-            for j in joints_list:
-                tmp.set(i, target_joints[i])
-                disp[i] = target_joints[i] - encs[j]
-                if disp[i] < 0.0:
-                    disp[i] =- disp[i]
-                speeds[i] = disp[i]/req_time
-                self.__IPositionControl__.setRefSpeed(j, speeds[i])
-                self.__IPositionControl__.positionMove(j, tmp[i])
-                i+=1
-        else:
-            disp  = [0]*len(joints_list)
-            speeds = [0]*len(joints_list)
-            times = [0]*len(joints_list)
-            tmp   = yarp.Vector(self.__joints__)
-            encs  = yarp.Vector(self.__joints__)
-            while not self.__IEncoders__.getEncoders(encs.data()):
-                yarp.delay(0.1)
-            i = 0
-            for j in joints_list:
-                tmp.set(i, target_joints[i])
-                disp[i] = target_joints[i] - encs[j]
-                if disp[i] < 0.0:
-                    disp[i] =- disp[i]
-                speeds[i] = speed
-                times[i] = disp[i]/speeds[i]
-                self.__IPositionControl__.setRefSpeed(j, speeds[i])
-                self.__IPositionControl__.positionMove(j, tmp[i])
-                i+=1
-            req_time = max(times)
+        req_time = self.__move__(target_joints, joints_list, req_time, joints_speed)
 
         if waitMotionDone is True:
             res = self.__waitMotionDone__(req_time=req_time, timeout=timeout)
+            elapsed_time = time.perf_counter() - t0
             if res:
                 self.__logger__.info("""Motion COMPLETED!
+                                elapsed_time: %s,
                                 tag: %s,
                                 robot_part:%s,
                                 target_joints:%s
                                 req_time:%.2f,
                                 joints_list=%s,
                                 waitMotionDone=%s,
-                                timeout=%s""" %
+                                timeout=%s,
+                                speed=%s""" %
                                 (
+                                    elapsed_time,
                                     tag,
-                                    self.__part_name__,
+                                    self.__part__.name,
                                     str(target_joints)      ,
                                     req_time                ,
                                     str(joints_list)        ,
                                     str(waitMotionDone)     ,
-                                    str(timeout)
+                                    str(timeout),
+                                    str(joints_speed)
                                 ))
             else:
+                self.stop()
                 self.__logger__.warning("""Motion TIMEOUT!
+                                elapsed_time: %s,
                                 tag: %s,
                                 robot_part:%s,
                                 target_joints:%s
                                 req_time:%.2f,
                                 joints_list=%s,
                                 waitMotionDone=%s,
-                                timeout=%s""" %
+                                timeout=%s,
+                                speed=%s""" %
                                 (
+                                    elapsed_time,
                                     tag,
-                                    self.__part_name__,
+                                    self.__part__.name,
                                     str(target_joints)      ,
                                     req_time                ,
                                     str(joints_list)        ,
                                     str(waitMotionDone)     ,
-                                    str(timeout)
+                                    str(timeout),
+                                    str(joints_speed)
                                 ))
             return res
                 
 
-    def setPositionControlMode(self):
-        self.__IControlMode__.setControlModes(self.__control_modes__)
+    def setPositionControlMode(self, joints_list):
+        for j in joints_list:
+            self.__IControlMode__.setControlMode(j, yarp.VOCAB_CM_POSITION)
 
     def setCustomWaitMotionDone(self, motion_complete_at=MOTION_COMPLETE_AT):
         self.__waitMotionDone__ = self.waitMotionDone2
@@ -228,10 +286,12 @@ class PositionController:
 
     def waitMotionDone(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
         t0 = time.perf_counter()
-        while (time.perf_counter() - t0) < timeout:
-            if self.__IPositionControl__.checkMotionDone():
+        elapsed_time = 0.0
+        while elapsed_time < timeout:
+            if not self.isMoving():
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
+            elapsed_time = time.perf_counter() - t0
         return False
 
     def waitMotionDone2(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
