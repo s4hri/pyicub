@@ -808,26 +808,24 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
 
 
     def __on_enter_state__(self, args):
-        trigger = args["input_json"]["trigger"]
-        state = self.__triggers__[trigger]
-        target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
-        res = requests.post(target, json={})
+        res = self.refresh_targets()
         session_id = res.json()['session_id']
         session_count = res.json()['session_count']
         fsm_name = res.json()['name']
+        trigger = args["input_json"]["trigger"]
+        state = self.__triggers__[trigger]
         if not state == FSM.INIT_STATE:
             if state == self.__root_state__:                
                 self.on_enter_fsm(fsm_name=fsm_name, session_id=session_id, session_count=session_count)
             self.on_enter_state(fsm_name=fsm_name, session_id=session_id, session_count=session_count, state_name=state)
 
     def __on_exit_state__(self, args):
-        trigger = args["input_json"]["trigger"]
-        state = self.__triggers__[trigger]
-        target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
-        res = requests.post(target, json={})
+        res = self.refresh_targets()
         session_id = res.json()['session_id']
         session_count = res.json()['session_count']
         fsm_name = res.json()['name']
+        trigger = args["input_json"]["trigger"]
+        state = self.__triggers__[trigger]
         if not state == FSM.INIT_STATE:
             self.on_exit_state(fsm_name=fsm_name, session_id=session_id, session_count=session_count, state_name=state)
             if state in self.__leaf_states__:
@@ -848,6 +846,7 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
             if transition['dest'] == FSM.INIT_STATE:
                 self.__leaf_states__.append(transition['source'])
             self.__triggers__[transition['trigger']] = transition['dest']
+        return res
     
     def __subscribe__(self):
         topic_uri = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.runStep", host=self.__server_host__, port=self.__server_port__)
