@@ -26,7 +26,7 @@ class cameraPyCtrl:
 
    def __init__(self, robot, side="right", proxy_host=None):
         self.__portImg__ = yarp.BufferedPortImageRgb()
-        self.__portImg__.open("/read/image:o")
+        self.__portImg__.open("/read/"+ side + "_image:o")
         self.__portCamera__ = []
         self._proxy_host_ = proxy_host
         if robot == "icubSim":
