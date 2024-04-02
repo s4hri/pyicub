@@ -287,7 +287,7 @@ class PositionController:
     def waitMotionDone(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
         t0 = time.perf_counter()
         elapsed_time = 0.0
-        while elapsed_time < timeout:
+        while elapsed_time < req_time:
             if not self.isMoving():
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
