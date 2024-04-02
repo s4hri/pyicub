@@ -804,9 +804,6 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
         self.__server_port__ = server_port
         self.__robot_name__ = robot_name
         self.__app_name__ = app_name
-        self.__triggers__ = {}
-        self.__root_state__ = None
-        self.__leaf_states__ = []
         self.__subscribe__()
 
 
@@ -836,9 +833,11 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
             if state in self.__leaf_states__:
                 self.on_exit_fsm(fsm_name=fsm_name, session_id=session_id, session_count=session_count)
 
-    def __subscribe__(self):
-        topic_uri = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.runStep", host=self.__server_host__, port=self.__server_port__)
-        self.subscribe_topic(topic_uri=topic_uri, on_enter=self.__on_enter_state__, on_exit=self.__on_exit_state__)
+    def refresh_targets(self):
+        self.__triggers__ = {}
+        self.__root_state__ = None
+        self.__leaf_states__ = []
+
         target = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.toJSON?sync", host=self.__server_host__, port=self.__server_port__)
         res = requests.post(target, json={})
         transitions = list(res.json()['transitions'])
@@ -849,6 +848,11 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
             if transition['dest'] == FSM.INIT_STATE:
                 self.__leaf_states__.append(transition['source'])
             self.__triggers__[transition['trigger']] = transition['dest']
+    
+    def __subscribe__(self):
+        topic_uri = self.rest_manager.target_rule(self.__robot_name__, self.__app_name__, "fsm.runStep", host=self.__server_host__, port=self.__server_port__)
+        self.subscribe_topic(topic_uri=topic_uri, on_enter=self.__on_enter_state__, on_exit=self.__on_exit_state__)
+        self.refresh_targets()
 
     def on_enter_state(self, fsm_name, session_id, session_count, state_name):
         raise Exception("Method iCubRESTSubscriberFSM.on_enter_state is not implemented!")
