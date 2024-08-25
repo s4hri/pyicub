@@ -189,11 +189,11 @@ class PositionController:
         t0 = time.perf_counter()
         target_joints = pose.target_joints
         joints_list = pose.joints_list
-        self.setPositionControlMode(joints_list=joints_list)
-        
         if joints_list is None:
             joints_list = range(0, self.__joints__)
-    
+
+        self.setPositionControlMode(joints_list=joints_list)
+            
         if not joints_speed:
             for j in joints_list:
                 ref_speed = 10.0
