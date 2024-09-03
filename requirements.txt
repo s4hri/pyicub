@@ -1,6 +1,6 @@
 PyYAML==6.0.1
 Flask==3.0.2
-Flask-Cors==3.0.10
+Flask-Cors==5.0.0
 transitions==0.9.0
 graphviz==0.20.1
 requests==2.32.0
