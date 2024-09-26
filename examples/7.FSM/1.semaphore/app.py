@@ -29,39 +29,40 @@
 from pyicub.fsm import FSM
 import enum
 import time
+import random
 
-def on_RED():
+def on_RED(data):
     print("Stop!")
-    time.sleep(1)
+    time.sleep(data)
 
-def on_YELLOW():
+def on_YELLOW(data):
     print("Slow down!")
-    time.sleep(1)
+    time.sleep(data)
 
-def on_GREEN():
+def on_GREEN(data):
     print("Go!")
-    time.sleep(1)
+    time.sleep(data)
 
 fsm = FSM("Semaphore")
 
-fsm.addState(name="RED", on_enter_callback=on_RED)
-fsm.addState(name="YELLOW", on_enter_callback=on_YELLOW)
-fsm.addState(name="GREEN", on_enter_callback=on_GREEN)
+fsm.addState(name="RED")
+fsm.addState(name="YELLOW")
+fsm.addState(name="GREEN")
 
 # The initial state is always "init"
-fsm.addTransition("start", "init", "RED")
-fsm.addTransition("go", "RED", "GREEN")
-fsm.addTransition("slowdown", "GREEN", "YELLOW")
-
-# If a closed-loop is required, the final state has to be connected always with the "init"
-fsm.addTransition("stop", "YELLOW", "init")
+fsm.addTransition("start", "init", "RED", after=on_RED)
+fsm.addTransition("go", "RED", "GREEN", after=on_GREEN)
+fsm.addTransition("slowdown", "GREEN", "YELLOW", after=on_YELLOW)
+fsm.addTransition("stop", "YELLOW", "init", after=on_RED)
 
 fsm.draw('diagram.png')
+fsm.show()
 
-triggers = ["start", "go", "slowdown", "stop"]
-
-for trigger in triggers:
-    fsm.runStep(trigger)
+input("PRESS A KEY TO START THE SEMAPHORE")
+while True:
+    triggers = ["start", "go", "slowdown", "stop"]
+    for trigger in triggers:
+        fsm.runStep(trigger, data=random.randrange(2,5))
 
 print("\nSTATES: ", fsm.getStates())
 print("\nTRANSITIONS: ", fsm.getTransitions())
