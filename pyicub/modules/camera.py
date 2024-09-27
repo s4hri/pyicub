@@ -30,7 +30,7 @@ class cameraPyCtrl:
         self.__portCamera__ = []
         self._proxy_host_ = proxy_host
         if robot == "icubSim":
-           self.__portCamera__ = "/" + robot + "/cam/" + side
+           self.__portCamera__ = "/" + robot + "/cam/" + side + "/rgbImage:o"
         elif robot == "icub":
            self.__portCamera__ = "/" + robot + "/camcalib/" + side + "/out"
         yarp.Network.connect(self.__portCamera__, self.__portImg__.getName())
