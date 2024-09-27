@@ -1,21 +1,19 @@
 from transitions import Machine, State
 from transitions.extensions import GraphMachine
 from pyicub.utils import importFromJSONFile, exportJSONFile
-from PIL import Image, ImageTk
 
 import json
-import tkinter as tk
 import threading
 import io
 import time
 import queue
-
+import pygame
 
 class FSM:
 
     INIT_STATE = "init"
 
-    def __init__(self, name="", JSON_dict=None, JSON_file=None, session_id=0):
+    def __init__(self, name="", JSON_dict=None, JSON_file=None, session_id=0, auto_transitions=False):
         self._name_ = name
         self._states_ = []
         self._triggers_ = {}
@@ -23,7 +21,8 @@ class FSM:
         self._session_id_ = session_id
         self._session_count_ = 0
         self._root_state_ = None
-        self._machine_ = GraphMachine(model=self, states=[], initial=FSM.INIT_STATE, auto_transitions=False)
+        self._machine_ = GraphMachine(model=self, states=[], initial=FSM.INIT_STATE, auto_transitions=auto_transitions)
+
         if JSON_dict or JSON_file:
             if JSON_dict:
                 self.importFromJSONDict(JSON_dict)
@@ -50,69 +49,44 @@ class FSM:
     def draw(self, filepath):
         self.get_graph().draw(filepath, prog='dot')
 
-
     def show(self):
-        # Step 1: Create a queue for thread-safe communication
         image_queue = queue.Queue()
+        pygame.init()
 
-        # Step 2: Function to update the image periodically and send to queue
+        screen = pygame.display.set_mode((100, 100))
+        pygame.display.set_caption(self._name_)
+
         def update_image():
             while True:
-                # Generate the graph and save it to a binary stream
                 image_stream = io.BytesIO()
-                self.get_graph().draw(image_stream, format="png", prog='dot')
-
-                # Load the image from the binary stream using Pillow
+                self.get_graph(force_new=True).draw(image_stream, format="png", prog='dot')
                 image_stream.seek(0)
-                img = Image.open(image_stream)
-                img_tk = ImageTk.PhotoImage(img)
+                pygame_image = pygame.image.load(image_stream)
+                image_queue.put(pygame_image)
+                time.sleep(0.1)
 
-                # Put the image in the queue
-                image_queue.put(img_tk)
+        def display_images(screen):
+            running = True
+            while running:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
 
-                # Sleep for a while before updating again
-                time.sleep(0.1)  # Update interval in seconds
+                if not image_queue.empty():
+                    img = image_queue.get()
+                    img_size = img.get_size()
 
-        # Step 3: Function to display the image in the tkinter window
-        def _show_image():
-            # Set up the tkinter window
-            root = tk.Tk()
-            root.title(self._name_)
+                    if screen.get_size() != img_size:
+                        screen = pygame.display.set_mode(img_size)
+                    screen.blit(img, (0, 0))
+                    pygame.display.flip()
+    
+            pygame.quit()
 
-            # Create a label to display the image
-            label = tk.Label(root)
-            label.pack()
-
-            # Function to refresh the image from the queue
-            def refresh_image():
-                try:
-                    # Check if there's a new image in the queue
-                    new_img_tk = image_queue.get_nowait()
-                    # Update the label to display the new image
-                    label.configure(image=new_img_tk)
-                    label.image = new_img_tk  # Keep a reference to avoid garbage collection
-                except queue.Empty:
-                    pass
-                
-                # Schedule the next check
-                root.after(100, refresh_image)  # Check queue every 100 ms
-
-            # Start refreshing the image
-            refresh_image()
-
-            # Run the tkinter main loop
-            root.mainloop()
-
-        # Step 4: Start the image updating thread
-        update_thread = threading.Thread(target=update_image)
-        update_thread.daemon = True  # Allows the program to exit even if thread is running
-        update_thread.start()
-
-        # Step 5: Start the tkinter window in a separate thread
-        display_thread = threading.Thread(target=_show_image)
-        display_thread.daemon = True
-        display_thread.start()
-
+        threading.Thread(target=update_image, daemon=True).start()
+        threading.Thread(target=display_images, args=(screen,), daemon=True).start()
+        
+    
     def exportJSONFile(self, filepath):
         data = json.dumps(self.toJSON(), default=lambda o: o.__dict__, indent=4)
         exportJSONFile(filepath, data)
@@ -150,7 +124,6 @@ class FSM:
         transitions = data.get("transitions", [])
 
         for state_data in states:
-            #self.addState(name=state_data["name"], description=state_data["description"], on_enter_callback=self.__on_enter_action__)
             self.addState(name=state_data["name"], description=state_data["description"])
 
         for transition_data in transitions:
@@ -171,6 +144,7 @@ class FSM:
         triggers = self.getCurrentTriggers()
         if not triggers:
             self._machine_.set_state(FSM.INIT_STATE)
+        
         return triggers
 
     def setSessionID(self, session_id):
