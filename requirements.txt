@@ -4,4 +4,4 @@ Flask-Cors==5.0.0
 transitions==0.9.2
 graphviz==0.20.3
 requests==2.32.0
-pygame==2.6.0
+pygraphviz==1.11

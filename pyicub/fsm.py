@@ -7,7 +7,10 @@ import threading
 import io
 import time
 import queue
-import pygame
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logging.getLogger('transitions').setLevel(logging.INFO)
 
 class FSM:
 
@@ -16,7 +19,6 @@ class FSM:
     def __init__(self, name="", JSON_dict=None, JSON_file=None, session_id=0, auto_transitions=False):
         self._name_ = name
         self._states_ = []
-        self._triggers_ = {}
         self._transitions_ = []
         self._session_id_ = session_id
         self._session_count_ = 0
@@ -39,53 +41,18 @@ class FSM:
         self._states_.append({"name": name, "description": description})
         return s
 
-    def addTransition(self, trigger, source, dest, conditions=None, unless=None, before=None, after=None, prepare=None):
-        self._transitions_.append({'trigger': trigger, 'source': source, 'dest': dest})
-        self._triggers_[trigger] = dest
-        self._machine_.add_transition(trigger=trigger, source=source, dest=dest, conditions=conditions, unless=unless, before=before, after=after, prepare=prepare)
+    def addTransition(self, trigger="", source=INIT_STATE, dest="", conditions=None, unless=None, before=None, after=None, prepare=None):
+        if not dest:
+            dest = source
         if source == FSM.INIT_STATE:
             self._root_state_ = dest
+        if not trigger:
+            trigger = "{}>{}".format(source, dest)
+        self._transitions_.append({'trigger': trigger, 'source': source, 'dest': dest})
+        self._machine_.add_transition(trigger=trigger, source=source, dest=dest, conditions=conditions, unless=unless, before=before, after=after, prepare=prepare)
 
     def draw(self, filepath):
-        self.get_graph().draw(filepath, prog='dot')
-
-    def show(self):
-        image_queue = queue.Queue()
-        pygame.init()
-
-        screen = pygame.display.set_mode((100, 100))
-        pygame.display.set_caption(self._name_)
-
-        def update_image():
-            while True:
-                image_stream = io.BytesIO()
-                self.get_graph(force_new=True).draw(image_stream, format="png", prog='dot')
-                image_stream.seek(0)
-                pygame_image = pygame.image.load(image_stream)
-                image_queue.put(pygame_image)
-                time.sleep(0.1)
-
-        def display_images(screen):
-            running = True
-            while running:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        running = False
-
-                if not image_queue.empty():
-                    img = image_queue.get()
-                    img_size = img.get_size()
-
-                    if screen.get_size() != img_size:
-                        screen = pygame.display.set_mode(img_size)
-                    screen.blit(img, (0, 0))
-                    pygame.display.flip()
-    
-            pygame.quit()
-
-        threading.Thread(target=update_image, daemon=True).start()
-        threading.Thread(target=display_images, args=(screen,), daemon=True).start()
-        
+        self.get_graph().draw(filepath, prog='dot')       
     
     def exportJSONFile(self, filepath):
         data = json.dumps(self.toJSON(), default=lambda o: o.__dict__, indent=4)
@@ -137,18 +104,25 @@ class FSM:
         self.importFromJSONDict(data)
 
     def runStep(self, trigger, data=None):
-        state = self._triggers_[trigger]
-        if state == self._root_state_:
-            self._session_count_ += 1
-        self.trigger(trigger_name=trigger, data=data)
+        if data:
+            self.trigger(trigger_name=trigger, data=data)
+        else:
+            self.trigger(trigger_name=trigger)
         triggers = self.getCurrentTriggers()
         if not triggers:
             self._machine_.set_state(FSM.INIT_STATE)
-        
+        if self.getCurrentState() == self._root_state_:
+            self._session_count_ += 1
         return triggers
 
     def setSessionID(self, session_id):
         self._session_id_ = session_id
+
+    def getSessionID(self):
+        return self._session_id_
+
+    def getSessionCount(self):
+        return self._session_count_
 
     def toJSON(self):
         data = {

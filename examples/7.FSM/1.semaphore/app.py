@@ -50,16 +50,18 @@ fsm.addState(name="YELLOW", on_enter_callback=on_YELLOW)
 fsm.addState(name="GREEN", on_enter_callback=on_GREEN)
 
 # The initial state is always "init"
-fsm.addTransition("start", "init", "RED")
-fsm.addTransition("go", "RED", "GREEN")
-fsm.addTransition("slowdown", "GREEN", "YELLOW")
-fsm.addTransition("stop", "YELLOW", "init")
+fsm.addTransition(trigger="start", source="init", dest="RED")
+fsm.addTransition(trigger="go", source="RED", dest="GREEN")
+fsm.addTransition(trigger="slowdown", source="GREEN", dest="YELLOW")
+fsm.addTransition(trigger="stop", source="YELLOW", dest="init")
 
 fsm.draw('diagram.png')
 
-triggers = ["start", "go", "slowdown", "stop"]
-for trigger in triggers:
-    fsm.runStep(trigger, data=random.randrange(2,5))
+for i in range(3):
+    triggers = ["start", "go", "slowdown", "stop"]
+    for trigger in triggers:
+        fsm.runStep(trigger, data=random.randrange(1,2))
+    print("Session Count: ", fsm.getSessionCount())
 
 print("\nSTATES: ", fsm.getStates())
 print("\nTRANSITIONS: ", fsm.getTransitions())
