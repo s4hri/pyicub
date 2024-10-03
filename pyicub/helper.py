@@ -232,6 +232,12 @@ class iCub(metaclass=iCubSingleton):
     def robot_name(self):
         return self._robot_name_
 
+    def addRuntimeModule(self, name, module):
+        if not name in self.__dict__.keys(): 
+            self.__dict__[name] = module
+        else:
+            self._logger_.error('You are trying to add a runtime module with a name %s that already exists in the helper class' % name)
+
     def addAction(self, action: iCubFullbodyAction, action_id=None):
         action_id = self.actions_manager.addAction(action, action_id=action_id)
         return action_id
