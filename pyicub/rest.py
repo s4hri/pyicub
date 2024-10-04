@@ -888,6 +888,10 @@ class iCubFSM(FSM):
     @property
     def actions(self):
         return self._actions_
+    
+    @property
+    def icub(self):
+        return self._app_.icub
 
     def __on_enter_action__(self):
         current_state = self.getCurrentState()
