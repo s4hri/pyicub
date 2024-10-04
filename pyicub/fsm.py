@@ -103,9 +103,9 @@ class FSM:
         data = importFromJSONFile(filepath)
         self.importFromJSONDict(data)
 
-    def runStep(self, trigger, data=None):
-        if data:
-            self.trigger(trigger_name=trigger, data=data)
+    def runStep(self, trigger, **kargs):
+        if kargs:
+            self.trigger(trigger_name=trigger, **kargs)
         else:
             self.trigger(trigger_name=trigger)
         triggers = self.getCurrentTriggers()

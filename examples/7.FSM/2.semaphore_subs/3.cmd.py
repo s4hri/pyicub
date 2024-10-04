@@ -28,7 +28,9 @@
 
 from pyicub.rest import PyiCubRESTfulClient
 
-client = PyiCubRESTfulClient(host='localhost', port=9001)
+import random
+
+client = PyiCubRESTfulClient(host='localhost', port=9005)
 
 print("PyiCub ver: ", client.get_version())
 
@@ -37,5 +39,6 @@ triggers = ["start", "go", "slowdown", "stop"]
 while True:
     input("Press ENTER to run the FSM (CTRL+C to exit): ")
     for trigger in triggers:
-        res = client.fsm_runStep(robot_name='generic', app_name='Publisher', trigger=trigger)
+        msg = input("Type a message and press ENTER to send the trigger %s : " % trigger)
+        res = client.fsm_runStep(robot_name='generic', app_name='Publisher', trigger=trigger, msg=msg, wait_time=random.randrange(1,2))
         print(res)

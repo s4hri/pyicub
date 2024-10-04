@@ -41,6 +41,7 @@ from pyicub.actions import iCubFullbodyAction, iCubActionTemplate, TemplateParam
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from urllib.parse import urlparse, urlsplit
+from typing import Any
 
 import requests
 import json
@@ -50,6 +51,17 @@ import inspect
 import threading
 import functools
 import importlib
+
+# A sample class that might represent a generic type
+class GenericType:
+    def __init__(self, data):
+        self.data = data
+
+# Custom serialization function
+def custom_serializer(obj: Any) -> Any:
+    if isinstance(obj, GenericType):
+        return {'__GenericType__': True, 'data': obj.data}
+    raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
 
 class RESTJSON:
 
@@ -941,9 +953,11 @@ class PyiCubRESTfulClient:
         res = requests.post(url=url, json=data)
         return res.json()
 
-    def fsm_runStep(self, robot_name, app_name, trigger):
+    def fsm_runStep(self, robot_name, app_name, trigger, **kargs):
         data = {}
         data['trigger'] = trigger
+        for key, value in kargs.items():
+            data[key] = value
         res = requests.post(url=self._header_ + '/' + robot_name + '/' + app_name + '/fsm.runStep?sync', json=data)
         return res.json()
 
