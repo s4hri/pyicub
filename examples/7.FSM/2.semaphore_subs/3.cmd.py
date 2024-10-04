@@ -30,7 +30,7 @@ from pyicub.rest import PyiCubRESTfulClient
 
 import random
 
-client = PyiCubRESTfulClient(host='localhost', port=9005)
+client = PyiCubRESTfulClient(host='localhost', port=9001)
 
 print("PyiCub ver: ", client.get_version())
 
