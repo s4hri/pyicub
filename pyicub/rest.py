@@ -376,7 +376,7 @@ class iCubRESTManager(iCubRESTServer):
     def proc_info(self, name):
         if name in self._processes_.keys():
             return jsonify(self._processes_[name])
-        return jsonify([])
+        return jsonify("")
 
     def req_info(self, req_id):
         if req_id in self._requests_.keys():
