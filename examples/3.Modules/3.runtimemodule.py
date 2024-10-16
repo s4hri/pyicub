@@ -1,6 +1,7 @@
+
 # BSD 2-Clause License
 #
-# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -27,9 +28,16 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-__name__ = 'PyiCub'
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
-__license__ = 'BSD-2'
-__version__ = '8.2.0'
-__description__ = 'Developing iCub applications using Python'
+from pyicub.helper import iCub
+
+class myCustomModule:
+
+    def test(self):
+        print("test message from my custom module")
+
+icub = iCub()
+icub.addRuntimeModule(name='test_module', module=myCustomModule())
+
+input("PRESS A KEY TO CONTINUE")
+icub.test_module.test()
+

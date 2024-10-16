@@ -45,17 +45,17 @@ class Semaphore(FSM):
         self.addTransition("slowdown", "GREEN", "YELLOW")
         self.addTransition("stop", "YELLOW", "init")
 
-    def on_RED(self):
-        print("RED STATE: Stop!")
-        time.sleep(5)
+    def on_RED(self, msg='default', wait_time=6):
+        print("RED STATE: Stop! Received msg: %s" % msg)
+        time.sleep(wait_time)
 
-    def on_YELLOW(self):
-        print("YELLOW STATE: Slow down!")
-        time.sleep(1)
+    def on_YELLOW(self, msg='default', wait_time=1):
+        print("YELLOW STATE: Slow down! Received msg: %s" % msg)
+        time.sleep(wait_time)
 
-    def on_GREEN(self):
-        print("GREEN STATE: Go!")
-        time.sleep(3)
+    def on_GREEN(self, msg='default', wait_time=1):
+        print("GREEN STATE: Go! Received msg: %s" % msg)
+        time.sleep(wait_time)
 
 class Publisher(PyiCubRESTfulServer):
 

@@ -41,6 +41,7 @@ from pyicub.actions import iCubFullbodyAction, iCubActionTemplate, TemplateParam
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from urllib.parse import urlparse, urlsplit
+from typing import Any
 
 import requests
 import json
@@ -50,6 +51,17 @@ import inspect
 import threading
 import functools
 import importlib
+
+# A sample class that might represent a generic type
+class GenericType:
+    def __init__(self, data):
+        self.data = data
+
+# Custom serialization function
+def custom_serializer(obj: Any) -> Any:
+    if isinstance(obj, GenericType):
+        return {'__GenericType__': True, 'data': obj.data}
+    raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
 
 class RESTJSON:
 
@@ -315,9 +327,11 @@ class iCubRESTManager(iCubRESTServer):
         self._proxy_host_ = proxy_host
         self._proxy_port_ = proxy_port
         self._requests_ = {}
+        self._processes_ = {}
         self._subscribers_ = {}
         self._request_manager_ = icubrequestmanager
         self._flaskapp_.add_url_rule("/%s/requests" % self._rule_prefix_, methods=['GET'], view_func=self.requests)
+        self._flaskapp_.add_url_rule("/%s/processes" % self._rule_prefix_, methods=['GET'], view_func=self.processes)
         self._flaskapp_.add_url_rule("/%s/<robot_name>/<app_name>/<target_name>/<local_id>" % (self._rule_prefix_), methods=['GET'], view_func=self.single_req_info)
     
     def __del__(self):
@@ -353,6 +367,16 @@ class iCubRESTManager(iCubRESTServer):
         for req_id, req in self._requests_.items():
             reqs.append(req['request'].info())
         return jsonify(reqs)
+
+    def processes(self):
+        if 'name' in request.args:
+            return self.proc_info(name=request.args['name'])
+        return jsonify(self._processes_)
+
+    def proc_info(self, name):
+        if name in self._processes_.keys():
+            return jsonify(self._processes_[name])
+        return jsonify("")
 
     def req_info(self, req_id):
         if req_id in self._requests_.keys():
@@ -406,6 +430,9 @@ class iCubRESTManager(iCubRESTServer):
         self._requests_[req.req_id] = {'robot_name': service.robot_name,
                                        'app_name': service.app_name,
                                        'request': req}
+        
+        self._processes_[service.name] = req.req_id
+        
         self.request_manager.run_request(req, wait_for_completed, **kwargs)
         if 'sync' in request.args:
             wait_for_completed=True
@@ -876,6 +903,10 @@ class iCubFSM(FSM):
     @property
     def actions(self):
         return self._actions_
+    
+    @property
+    def icub(self):
+        return self._app_.icub
 
     def __on_enter_action__(self):
         current_state = self.getCurrentState()
@@ -941,9 +972,11 @@ class PyiCubRESTfulClient:
         res = requests.post(url=url, json=data)
         return res.json()
 
-    def fsm_runStep(self, robot_name, app_name, trigger):
+    def fsm_runStep(self, robot_name, app_name, trigger, **kargs):
         data = {}
         data['trigger'] = trigger
+        for key, value in kargs.items():
+            data[key] = value
         res = requests.post(url=self._header_ + '/' + robot_name + '/' + app_name + '/fsm.runStep?sync', json=data)
         return res.json()
 
