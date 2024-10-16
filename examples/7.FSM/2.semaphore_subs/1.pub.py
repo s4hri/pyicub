@@ -45,7 +45,7 @@ class Semaphore(FSM):
         self.addTransition("slowdown", "GREEN", "YELLOW")
         self.addTransition("stop", "YELLOW", "init")
 
-    def on_RED(self, msg='default', wait_time=1):
+    def on_RED(self, msg='default', wait_time=6):
         print("RED STATE: Stop! Received msg: %s" % msg)
         time.sleep(wait_time)
 
