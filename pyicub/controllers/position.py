@@ -164,11 +164,8 @@ class PositionController:
             if disp[i] < 0.0:
                 disp[i] =- disp[i]
             if abs(disp[i]) > 0.001:
-                if req_time > 0.0:
-                    speeds[i] = disp[i]/req_time
-                else:
-                    speeds[i] = joints_speed[i]
-                    times[i] = disp[i]/speeds[i]
+                speeds[i] = joints_speed[i]
+                times[i] = disp[i]/speeds[i]
                 self.__IPositionControl__.setRefSpeed(j, speeds[i])
                 self.__IPositionControl__.positionMove(j, tmp[i])
             i+=1
@@ -248,7 +245,6 @@ class PositionController:
                                     str(joints_speed)
                                 ))
             else:
-                self.stop()
                 self.__logger__.warning("""Motion TIMEOUT!
                                 elapsed_time: %s,
                                 tag: %s,
