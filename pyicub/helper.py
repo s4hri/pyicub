@@ -393,7 +393,7 @@ class iCub(metaclass=iCubSingleton):
 
     def playAction(self, action_id: str, wait_for_completed=True):
         action = self.actions_manager.getAction(action_id)
-        return runAction(action)
+        return self.runAction(action)
 
     def runAction(self, action: iCubFullbodyAction):
         t0 = round(time.perf_counter(), 4)
