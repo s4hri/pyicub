@@ -395,7 +395,7 @@ class iCub(metaclass=iCubSingleton):
         action = self.actions_manager.getAction(action_id)
         return self.runAction(action)
 
-    def runAction(self, action: iCubFullbodyAction):
+    def runAction(self, action: iCubFullbodyAction, wait_for_completed=True):
         t0 = round(time.perf_counter(), 4)
         self._logger_.debug('Playing action <%s>' % action.name)
         if action.offset_ms:
