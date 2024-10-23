@@ -196,9 +196,11 @@ class iCubRESTServer(metaclass=SingletonMeta):
         if request.method == 'GET':
             return self._app_services_[robot_name][app_name][target_name]
         elif request.method == 'POST':
-            if not type(self._services_[target_rule].target) is str:
-                return self.process_target(self._services_[target_rule])
-            return self.process_target_remote(self._services_[target_rule])
+            if target_rule in self._services_.keys():
+                if not type(self._services_[target_rule].target) is str:
+                    return self.process_target(self._services_[target_rule])
+            elif self._app_services_[robot_name][app_name][target_name]['url'] in self._services_.keys():
+                return self.process_target_remote(self._services_[self._app_services_[robot_name][app_name][target_name]['url']])
 
     def process_target_remote(self, service):
         url = service.url
