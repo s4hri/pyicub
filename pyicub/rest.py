@@ -446,6 +446,9 @@ class iCubRESTManager(iCubRESTServer):
                 thread = threading.Thread(target=self.notify_subscriber, args=(subscriber, target_rule, req, res,))
                 thread.start()
 
+        if req.status == iCubRequest.FAILED:
+            print("Request %s Failed! Exception: %s" %(req.tag, req.exception))
+        
         if wait_for_completed:
             req.wait_for_completed()
             return jsonify(req.retval)
