@@ -51,6 +51,10 @@ import inspect
 import threading
 import functools
 import importlib
+import logging
+
+logging.getLogger('werkzeug').setLevel(logging.WARNING)
+
 
 # A sample class that might represent a generic type
 class GenericType:
@@ -140,6 +144,7 @@ class iCubRESTServer(metaclass=SingletonMeta):
         self._rule_prefix_ = rule_prefix
         self._on_enter_callbacks_ = {}
         self._on_exit_callbacks_ = {}
+        self._logger_ = logging.getLogger("iCubRESTServer")
         self._flaskapp_.add_url_rule("/", methods=['GET'], view_func=self.info)
         self._flaskapp_.add_url_rule("/%s" % self._rule_prefix_, methods=['GET'], view_func=self.get_robots)
         self._flaskapp_.add_url_rule("/%s/tree" % self._rule_prefix_, methods=['GET'], view_func=self.get_tree)
@@ -153,6 +158,10 @@ class iCubRESTServer(metaclass=SingletonMeta):
         self._flaskapp_.add_url_rule("/%s/<robot_name>" % self._rule_prefix_, methods=['GET'], view_func=self.get_apps)
         self._flaskapp_.add_url_rule("/%s/<robot_name>/<app_name>" % self._rule_prefix_, methods=['GET'], view_func=self.get_services)
         self._flaskapp_.add_url_rule("/%s/<robot_name>/<app_name>/<target_name>" % (self._rule_prefix_), methods=['GET', 'POST'], view_func=self.wrapper_target)
+    
+    @property
+    def logger(self):
+        return self._logger_
 
     def header(self, host, port):
         return "http://%s:%s" % (host, port)
@@ -194,13 +203,20 @@ class iCubRESTServer(metaclass=SingletonMeta):
     def wrapper_target(self, robot_name, app_name, target_name):
         target_rule = self.target_rule(robot_name, app_name, target_name)
         if request.method == 'GET':
-            return self._app_services_[robot_name][app_name][target_name]
+            if robot_name in self._app_services_.keys():
+                if app_name in self._app_services_[robot_name].keys():
+                    if target_name in self._app_services_[robot_name][app_name].keys():
+                        return self._app_services_[robot_name][app_name][target_name]
         elif request.method == 'POST':
             if target_rule in self._services_.keys():
                 if not type(self._services_[target_rule].target) is str:
                     return self.process_target(self._services_[target_rule])
-            elif self._app_services_[robot_name][app_name][target_name]['url'] in self._services_.keys():
-                return self.process_target_remote(self._services_[self._app_services_[robot_name][app_name][target_name]['url']])
+            elif robot_name in self._app_services_.keys():
+                if app_name in self._app_services_[robot_name].keys():
+                    if target_name in self._app_services_[robot_name][app_name].keys():
+                        if self._app_services_[robot_name][app_name][target_name]['url'] in self._services_.keys():
+                            return self.process_target_remote(self._services_[self._app_services_[robot_name][app_name][target_name]['url']])
+            return []
 
     def process_target_remote(self, service):
         url = service.url
@@ -445,6 +461,9 @@ class iCubRESTManager(iCubRESTServer):
             for subscriber in self._subscribers_[target_rule]:
                 thread = threading.Thread(target=self.notify_subscriber, args=(subscriber, target_rule, req, res,))
                 thread.start()
+
+        if req.status == iCubRequest.FAILED:
+            self.logger.error("Request %s Failed! Exception: %s" %(req.tag, req.exception))
 
         if wait_for_completed:
             req.wait_for_completed()

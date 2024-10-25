@@ -10,7 +10,7 @@ import queue
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
-logging.getLogger('transitions').setLevel(logging.INFO)
+logging.getLogger('transitions').setLevel(logging.ERROR)
 
 class FSM:
 
