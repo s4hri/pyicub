@@ -464,7 +464,7 @@ class iCubRESTManager(iCubRESTServer):
 
         if req.status == iCubRequest.FAILED:
             self.logger.error("Request %s Failed! Exception: %s" %(req.tag, req.exception))
-
+            
         if wait_for_completed:
             req.wait_for_completed()
             return jsonify(req.retval)
