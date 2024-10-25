@@ -91,7 +91,7 @@ class PyicubLogger(_Logger):
     FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
     FORMAT_VERBOSE = '%(asctime)s - %(levelname)s - %(module)s - %(process)d - %(thread)d - %(message)s'
     FORMAT_JSON = '{"asctime": "%(asctime)-15s", "created": %(created)f, "relativeCreated": %(relativeCreated)f, "levelname": "%(levelname)s", "module": "%(module)s", "process": %(process)d, "processName": "%(processName)s", "thread": %(thread)d, "threadName": "%(threadName)s", "message": "%(message)s"}'
-    LOGGING_LEVEL = logging.DEBUG
+    LOGGING_LEVEL = logging.WARNING
 
     def __init__(self):
         _Logger.__init__(self)

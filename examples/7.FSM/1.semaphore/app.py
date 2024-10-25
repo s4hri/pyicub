@@ -30,17 +30,20 @@ from pyicub.fsm import FSM
 import enum
 import time
 import random
+import logging
+
+logger = logging.getLogger("fsm")
 
 def on_RED(data):
-    print("Stop!")
+    logger.info("Stop!")
     time.sleep(data)
 
 def on_YELLOW(data):
-    print("Slow down!")
+    logger.info("Slow down!")
     time.sleep(data)
 
 def on_GREEN(data):
-    print("Go!")
+    logger.info("Go!")
     time.sleep(data)
 
 fsm = FSM("Semaphore")
