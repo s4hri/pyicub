@@ -115,6 +115,7 @@ class iCub(metaclass=iCubSingleton):
 
 
     def __del__(self):
+        print("Please Wait! Closing YARP connections...")
         self.close()
         yarp.Network().init()
         yarp.Network().fini()
