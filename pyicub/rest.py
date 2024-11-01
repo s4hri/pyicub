@@ -54,6 +54,8 @@ import importlib
 import logging
 
 logging.getLogger('werkzeug').setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("requests").setLevel(logging.WARNING)
 
 
 # A sample class that might represent a generic type
