@@ -392,15 +392,17 @@ class iCub(metaclass=iCubSingleton):
         return requests
 
 
-    def playAction(self, action_id: str, wait_for_completed=True):
+    def playAction(self, action_id: str, wait_for_completed=True, offset_ms=0.0):
         action = self.actions_manager.getAction(action_id)
-        return self.runAction(action)
+        return self.runAction(action, wait_for_completed, offset_ms)
 
-    def runAction(self, action: iCubFullbodyAction, wait_for_completed=True):
+    def runAction(self, action: iCubFullbodyAction, wait_for_completed=True, offset_ms=0.0):
         t0 = round(time.perf_counter(), 4)
         self._logger_.debug('Playing action <%s>' % action.name)
         if action.offset_ms:
             time.sleep(action.offset_ms/1000.0)
+        else:
+            time.sleep(offset_ms/1000.0)
         prefix = "/%s" % action.name
         req = self.request_manager.create(timeout=iCubRequest.TIMEOUT_REQUEST,
                                           target=self.moveSteps,
