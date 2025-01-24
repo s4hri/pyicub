@@ -28,25 +28,27 @@
 
 from pyicub.helper import iCub, JointPose, ICUB_HEAD, ICUB_TORSO
 
+# 1st step: create an instance of the iCub class
 icub = iCub()
+# 2nd step: get the position controller for the head and torso
 head_ctrl = icub.getPositionController(ICUB_HEAD)
 torso_ctrl = icub.getPositionController(ICUB_TORSO)
-
+# 3rd step: define the joint poses, this is the goal of the motion
 head_up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 head_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
 torso_down = JointPose(target_joints=[0.0, 0.0, 20.0])
 torso_home = JointPose(target_joints=[0.0, 0.0, 0.0])
-
+# 4th step: move the head and torso
 head_ctrl.move(head_home)
 torso_ctrl.move(torso_home)
-
+# 5th step: move the head and torso in parallel
 head_ctrl.move(head_up, req_time=1.0, waitMotionDone=False)
 torso_ctrl.move(torso_down, req_time=5.0, waitMotionDone=False)
-
+# 6th step: wait for the motion to be done
 head_ctrl.waitMotionDone(timeout=10.0)
 torso_ctrl.waitMotionDone(timeout=10.0)
-
+# 7th step: move the head and torso back to the home position
 head_ctrl.move(head_home)
 torso_ctrl.move(torso_home)
 
