@@ -373,7 +373,8 @@ class iCub(metaclass=iCubSingleton):
         self._logger_.debug('Step <%s> COMPLETED!' % step.name)
         return requests
     
-    def moveSteps(self, steps, checkpoints, prefix):
+    def moveSteps(self, steps, checkpoints, prefix, offset_ms=0.0):
+        time.sleep(offset_ms/1000.0)
         requests = []
         t0 = round(time.perf_counter(), 4)
         for i in range(0, len(steps)):
@@ -400,9 +401,8 @@ class iCub(metaclass=iCubSingleton):
         t0 = round(time.perf_counter(), 4)
         self._logger_.debug('Playing action <%s>' % action.name)
         if action.offset_ms:
-            time.sleep(action.offset_ms/1000.0)
-        else:
-            time.sleep(offset_ms/1000.0)
+            offset_ms = action.offset_ms
+
         prefix = "/%s" % action.name
         req = self.request_manager.create(timeout=iCubRequest.TIMEOUT_REQUEST,
                                           target=self.moveSteps,
@@ -413,7 +413,8 @@ class iCub(metaclass=iCubSingleton):
                                          wait_for_completed,
                                          action.steps,
                                          action.wait_for_steps,
-                                         req.tag)
+                                         req.tag,
+                                         offset_ms)
         if wait_for_completed:
             self._logger_.debug('Action <%s> finished!' % action.name)
         return req
