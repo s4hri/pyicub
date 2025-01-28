@@ -109,7 +109,7 @@ class RemoteControlboard:
 
 class PositionController:
 
-    WAITMOTIONDONE_PERIOD = 0.1
+    WAITMOTIONDONE_PERIOD = 0.01
     MOTION_COMPLETE_AT = 0.90
 
     def __init__(self, robot_name, part, logger):
@@ -150,27 +150,41 @@ class PositionController:
         return not self.__IPositionControl__.checkMotionDone()
 
     def __move__(self, target_joints, joints_list, req_time, joints_speed):
+
         disp  = [0]*len(joints_list)
         speeds = [0]*len(joints_list)
         times = [0]*len(joints_list)
         tmp   = yarp.Vector(self.__joints__)
         encs  = yarp.Vector(self.__joints__)
+
         while not self.__IEncoders__.getEncoders(encs.data()):
             yarp.delay(0.1)
         i = 0
-        for j in joints_list:
-            tmp.set(i, target_joints[i])
-            disp[i] = float(target_joints[i] - encs[j])
-            if disp[i] < 0.0:
-                disp[i] =- disp[i]
-            if abs(disp[i]) > 0.001:
-                speeds[i] = joints_speed[i]
-                times[i] = disp[i]/speeds[i]
+
+        if req_time > 0.0:
+            for j in joints_list:
+                tmp.set(i, target_joints[i])
+                disp[i] = target_joints[i] - encs[j]
+                if disp[i] < 0.0:
+                    disp[i] =- disp[i]
+                speeds[i] = disp[i]/req_time
                 self.__IPositionControl__.setRefSpeed(j, speeds[i])
                 self.__IPositionControl__.positionMove(j, tmp[i])
-            i+=1
-        if req_time == 0:
+                i+=1
+        else:
+            for j in joints_list:
+                tmp.set(i, target_joints[i])
+                disp[i] = float(target_joints[i] - encs[j])
+                if disp[i] < 0.0:
+                    disp[i] =- disp[i]
+                if abs(disp[i]) > 0.001:
+                    speeds[i] = joints_speed[i]
+                    times[i] = disp[i]/speeds[i]
+                    self.__IPositionControl__.setRefSpeed(j, speeds[i])
+                    self.__IPositionControl__.positionMove(j, tmp[i])
+                i+=1
             req_time = max(times)
+        
         return req_time
 
     def stop(self, joints_list=None):
@@ -283,11 +297,12 @@ class PositionController:
     def waitMotionDone(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
         t0 = time.perf_counter()
         elapsed_time = 0.0
-        while elapsed_time < req_time:
+        while elapsed_time < timeout:
             if not self.isMoving():
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
             elapsed_time = time.perf_counter() - t0
+        
         return False
 
     def waitMotionDone2(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
