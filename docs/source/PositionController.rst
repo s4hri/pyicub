@@ -1,8 +1,6 @@
 PositionController package
 ==========================
 
-Submodules
-----------
 
 PositionController.move\_head module
 ------------------------------------
@@ -52,10 +50,3 @@ PositionController.move\_step module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: PositionController
-   :members:
-   :undoc-members:
-   :show-inheritance:

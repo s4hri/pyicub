@@ -5,19 +5,21 @@ Welcome to pyicub's Documentation!
    :maxdepth: 2
    :caption: Table of Contents
 
+   PositionController
+..
    introduction
    installation
    usage
    api_reference
    examples
-   modules
+  
 
 API Reference
 =============
 
 .. toctree::
    :maxdepth: 2
-
+..
    pyicub
 
 Examples: PositionController
@@ -26,8 +28,9 @@ Examples: PositionController
 The following examples demonstrate various functionalities of the iCub robot:
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 4
 
+..
    examples/PositionController/move_head
    examples/PositionController/move_head_timeout
    examples/PositionController/move_parallel
@@ -40,7 +43,7 @@ Modules
 
 .. toctree::
    :maxdepth: 2
-
+..
    pyicub.actions
    pyicub.controllers
    pyicub.core
@@ -55,5 +58,5 @@ Modules
 License
 ========
 
-This project is licensed under the terms of the MIT license.
+This project is licensed under the terms of the Social Cognition in Human Robot Interaction (s4hri) license.
 

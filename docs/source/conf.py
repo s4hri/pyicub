@@ -16,12 +16,15 @@ import sys
 sys.path.insert(0, os.path.abspath('../../'))
 sys.path.insert(0, os.path.abspath('../../examples'))
 sys.path.insert(0, os.path.abspath('../../examples/PositionController'))
+sys.path.insert(0, os.path.abspath('../../examples/PositionController/json'))
+
+
  
 # -- Project information -----------------------------------------------------
 
 project = "PyiCub"
 copyright = "2024, Davide De Tommaso"
-author = "Enrico Piacenti"
+author = "Davide De Tommaso, Enrico Piacenti"
 
 
 # -- General configuration ---------------------------------------------------

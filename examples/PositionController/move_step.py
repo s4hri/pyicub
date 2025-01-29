@@ -26,6 +26,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 from pyicub.helper import iCub, JointPose, LimbMotion, JointsTrajectoryCheckpoint, ICUB_HEAD, ICUB_TORSO, iCubFullbodyStep
 
 class Step(iCubFullbodyStep):
@@ -48,8 +49,14 @@ class Step(iCubFullbodyStep):
         torso_motion.createJointsTrajectory(torso_down)
         torso_motion.createJointsTrajectory(torso_home)
 
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Define the relative path to the JSON file
+json_path = os.path.join(script_dir, "json", "step.json")
+
 step = Step()
-step.exportJSONFile(filepath="json/step.json")
+step.exportJSONFile(filepath=json_path)  # Use the dynamically created path
 icub = iCub()
 icub.moveStep(step)
 
