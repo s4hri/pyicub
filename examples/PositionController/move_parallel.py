@@ -26,29 +26,95 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+"""
+move_parallel.py
+================
+
+This script controls both the head and torso movements of the iCub humanoid robot simultaneously.
+It demonstrates how to retrieve position controllers for multiple parts, define joint poses, 
+and execute parallel motion with synchronized execution.
+
+Usage:
+------
+Run this script to move the iCub's head and torso simultaneously to predefined positions 
+and then return them to their initial positions.
+
+License:
+--------
+BSD 2-Clause License
+Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
+Istituto Italiano di Tecnologia, Genova
+"""
+
 from pyicub.helper import iCub, JointPose, ICUB_HEAD, ICUB_TORSO
 
-# 1st step: create an instance of the iCub class
+# Create an instance of the iCub robot
 icub = iCub()
-# 2nd step: get the position controller for the head and torso
+
+# Retrieve position controllers for the iCub's head and torso
 head_ctrl = icub.getPositionController(ICUB_HEAD)
 torso_ctrl = icub.getPositionController(ICUB_TORSO)
-# 3rd step: define the joint poses, this is the goal of the motion
+
+# Define the "up" pose for the head
 head_up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+
+# Define the "home" pose for the head (neutral position)
 head_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
+# Define the "down" pose for the torso
 torso_down = JointPose(target_joints=[0.0, 0.0, 20.0])
+
+# Define the "home" pose for the torso (neutral position)
 torso_home = JointPose(target_joints=[0.0, 0.0, 0.0])
-# 4th step: move the head and torso
-head_ctrl.move(head_home)
-torso_ctrl.move(torso_home)
-# 5th step: move the head and torso in parallel
-head_ctrl.move(head_up, req_time=1.0, waitMotionDone=False)
-torso_ctrl.move(torso_down, req_time=5.0, waitMotionDone=False)
-# 6th step: wait for the motion to be done
-head_ctrl.waitMotionDone(timeout=10.0)
-torso_ctrl.waitMotionDone(timeout=10.0)
-# 7th step: move the head and torso back to the home position
-head_ctrl.move(head_home)
-torso_ctrl.move(torso_home)
+
+def move_head_and_torso_parallel(req_time_head: float = 1.0, req_time_torso: float = 5.0, timeout: float = 10.0):
+    """
+    Moves the iCub's head and torso simultaneously to predefined positions and then back to their initial positions.
+
+    Parameters
+    ----------
+    req_time_head : float, optional
+        The requested time (in seconds) for the head motion to complete. Default is 1.0 seconds.
+    
+    req_time_torso : float, optional
+        The requested time (in seconds) for the torso motion to complete. Default is 5.0 seconds.
+
+    timeout : float, optional
+        The maximum time allowed (in seconds) for the motion to complete before timeout occurs. Default is 10.0 seconds.
+
+    Steps
+    -----
+    1. Move both the head and torso to their "home" positions.
+    2. Move the head to the "up" position and the torso to the "down" position simultaneously.
+    3. Wait for both motions to complete.
+    4. Move both the head and torso back to their "home" positions.
+
+    Example
+    -------
+    >>> move_head_and_torso_parallel(req_time_head=1.0, req_time_torso=5.0, timeout=10.0)
+
+    Notes
+    -----
+    - The movements of the head and torso are executed in parallel.
+    - The function ensures that both motions are completed before proceeding.
+    - The timeout prevents the robot from remaining in an unfinished movement state.
+    """
+    # Move head and torso to home position
+    head_ctrl.move(head_home)
+    torso_ctrl.move(torso_home)
+
+    # Move head up and torso down in parallel
+    head_ctrl.move(head_up, req_time=req_time_head, waitMotionDone=False)
+    torso_ctrl.move(torso_down, req_time=req_time_torso, waitMotionDone=False)
+
+    # Wait for both motions to complete
+    head_ctrl.waitMotionDone(timeout=timeout)
+    torso_ctrl.waitMotionDone(timeout=timeout)
+
+    # Move head and torso back to home position
+    head_ctrl.move(head_home)
+    torso_ctrl.move(torso_home)
+
+if __name__ == "__main__":
+    move_head_and_torso_parallel()
 
