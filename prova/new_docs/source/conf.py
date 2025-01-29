@@ -7,24 +7,13 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'pyicub'
-copyright = '2025, Davide De Tommaso'
-author = 'Davide De Tommaso, Enrico Piacenti'
+copyright = '2025, Davide De Tommaso, Enrico Piacenit'
+author = 'Davide De Tommaso, Enrico Piacenit'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
-#
-import os
-import sys
-#sys.path.insert(0, os.path.abspath('../'))
-sys.path.insert(0, os.path.abspath('../'))
-sys.path.insert(0, os.path.abspath('../examples/PositionController'))
 
-
-extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.autodoc'
-]
+extensions = []
 
 templates_path = ['_templates']
 exclude_patterns = []
