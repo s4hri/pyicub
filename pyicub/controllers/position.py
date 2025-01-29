@@ -58,6 +58,7 @@ class iCubPart:
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, indent=4)
 
+
 ICUB_EYELIDS        = iCubPart('EYELIDS',       ICUB_PARTS.FACE       ,  1,  [0], [10])
 ICUB_HEAD           = iCubPart('HEAD',          ICUB_PARTS.HEAD       ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 20, 20, 20, 20])
 ICUB_EYES           = iCubPart('EYES',          ICUB_PARTS.HEAD       ,  3,  [3, 4, 5], [20, 20, 20])
@@ -109,7 +110,7 @@ class RemoteControlboard:
 
 class PositionController:
 
-    WAITMOTIONDONE_PERIOD = 0.01
+    WAITMOTIONDONE_PERIOD = 0.02
     MOTION_COMPLETE_AT = 0.90
 
     def __init__(self, robot_name, part, logger):
@@ -171,6 +172,7 @@ class PositionController:
                 self.__IPositionControl__.setRefSpeed(j, speeds[i])
                 self.__IPositionControl__.positionMove(j, tmp[i])
                 i+=1
+            motion_time = req_time
         else:
             for j in joints_list:
                 tmp.set(i, target_joints[i])
@@ -183,9 +185,9 @@ class PositionController:
                     self.__IPositionControl__.setRefSpeed(j, speeds[i])
                     self.__IPositionControl__.positionMove(j, tmp[i])
                 i+=1
-            req_time = max(times)
+            motion_time = max(times)
         
-        return req_time
+        return motion_time
 
     def stop(self, joints_list=None):
         t0 = time.perf_counter()
@@ -231,10 +233,10 @@ class PositionController:
                                 )
                             )
 
-        req_time = self.__move__(target_joints, joints_list, req_time, joints_speed)
+        motion_time = self.__move__(target_joints, joints_list, req_time, joints_speed)
 
         if waitMotionDone is True:
-            res = self.__waitMotionDone__(req_time=req_time, timeout=timeout)
+            res = self.__waitMotionDone__(motion_time=motion_time, timeout=timeout)
             elapsed_time = time.perf_counter() - t0
             if res:
                 self.__logger__.info("""Motion COMPLETED!
@@ -294,10 +296,10 @@ class PositionController:
     def unsetCustomWaitMotionDone(self):
         self.__waitMotionDone__ = self.waitMotionDone
 
-    def waitMotionDone(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
+    def waitMotionDone(self, motion_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
         t0 = time.perf_counter()
         elapsed_time = 0.0
-        while elapsed_time < timeout:
+        while elapsed_time <= motion_time:
             if not self.isMoving():
                 return True
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
