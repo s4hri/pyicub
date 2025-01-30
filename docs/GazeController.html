@@ -43,44 +43,34 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="PositionController.html">PositionController package</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">GazeController package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-GazeController.lookat">GazeController.lookat module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#lookat-py">1.lookat.py</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#usage">Usage:</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="Examples.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="PositionController.html">PositionController package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">GazeController package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-GazeController.lookat">GazeController.lookat module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lookat-py">1.lookat.py</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#GazeController.lookat.look_at_fixation_point"><code class="docutils literal notranslate"><span class="pre">look_at_fixation_point()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#GazeController.lookat.reset_gaze_to_neutral"><code class="docutils literal notranslate"><span class="pre">reset_gaze_to_neutral()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#GazeController.lookat.look_at_fixation_point"><code class="docutils literal notranslate"><span class="pre">look_at_fixation_point()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#GazeController.lookat.reset_gaze_to_neutral"><code class="docutils literal notranslate"><span class="pre">reset_gaze_to_neutral()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-GazeController.lookat_timeout">GazeController.lookat_timeout module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lookat-timeout-py">2.lookat_timeout.py</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#GazeController.lookat_timeout.set_gaze_absolute"><code class="docutils literal notranslate"><span class="pre">set_gaze_absolute()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#GazeController.lookat_timeout.execute_gaze_sequence"><code class="docutils literal notranslate"><span class="pre">execute_gaze_sequence()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-GazeController.lookat_timeout">GazeController.lookat_timeout module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#lookat-timeout-py">2.lookat_timeout.py</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id3">Usage:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-GazeController.lookat_events">GazeController.lookat_events module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lookat-events-py">3.lookat_events.py</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#GazeController.lookat_events.look_at_fixation_point_with_events"><code class="docutils literal notranslate"><span class="pre">look_at_fixation_point_with_events()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#GazeController.lookat_events.reset_gaze_to_neutral"><code class="docutils literal notranslate"><span class="pre">reset_gaze_to_neutral()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#GazeController.lookat_timeout.set_gaze_absolute"><code class="docutils literal notranslate"><span class="pre">set_gaze_absolute()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#GazeController.lookat_timeout.execute_gaze_sequence"><code class="docutils literal notranslate"><span class="pre">execute_gaze_sequence()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-GazeController.lookat_portmonitor">GazeController.lookat_portmonitor module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#lookat-portmonitor-py">4.lookat_portmonitor.py</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#GazeController.lookat_portmonitor.af1"><code class="docutils literal notranslate"><span class="pre">af1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#GazeController.lookat_portmonitor.cb1"><code class="docutils literal notranslate"><span class="pre">cb1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#GazeController.lookat_portmonitor.monitor_gaze"><code class="docutils literal notranslate"><span class="pre">monitor_gaze()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-GazeController.lookat_events">GazeController.lookat_events module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#lookat-events-py">3.lookat_events.py</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id9">Usage:</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#license">License:</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#GazeController.lookat_events.look_at_fixation_point_with_events"><code class="docutils literal notranslate"><span class="pre">look_at_fixation_point_with_events()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#GazeController.lookat_events.reset_gaze_to_neutral"><code class="docutils literal notranslate"><span class="pre">reset_gaze_to_neutral()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#module-GazeController.lookat_portmonitor">GazeController.lookat_portmonitor module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#lookat-portmonitor-py">4.lookat_portmonitor.py</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id16">Usage:</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#GazeController.lookat_portmonitor.af1"><code class="docutils literal notranslate"><span class="pre">af1()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#GazeController.lookat_portmonitor.cb1"><code class="docutils literal notranslate"><span class="pre">cb1()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#GazeController.lookat_portmonitor.monitor_gaze"><code class="docutils literal notranslate"><span class="pre">monitor_gaze()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -101,6 +91,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="Examples.html">Examples</a></li>
       <li class="breadcrumb-item active">GazeController package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/GazeController.rst.txt" rel="nofollow"> View page source</a>

@@ -5,15 +5,15 @@ Welcome to pyicub's Documentation!
    :maxdepth: 2
    :caption: Table of Contents
 
-   PositionController
-   GazeController
+   Examples
 ..
    introduction
    installation
    usage
    api_reference
-   examples
-  
+   PositionController
+   GazeController
+ 
 
 API Reference
 =============
