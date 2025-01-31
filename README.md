@@ -6,6 +6,10 @@ Introduction
 [PYICUB](https://github.com/s4hri/pyicub) is a framework for developing iCub applications using Python.
 
 
+Documentation
+--------------
+For usage examples, check out the [Examples Documentation](https://ep3896.github.io/pyicub/).
+
 Requirements
 -------------
 - [YARP](https://github.com/robotology/yarp) (compiled with Python wrappers)
