@@ -38,11 +38,7 @@ Usage:
 Run this script to execute a predefined movement sequence for the iCub’s head and torso and retrieve
 motion requests.
 
-License:
---------
-BSD 2-Clause License
-Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
-Istituto Italiano di Tecnologia, Genova
+
 """
 
 from pyicub.helper import iCub, JointPose, LimbMotion, ICUB_HEAD, ICUB_TORSO, iCubFullbodyStep

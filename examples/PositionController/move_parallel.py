@@ -39,11 +39,6 @@ Usage:
 Run this script to move the iCub's head and torso simultaneously to predefined positions 
 and then return them to their initial positions.
 
-License:
---------
-BSD 2-Clause License
-Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
-Istituto Italiano di Tecnologia, Genova
 """
 
 from pyicub.helper import iCub, JointPose, ICUB_HEAD, ICUB_TORSO

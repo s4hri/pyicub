@@ -40,11 +40,7 @@ Usage:
 Run this script to move the iCub's head through a series of predefined positions and
 coordinate the movement of its eyes.
 
-License:
---------
-BSD 2-Clause License
-Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
-Istituto Italiano di Tecnologia, Genova
+
 """
 
 from pyicub.helper import iCub, JointPose, LimbMotion, ICUB_HEAD, ICUB_EYES

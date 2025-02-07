@@ -206,11 +206,12 @@ class PositionController:
             joints_list = range(0, self.__joints__)
 
         self.setPositionControlMode(joints_list=joints_list)
-            
+                    
         if not joints_speed:
             for j in joints_list:
                 ref_speed = 10.0
                 joints_speed.append(ref_speed)
+
 
         self.__logger__.info("""Motion STARTED!
                                 tag: %s,

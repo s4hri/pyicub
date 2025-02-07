@@ -40,11 +40,7 @@ Usage:
 Run this script to move the iCub's head to an "up" position and then return it to the "home" position 
 within a specific timeout period.
 
-License:
---------
-BSD 2-Clause License
-Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
-Istituto Italiano di Tecnologia, Genova
+
 """
 
 from pyicub.helper import iCub, JointPose, ICUB_HEAD
