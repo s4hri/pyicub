@@ -35,6 +35,9 @@ class FSM:
     def name(self):
         return self._name_
     
+    def on_exit_init(self, *args, **kwargs):
+        self._session_count_ += 1
+
     def addState(self, name, description='', on_enter_callback=None, on_exit_callback=None):
         s = State(name=name, on_enter=on_enter_callback, on_exit=on_exit_callback)
         self._machine_.add_state(s)
@@ -111,8 +114,6 @@ class FSM:
         triggers = self.getCurrentTriggers()
         if not triggers:
             self._machine_.set_state(FSM.INIT_STATE)
-        if self.getCurrentState() == self._root_state_:
-            self._session_count_ += 1
         return triggers
 
     def setSessionID(self, session_id):
