@@ -1,9 +1,10 @@
+
 name: Deploy Sphinx Docs to GitHub Pages
 
 on:
   push:
     branches:
-      - master # Adjust if your default branch is different
+      - master  # Adjust if your default branch is different
 
 jobs:
   build:
@@ -25,7 +26,14 @@ jobs:
 
       - name: Install Python dependencies
         run: |
+          pip install sphinx sphinx-rtd-theme  # Ensure Sphinx is installed
           pip install -r docs_build/requirements.txt
+          echo "Python Packages Installed:"
+          pip list
+
+      - name: Verify Sphinx Installation
+        run: |
+          sphinx-build --version  # Check if sphinx-build is available
 
       - name: Build Sphinx documentation
         run: |
