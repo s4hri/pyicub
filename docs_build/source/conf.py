@@ -13,13 +13,19 @@
 
 import os
 import sys
+from unittest.mock import MagicMock
 sys.path.insert(0, os.path.abspath('../../'))
 sys.path.insert(0, os.path.abspath('../../examples'))
 sys.path.insert(0, os.path.abspath('../../examples/PositionController'))
 sys.path.insert(0, os.path.abspath('../../examples/PositionController/json'))
 sys.path.insert(0, os.path.abspath('../../examples/GazeController'))
 
- 
+# Mock yarp and other unavailable dependencies
+MOCK_MODULES = ["yarp"]
+sys.modules.update((mod_name, MagicMock()) for mod_name in MOCK_MODULES)
+
+# Add project directories to the path
+sys.path.insert(0, os.path.abspath("../"))  # Adjust if necessary
 # -- Project information -----------------------------------------------------
 
 project = "PyiCub"
