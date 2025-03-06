@@ -27,7 +27,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install sphinx sphinx-rtd-theme  # Ensure Sphinx is installed
-          pip install -r docs_build/requirements.txt
+          pip install -r docs/requirements.txt
           pip install -e .  # Install your package in editable mode
           echo "Python Packages Installed:"
           pip list
@@ -38,8 +38,8 @@ jobs:
 
       - name: Build Sphinx documentation
         run: |
-          sphinx-apidoc -o docs_build/source/ ../pyicub  # Adjust path
-          sphinx-build -b html docs_build/source _build/html
+          sphinx-apidoc -o docs/source/ ../pyicub  # Adjust path
+          sphinx-build -b html docs/source _build/html
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
