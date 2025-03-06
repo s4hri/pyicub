@@ -27,7 +27,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install sphinx sphinx-rtd-theme  # Ensure Sphinx is installed
-          pip install -r docs/requirements.txt
+          pip install -r requirements.txt
           pip install -e .  # Install your package in editable mode
           echo "Python Packages Installed:"
           pip list
