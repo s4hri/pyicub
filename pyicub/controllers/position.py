@@ -1,11 +1,30 @@
-"""
-Module: position.py
-
-This module defines the structure and control of iCub robot parts, their joints,
-and a position controller for movement execution. It provides classes to define
-iCub robot components, manage joint poses, and control robot movements through
-the YARP interface.
-"""
+# BSD 2-Clause License
+#
+# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
+#                     Istituto Italiano di Tecnologia, Genova
+#
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 try:
     import yarp
@@ -14,27 +33,29 @@ except ImportError:
 
 import os
 import time
-import json
 import pyicub.utils as utils
+
 
 DEFAULT_TIMEOUT = 30.0
 
 class ICUB_PARTS:
+
     """
     Enumeration of iCub robot parts.
     """
-    HEAD = 'head'
-    FACE = 'face'
-    TORSO = 'torso'
-    LEFT_ARM = 'left_arm'
-    RIGHT_ARM = 'right_arm'
-    LEFT_LEG = 'left_leg'
-    RIGHT_LEG = 'right_leg'
+
+    HEAD       = 'head'
+    FACE       = 'face'
+    TORSO      = 'torso'
+    LEFT_ARM   = 'left_arm'
+    RIGHT_ARM  = 'right_arm'
+    LEFT_LEG   = 'left_leg'
+    RIGHT_LEG  = 'right_leg'
 
 class iCubPart:
     """
     Represents an individual iCub robot part with its joint configuration.
-
+    
     Attributes:
         name (str): Name of the robot part.
         robot_part (str): Corresponding robot section (head, torso, etc.).
@@ -42,35 +63,37 @@ class iCubPart:
         joints_list (list[int]): List of joint indices.
         joints_speed (list[int]): List of speeds for each joint.
     """
-    def __init__(self, name: str, robot_part: str, joints_nr: int, joints_list: list, joints_speed: list):
-        """
-        Initializes an iCub robot part.
-
-        Args:
-            name (str): The name of the part.
-            robot_part (str): The section of the robot the part belongs to.
-            joints_nr (int): Number of joints in the part.
-            joints_list (list[int]): List of joint indices.
-            joints_speed (list[int]): List of speeds for each joint.
-        """
+    def __init__(self, name, robot_part, joints_nr, joints_list, joints_speed):
         self.name = name
         self.robot_part = robot_part
         self.joints_nr = joints_nr
         self.joints_list = joints_list
         self.joints_speed = joints_speed
 
-    def toJSON(self) -> str:
+    def toJSON(self):
         """
         Converts the iCub part object to a JSON string.
-
+        
         Returns:
             str: JSON representation of the object.
         """
         return json.dumps(self, default=lambda o: o.__dict__, indent=4)
 
-# Define iCub parts with specific joints and speeds
-ICUB_HEAD = iCubPart('HEAD', ICUB_PARTS.HEAD, 6, [0, 1, 2, 3, 4, 5], [10, 10, 20, 20, 20, 20])
-ICUB_TORSO = iCubPart('TORSO', ICUB_PARTS.TORSO, 3, [0, 1, 2], [10, 10, 10])
+
+ICUB_EYELIDS        = iCubPart('EYELIDS',       ICUB_PARTS.FACE       ,  1,  [0], [10])
+ICUB_HEAD           = iCubPart('HEAD',          ICUB_PARTS.HEAD       ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 20, 20, 20, 20])
+ICUB_EYES           = iCubPart('EYES',          ICUB_PARTS.HEAD       ,  3,  [3, 4, 5], [20, 20, 20])
+ICUB_NECK           = iCubPart('NECK',          ICUB_PARTS.HEAD       ,  3,  [0, 1, 2], [10, 10, 20])
+ICUB_LEFTARM_FULL   = iCubPart('LEFTARM_FULL',  ICUB_PARTS.LEFT_ARM   ,  16, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], [25, 25, 25, 25, 40, 40, 40, 40, 100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_LEFTHAND       = iCubPart('LEFTHAND',      ICUB_PARTS.LEFT_ARM   ,  8,  [8, 9, 10, 11, 12, 13, 14, 15], [100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_LEFTARM        = iCubPart('LEFTARM',       ICUB_PARTS.LEFT_ARM   ,  8,  [0, 1, 2, 3, 4, 5, 6, 7], [25, 25, 25, 25, 40, 40, 40, 40])
+ICUB_RIGHTARM_FULL  = iCubPart('RIGHTARM_FULL', ICUB_PARTS.RIGHT_ARM  ,  16, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], [25, 25, 25, 25, 40, 40, 40, 40, 100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_RIGHTHAND      = iCubPart('RIGHTHAND',     ICUB_PARTS.RIGHT_ARM  ,  8,  [8, 9, 10, 11, 12, 13, 14, 15], [100, 100, 100, 100, 100, 100, 100, 100])
+ICUB_RIGHTARM       = iCubPart('RIGHTARM',      ICUB_PARTS.RIGHT_ARM  ,  8,  [0, 1, 2, 3, 4, 5, 6, 7], [25, 25, 25, 25, 40, 40, 40, 40])
+ICUB_TORSO          = iCubPart('TORSO',         ICUB_PARTS.TORSO      ,  3,  [0, 1, 2], [20, 20, 20])
+ICUB_LEFTLEG        = iCubPart('LEFTLEG',       ICUB_PARTS.LEFT_LEG   ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 10, 10, 10, 10])
+ICUB_RIGHTLEG       = iCubPart('RIGHTLEG',      ICUB_PARTS.RIGHT_LEG  ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 10, 10, 10, 10])
+
 
 class JointPose:
     """
@@ -80,21 +103,14 @@ class JointPose:
         target_joints (list[float]): Desired joint positions.
         joints_list (list[int] or None): Specific joints to be controlled.
     """
-    def __init__(self, target_joints: list[float], joints_list: list[int] = None):
-        """
-        Initializes a joint pose.
-
-        Args:
-            target_joints (list[float]): Target positions for the joints.
-            joints_list (list[int], optional): List of specific joints to move. Defaults to None.
-        """
+    def __init__(self, target_joints, joints_list=None):
         self.target_joints = target_joints
         self.joints_list = joints_list
-    
-    def toJSON(self) -> dict:
+
+    def toJSON(self):
         """
         Converts the JointPose object to a dictionary.
-
+        
         Returns:
             dict: Dictionary representation of the object.
         """
@@ -104,19 +120,12 @@ class RemoteControlboard:
     """
     Interface for controlling an iCub robot part remotely using YARP.
     """
-    def __init__(self, robot_name: str, part: iCubPart):
-        """
-        Initializes the remote control board.
-
-        Args:
-            robot_name (str): Name of the robot.
-            part (iCubPart): The robot part to be controlled.
-        """
+    def __init__(self, robot_name, part):
         self.__robot_name__ = robot_name
         self.__part__ = part
         self.__pid__ = str(os.getpid())
         self.__driver__ = None
-        props = self._getRobotPartProperties_()
+        props  = self._getRobotPartProperties_()
         self.__driver__ = yarp.PolyDriver(props)
 
     def __del__(self):
@@ -124,26 +133,20 @@ class RemoteControlboard:
         Closes the YARP driver upon object deletion.
         """
         self.__driver__.close()
-    
-    def _getRobotPartProperties_(self) -> yarp.Property:
+
+    def _getRobotPartProperties_(self):
         """
         Defines and returns YARP properties for the robot part.
-
-        Returns:
-            yarp.Property: YARP properties for the remote control board.
         """
         props = yarp.Property()
-        props.put("device", "remote_controlboard")
-        props.put("local", f"/pyicub/{self.__pid__}/{self.__robot_name__}/{self.__part__.name}")
-        props.put("remote", f"/{self.__robot_name__}/{self.__part__.robot_part}")
+        props.put("device","remote_controlboard")
+        props.put("local","/pyicub/" + self.__pid__ + "/" + self.__robot_name__ + "/" + self.__part__.name)
+        props.put("remote", "/" + self.__robot_name__ + "/" + self.__part__.robot_part)
         return props
-    
-    def getDriver(self) -> yarp.PolyDriver:
+
+    def getDriver(self):
         """
         Returns the YARP driver instance.
-
-        Returns:
-            yarp.PolyDriver: YARP driver instance.
         """
         return self.__driver__
 
@@ -151,10 +154,10 @@ class PositionController:
     """
     Controls joint movement of a robot part.
     """
-    WAITMOTIONDONE_PERIOD = 0.1
+    WAITMOTIONDONE_PERIOD = 0.02
     MOTION_COMPLETE_AT = 0.90
 
-    def __init__(self, robot_name: str, part: iCubPart, logger):
+    def __init__(self, robot_name, part, logger):
         """
         Initializes the position controller.
 
@@ -164,46 +167,251 @@ class PositionController:
             logger: Logger instance for debugging.
         """
         self.__part__ = part
-        self.__logger__ = logger
+        self.__logger__     = logger
         self.__driver__ = RemoteControlboard(robot_name, part)
-        self.__IPositionControl__ = None
-        self.__joints__ = None
+        self.__IEncoders__        = None
+        self.__IControlLimits__   = None
+        self.__IControlMode__   = None
+        self.__IPositionControl__   = None
+        self.__joints__   = None
         self.__waitMotionDone__ = self.waitMotionDone
+
+    def isValid(self):
+        return self.PolyDriver.isValid()
 
     def init(self):
         """
         Initializes the control interfaces.
         """
+        self.__IEncoders__        = self.PolyDriver.viewIEncoders()
+        self.__IControlLimits__   = self.PolyDriver.viewIControlLimits()
+        self.__IControlMode__     = self.PolyDriver.viewIControlMode()
         self.__IPositionControl__ = self.PolyDriver.viewIPositionControl()
-        self.__joints__ = self.__IPositionControl__.getAxes()
+        self.__joints__           = self.__IPositionControl__.getAxes()
     
     @property
-    def PolyDriver(self) -> yarp.PolyDriver:
+    def PolyDriver(self):
         """
-        Returns the PolyDriver instance.
-
         Returns:
             yarp.PolyDriver: PolyDriver instance controlling the robot part.
         """
         return self.__driver__.getDriver()
-    
-    def move(self, pose: JointPose):
-        """
-        Moves the joints to the specified target pose.
 
-        Args:
-            pose (JointPose): Target pose for the joints.
-        """
-        self.__IPositionControl__.positionMove(pose.target_joints)
-    
-    def waitMotionDone(self, timeout: float = DEFAULT_TIMEOUT) -> bool:
-        """
-        Waits until the movement is complete or times out.
+    def getIPositionControl(self):
+        return self.__IPositionControl__
 
-        Args:
-            timeout (float, optional): Maximum time to wait. Defaults to DEFAULT_TIMEOUT.
+    def getIEncoders(self):
+        return self.__IEncoders__
 
-        Returns:
-            bool: True if motion is completed, False otherwise.
-        """
-        return self.__IPositionControl__.checkMotionDone()
+    def getIControlLimits(self):
+        return self.__IControlLimits__
+
+    def isMoving(self):
+        return not self.__IPositionControl__.checkMotionDone()
+
+    def __move__(self, target_joints, joints_list, req_time, joints_speed):
+        disp  = [0]*len(joints_list)
+        speeds = [0]*len(joints_list)
+        times = [0]*len(joints_list)
+        tmp   = yarp.Vector(self.__joints__)
+        encs  = yarp.Vector(self.__joints__)
+
+        while not self.__IEncoders__.getEncoders(encs.data()):
+            yarp.delay(0.1)
+        i = 0
+
+        if req_time > 0.0:
+            for j in joints_list:
+                tmp.set(i, target_joints[i])
+                disp[i] = target_joints[i] - encs[j]
+                if disp[i] < 0.0:
+                    disp[i] =- disp[i]
+                speeds[i] = disp[i]/req_time
+                self.__IPositionControl__.setRefSpeed(j, speeds[i])
+                self.__IPositionControl__.positionMove(j, tmp[i])
+                i+=1
+            motion_time = req_time
+        else:
+            for j in joints_list:
+                tmp.set(i, target_joints[i])
+                disp[i] = float(target_joints[i] - encs[j])
+                if disp[i] < 0.0:
+                    disp[i] =- disp[i]
+                if abs(disp[i]) > 0.001:
+                    speeds[i] = joints_speed[i]
+                    times[i] = disp[i]/speeds[i]
+                    self.__IPositionControl__.setRefSpeed(j, speeds[i])
+                    self.__IPositionControl__.positionMove(j, tmp[i])
+                i+=1
+            motion_time = max(times)
+        
+        return motion_time
+
+    def stop(self, joints_list=None):
+        t0 = time.perf_counter()
+        if joints_list is None:
+            joints_list = range(0, self.__joints__)
+        for j in joints_list:
+            self.__IPositionControl__.setRefSpeed(j, 0.0)
+        return 0.0
+
+
+    def move(self, pose: JointPose, req_time: float=0.0, timeout: float=DEFAULT_TIMEOUT, joints_speed: list=[], waitMotionDone: bool=True, tag: str='default'):
+        t0 = time.perf_counter()
+        target_joints = pose.target_joints
+        joints_list = pose.joints_list
+        if joints_list is None:
+            joints_list = range(0, self.__joints__)
+
+        self.setPositionControlMode(joints_list=joints_list)
+            
+        if not joints_speed:
+            for j in joints_list:
+                ref_speed = 10.0
+                joints_speed.append(ref_speed)
+
+        self.__logger__.info("""Motion STARTED!
+                                tag: %s,
+                                robot_part:%s,
+                                target_joints:%s,
+                                req_time:%.2f,
+                                joints_list=%s,
+                                waitMotionDone=%s,
+                                timeout=%s,
+                                speed=%s""" %
+                                (
+                                  tag,
+                                  self.__part__.name,
+                                  str(target_joints)      ,
+                                  req_time                ,
+                                  str(joints_list)        ,
+                                  str(waitMotionDone)     ,
+                                  str(timeout)            ,
+                                  str(joints_speed)
+                                )
+                            )
+
+        motion_time = self.__move__(target_joints, joints_list, req_time, joints_speed)
+
+        if waitMotionDone is True:
+            res = self.__waitMotionDone__(motion_time=motion_time, timeout=timeout)
+            elapsed_time = time.perf_counter() - t0
+            if res:
+                self.__logger__.info("""Motion COMPLETED!
+                                elapsed_time: %s,
+                                tag: %s,
+                                robot_part:%s,
+                                target_joints:%s
+                                req_time:%.2f,
+                                joints_list=%s,
+                                waitMotionDone=%s,
+                                timeout=%s,
+                                speed=%s""" %
+                                (
+                                    elapsed_time,
+                                    tag,
+                                    self.__part__.name,
+                                    str(target_joints)      ,
+                                    req_time                ,
+                                    str(joints_list)        ,
+                                    str(waitMotionDone)     ,
+                                    str(timeout),
+                                    str(joints_speed)
+                                ))
+            else:
+                self.__logger__.warning("""Motion TIMEOUT!
+                                elapsed_time: %s,
+                                tag: %s,
+                                robot_part:%s,
+                                target_joints:%s
+                                req_time:%.2f,
+                                joints_list=%s,
+                                waitMotionDone=%s,
+                                timeout=%s,
+                                speed=%s""" %
+                                (
+                                    elapsed_time,
+                                    tag,
+                                    self.__part__.name,
+                                    str(target_joints)      ,
+                                    req_time                ,
+                                    str(joints_list)        ,
+                                    str(waitMotionDone)     ,
+                                    str(timeout),
+                                    str(joints_speed)
+                                ))
+            return res
+                
+
+    def setPositionControlMode(self, joints_list):
+        for j in joints_list:
+            self.__IControlMode__.setControlMode(j, yarp.VOCAB_CM_POSITION)
+
+    def setCustomWaitMotionDone(self, motion_complete_at=MOTION_COMPLETE_AT):
+        self.__waitMotionDone__ = self.waitMotionDone2
+        PositionController.MOTION_COMPLETE_AT = motion_complete_at
+
+    def unsetCustomWaitMotionDone(self):
+        self.__waitMotionDone__ = self.waitMotionDone
+
+    def waitMotionDone(self, motion_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
+        t0 = time.perf_counter()
+        elapsed_time = 0.0
+        while elapsed_time <= motion_time:
+            if not self.isMoving():
+                return True
+            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
+            elapsed_time = time.perf_counter() - t0
+        
+        return False
+
+    def waitMotionDone2(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
+        t0 = time.perf_counter()
+        target_pos = yarp.Vector(self.__joints__)
+        encs=yarp.Vector(self.__joints__)
+        self.__IPositionControl__.getTargetPositions(target_pos.data())
+        count = 0
+        deadline = min(timeout, req_time)
+        while (time.perf_counter() - t0) < deadline:
+            while not self.__IEncoders__.getEncoders(encs.data()):
+                yarp.delay(0.05)
+            v = []
+            w = []
+            for i in range(0, self.__joints__):
+                v.append(encs[i])
+                w.append(target_pos[i])
+            if count == 0:
+                tot_disp = utils.vector_distance(v, w)
+            count+=1
+            dist = utils.vector_distance(v, w)
+            if dist <= (1.0 - PositionController.MOTION_COMPLETE_AT)*tot_disp:
+                return True
+            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
+        if (time.perf_counter() - t0) > timeout:
+            return False
+        else:
+            return True
+
+    def waitMotionDone3(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
+        onset = False
+        offset = False
+        t0 = time.perf_counter()
+        vel= yarp.Vector(self.__joints__)
+        while (time.perf_counter() - t0) < timeout:
+            self.__IEncoders__.getEncoderSpeeds(vel.data())
+            v = []
+            for i in range(0, self.__joints__):
+                v.append(vel[i])
+            if not onset:
+                if utils.norm(v) > 0:
+                    onset = True
+            elif onset and (not offset):
+                if utils.norm(v) == 0:
+                    offset = True
+                    break
+            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
+        return onset and offset
+
+    def waitMotionDone4(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
+        yarp.delay(req_time)
+        return True

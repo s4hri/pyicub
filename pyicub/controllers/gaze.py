@@ -1,3 +1,31 @@
+# BSD 2-Clause License
+#
+# Copyright (c) 2022, Social Cognition in Human-Robot Interaction,
+#                     Istituto Italiano di Tecnologia, Genova
+#
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 """
 Module: gaze.py
 
@@ -20,7 +48,7 @@ class GazeControllerPolyDriver:
         __driver__ (yarp.PolyDriver): The YARP PolyDriver instance.
     """
 
-    def __init__(self, robot: str):
+    def __init__(self, robot):
         """
         Initializes the GazeControllerPolyDriver with the given robot name.
 
@@ -30,9 +58,9 @@ class GazeControllerPolyDriver:
         self.__pid__ = str(os.getpid())
         self.__props__ = yarp.Property()
         self.__props__.put("robot", robot)
-        self.__props__.put("device", "gazecontrollerclient")
-        self.__props__.put("local", f"/pyicub/gaze/{self.__pid__}")
-        self.__props__.put("remote", "/iKinGazeCtrl")
+        self.__props__.put("device","gazecontrollerclient")
+        self.__props__.put("local","/pyicub/gaze/" + self.__pid__)
+        self.__props__.put("remote","/iKinGazeCtrl")
         self.__driver__ = yarp.PolyDriver(self.__props__)
 
     def __del__(self):
@@ -42,7 +70,7 @@ class GazeControllerPolyDriver:
         self.__driver__.close()
 
     @property
-    def properties(self) -> yarp.Property:
+    def properties(self):
         """
         Returns the properties of the YARP PolyDriver.
 
@@ -71,7 +99,7 @@ class GazeController:
         __IGazeControl__ (IGazeControl): Interface for gaze control.
     """
 
-    def __init__(self, robot: str, logger):
+    def __init__(self, robot, logger):        
         """
         Initializes the GazeController with the given robot name and logger.
 
@@ -110,10 +138,8 @@ class GazeController:
         self.PolyDriver.close()
 
     @property
-    def PolyDriver(self) -> yarp.PolyDriver:
+    def PolyDriver(self):
         """
-        Returns the YARP PolyDriver instance.
-
         Returns:
             yarp.PolyDriver: The YARP PolyDriver instance.
         """
@@ -122,14 +148,44 @@ class GazeController:
     @property
     def IGazeControl(self):
         """
-        Returns the gaze control interface.
-
         Returns:
             IGazeControl: The gaze control interface.
         """
         return self.__IGazeControl__
+    
+    def __lookAtAbsAngles__(self, angles, waitMotionDone=True, timeout=0.0):
+        self.__mot_id__ += 1
+        self.__logger__.info("""Looking at angles <%d> STARTED!
+                                 angles=%s, waitMotionDone=%s, timeout=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone), str(timeout)) )
+        self.IGazeControl.lookAtAbsAngles(angles)
+        res = True
+        if waitMotionDone is True:
+            res = self.waitMotionDone(timeout=timeout)
+        if res:
+            self.__logger__.info("""Looking at angles <%d> COMPLETED!
+                                    angles=%s, waitMotionDone=%s, timeout=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone), str(timeout)) )
+        else:
+            self.__logger__.warning("""Looking at angles <%d> TIMEOUT!
+                                       angles=%s, waitMotionDone=%s, timeout=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone), str(timeout)) )
 
-    def blockEyes(self, vergence: float):
+
+    def __lookAtRelAngles__(self, angles, waitMotionDone=True, timeout=0.0):
+        self.__mot_id__ += 1
+        self.__logger__.info("""Looking at rel angles <%d> STARTED!
+                                 angles=%s, waitMotionDone=%s, timeout=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone), str(timeout)) )
+        self.IGazeControl.lookAtRelAngles(angles)
+        res = True
+        if waitMotionDone is True:
+            res = self.waitMotionDone(timeout=timeout)
+        if res:
+            self.__logger__.info("""Looking at rel angles <%d> COMPLETED!
+                                    angles=%s, waitMotionDone=%s, timeout=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone), str(timeout)) )
+        else:
+            self.__logger__.warning("""Looking at rel angles <%d> TIMEOUT!
+                                        angles=%s, waitMotionDone=%s, timeout=%s""" % (self.__mot_id__, str([angles[0], angles[1], angles[2]]), str(waitMotionDone), str(timeout)) )
+
+
+    def blockEyes(self, vergence):
         """
         Blocks the eyes at the specified vergence.
 
@@ -160,10 +216,35 @@ class GazeController:
         self.IGazeControl.clearNeckRoll()
         self.IGazeControl.clearNeckPitch()
 
-    def setParams(self, neck_tt: float, eyes_tt: float):
-        """
-        Sets the trajectory times for the neck and eyes.
+    def lookAtAbsAngles(self, azi, ele, ver, waitMotionDone=True, timeout=0.0):
+        angles = yarp.Vector(3)
+        angles.set(0, azi)
+        angles.set(1, ele)
+        angles.set(2, ver)
+        self.__lookAtAbsAngles__(angles, waitMotionDone, timeout)
 
+    def lookAtRelAngles(self, azi, ele, ver, waitMotionDone=True, timeout=0.0):
+        angles = yarp.Vector(3)
+        angles.set(0, azi)
+        angles.set(1, ele)
+        angles.set(2, ver)
+        self.__lookAtRelAngles__(angles, waitMotionDone, timeout)
+
+    def lookAtFixationPoint(self, x, y, z, waitMotionDone=True, timeout=0.0):
+        p = yarp.Vector(3)
+        p.set(0, x)
+        p.set(1, y)
+        p.set(2, z)
+        angles = yarp.Vector(3)
+        self.IGazeControl.getAnglesFrom3DPoint(p, angles)
+        self.__lookAtAbsAngles__(angles, waitMotionDone, timeout)
+
+    def reset(self):
+        self.clearEyes()
+        self.clearNeck()
+
+    def setParams(self, neck_tt, eyes_tt):
+        """
         Args:
             neck_tt (float): Trajectory time for the neck.
             eyes_tt (float): Trajectory time for the eyes.
@@ -173,8 +254,6 @@ class GazeController:
 
     def setTrackingMode(self, mode: bool):
         """
-        Sets the tracking mode.
-
         Args:
             mode (bool): True to enable tracking mode, False to disable.
         """
@@ -182,8 +261,6 @@ class GazeController:
 
     def waitMotionDone(self, period: float = 0.1, timeout: float = 0.0) -> bool:
         """
-        Waits for the motion to complete.
-
         Args:
             period (float): Period to check the motion status.
             timeout (float): Timeout for waiting for the motion to complete.
@@ -192,3 +269,20 @@ class GazeController:
             bool: True if the motion completed, False otherwise.
         """
         return self.IGazeControl.waitMotionDone(period=period, timeout=timeout)
+
+    def waitMotionOnset(self, speed_ref=0, period=0.1, max_attempts=50):
+        self.__logger__.info("""Waiting for gaze motion onset STARTED!
+                                 speed_ref=%s""" % str(speed_ref))
+        q = yarp.Vector(6)
+        for _ in range(0, max_attempts):
+            self.IGazeControl.getJointsVelocities(q)
+            v = []
+            for i in range(0,6):
+                v.append(q[i])
+            speed = utils.norm(v)
+            if speed > speed_ref:
+                self.__logger__.info("""Motion onset DETECTED! speed_ref=%s""" % str(speed_ref))
+                return True
+            yarp.delay(period)
+        self.__logger__.warning("""Motion onset TIMEOUT! speed_ref=%s""" % str(speed_ref))
+        return False
