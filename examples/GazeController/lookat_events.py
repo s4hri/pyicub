@@ -38,12 +38,6 @@ Usage:
 ------
 Run this script to move the iCub's gaze while detecting when the movement starts and ends.
 
-License:
---------
-BSD 2-Clause License  
-Copyright (c) 2022,  
-Social Cognition in Human-Robot Interaction,  
-Istituto Italiano di Tecnologia, Genova
 """
 
 from pyicub.helper import iCub

@@ -51,16 +51,7 @@ head_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 torso_down = JointPose(target_joints=[0.0, 0.0, 20.0])
 torso_home = JointPose(target_joints=[0.0, 0.0, 0.0])
 
-# Create a motion trajectory for the head
-head_motion = LimbMotion(ICUB_HEAD)
-head_motion.createJointsTrajectory(head_up)
-head_motion.createJointsTrajectory(head_down)
-head_motion.createJointsTrajectory(head_home)
 
-# Create a motion trajectory for the torso
-torso_motion = LimbMotion(ICUB_TORSO)
-torso_motion.createJointsTrajectory(torso_down)
-torso_motion.createJointsTrajectory(torso_home)
 
 class HeadTorsoStep(iCubFullbodyStep):
     """
@@ -90,8 +81,16 @@ class HeadTorsoStep(iCubFullbodyStep):
         >>> step = HeadTorsoStep()
         >>> step.prepare()
         """
-        self.addLimbMotion(head_motion)
-        self.addLimbMotion(torso_motion)
+        # Create a motion trajectory for the head
+        head_motion = self.createLimbMotion(ICUB_HEAD)
+        head_motion.createJointsTrajectory(head_up)
+        head_motion.createJointsTrajectory(head_down)
+        head_motion.createJointsTrajectory(head_home)
+
+        # Create a motion trajectory for the torso
+        torso_motion = self.createLimbMotion(ICUB_TORSO)
+        torso_motion.createJointsTrajectory(torso_down)
+        torso_motion.createJointsTrajectory(torso_home)
 
 def execute_fullbody_step():
     """
