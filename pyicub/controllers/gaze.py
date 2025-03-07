@@ -79,7 +79,7 @@ class GazeControllerPolyDriver:
         """
         return self.__props__
 
-    def getDriver(self) -> yarp.PolyDriver:
+    def getDriver(self):
         """
         Returns the YARP PolyDriver instance.
 
@@ -112,7 +112,7 @@ class GazeController:
         self.__mot_id__ = 0
         self.__IGazeControl__ = None
 
-    def isValid(self) -> bool:
+    def isValid(self):
         """
         Checks if the PolyDriver is valid.
 
@@ -252,14 +252,14 @@ class GazeController:
         self.IGazeControl.setNeckTrajTime(neck_tt)
         self.IGazeControl.setEyesTrajTime(eyes_tt)
 
-    def setTrackingMode(self, mode: bool):
+    def setTrackingMode(self, mode):
         """
         Args:
             mode (bool): True to enable tracking mode, False to disable.
         """
         self.IGazeControl.setTrackingMode(mode)
 
-    def waitMotionDone(self, period: float = 0.1, timeout: float = 0.0) -> bool:
+    def waitMotionDone(self, period=0.1, timeout=0.0):
         """
         Args:
             period (float): Period to check the motion status.
