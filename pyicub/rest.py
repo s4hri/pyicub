@@ -865,9 +865,10 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
         trigger = args["input_json"]["trigger"]
         state = self.__triggers__[trigger]
         if not state == FSM.INIT_STATE:
-            if state == self.__root_state__:                
+            if state == self.__root_state__:
                 self.on_enter_fsm(fsm_name=fsm_name, session_id=session_id, session_count=session_count)
             self.on_enter_state(fsm_name=fsm_name, session_id=session_id, session_count=session_count, state_name=state)
+
 
     def __on_exit_state__(self, args):
         res = self.refresh_targets()
