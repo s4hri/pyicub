@@ -26,6 +26,14 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+"""
+Module: position.py
+
+This module provides classes and functionalities to manage the position control of iCub robot parts using YARP.
+It includes definitions for robot parts, joint configurations, and controllers to move and control the joints of the robot.
+"""
+
 try:
     import yarp
 except ImportError:
@@ -79,6 +87,11 @@ class iCubPart:
         """
         return json.dumps(self, default=lambda o: o.__dict__, indent=4)
 
+
+"""
+Predefined iCubPart instances for various parts of the iCub robot.
+These instances define the joint configurations and speeds for different robot sections.
+"""
 
 ICUB_EYELIDS        = iCubPart('EYELIDS',       ICUB_PARTS.FACE       ,  1,  [0], [10])
 ICUB_HEAD           = iCubPart('HEAD',          ICUB_PARTS.HEAD       ,  6,  [0, 1, 2, 3, 4, 5], [10, 10, 20, 20, 20, 20])
@@ -210,6 +223,24 @@ class PositionController:
         return not self.__IPositionControl__.checkMotionDone()
 
     def __move__(self, target_joints, joints_list, req_time, joints_speed):
+        """
+        Move the joints to the target positions.
+        This function moves the specified joints to the target positions within the requested time or at the specified speeds.
+        Parameters
+        ----------
+        target_joints : list of float
+            The target positions for the joints.
+        joints_list : list of int
+            The list of joint indices to be moved.
+        req_time : float
+            The requested time to complete the motion. If greater than 0, the motion will be completed in this time.
+        joints_speed : list of float
+            The speeds at which to move the joints. Used if `req_time` is less than or equal to 0.
+        Returns
+        -------
+        float
+            The time taken to complete the motion.
+        """
         disp  = [0]*len(joints_list)
         speeds = [0]*len(joints_list)
         times = [0]*len(joints_list)
@@ -227,8 +258,8 @@ class PositionController:
                 if disp[i] < 0.0:
                     disp[i] =- disp[i]
                 speeds[i] = disp[i]/req_time
-                self.__IPositionControl__.setRefSpeed(j, speeds[i])
-                self.__IPositionControl__.positionMove(j, tmp[i])
+                self.__IPositionControl__.setRefSpeed(j, speeds[i]) 
+                self.__IPositionControl__.positionMove(j, tmp[i]) 
                 i+=1
             motion_time = req_time
         else:
@@ -248,6 +279,19 @@ class PositionController:
         return motion_time
 
     def stop(self, joints_list=None):
+        """
+        Stops the movement of specified joints by setting their reference speed to zero.
+
+        Parameters
+        ----------
+        joints_list : list of int, optional
+            List of joint indices to stop. If None, all joints will be stopped. Default is None.
+
+        Returns
+        -------
+        float
+            Always returns 0.0.
+        """
         t0 = time.perf_counter()
         if joints_list is None:
             joints_list = range(0, self.__joints__)
@@ -257,6 +301,33 @@ class PositionController:
 
 
     def move(self, pose: JointPose, req_time: float=0.0, timeout: float=DEFAULT_TIMEOUT, joints_speed: list=[], waitMotionDone: bool=True, tag: str='default'):
+        """
+        Moves the robot to the specified joint positions.
+        Parameters
+        ----------
+        pose : JointPose
+            The target joint positions and the list of joints to move.
+        req_time : float, optional
+            The requested time to complete the motion (default is 0.0).
+        timeout : float, optional
+            The maximum time to wait for the motion to complete (default is DEFAULT_TIMEOUT).
+        joints_speed : list, optional
+            The speed for each joint (default is an empty list, which sets all speeds to 10.0).
+        waitMotionDone : bool, optional
+            Whether to wait for the motion to complete before returning (default is True).
+        tag : str, optional
+            A tag for logging purposes (default is 'default').
+        Returns
+        -------
+        bool
+            True if the motion completed successfully, False if it timed out.
+        Notes
+        -----
+        This method sets the position control mode for the specified joints, 
+        initiates the motion, and optionally waits for the motion to complete.
+        It logs the start and end of the motion, including whether it completed 
+        successfully or timed out.
+        """
         t0 = time.perf_counter()
         target_joints = pose.target_joints
         joints_list = pose.joints_list
