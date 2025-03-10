@@ -27,7 +27,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-1.lookat.py
+lookat.py
 ===========
 
 This script controls the gaze movement of the iCub humanoid robot. It demonstrates

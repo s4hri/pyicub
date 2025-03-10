@@ -27,7 +27,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-4.lookat_portmonitor.py
+lookat_portmonitor.py
 =======================
 
 This script controls the gaze movement of the iCub humanoid robot using YARP port monitoring.

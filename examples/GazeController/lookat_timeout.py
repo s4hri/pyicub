@@ -28,7 +28,7 @@
 
 
 """
-2.lookat_timeout.py
+lookat_timeout.py
 ===================
 
 This script controls the gaze movement of the iCub humanoid robot with a timeout feature.

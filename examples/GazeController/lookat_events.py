@@ -27,7 +27,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-3.lookat_events.py
+lookat_events.py
 ==================
 
 This script controls the gaze movement of the iCub humanoid robot with event-based motion monitoring.
