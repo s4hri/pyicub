@@ -1,0 +1,218 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyicub.utils &mdash; PyiCub  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=54433ac4" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/custom.js?v=7f86f365"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyicub.actions" href="pyicub.actions.html" />
+    <link rel="prev" title="pyicub.proc.fsmizer" href="pyicub.proc.fsmizer.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PyiCub
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Api.html">Python API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pyicub.core.html">pyicub.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.controllers.html">pyicub.controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.proc.html">pyicub.proc</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pyicub.utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.utils.SingletonMeta"><code class="docutils literal notranslate"><span class="pre">SingletonMeta</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.utils.vector_distance"><code class="docutils literal notranslate"><span class="pre">vector_distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.utils.norm"><code class="docutils literal notranslate"><span class="pre">norm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.utils.getPublicMethods"><code class="docutils literal notranslate"><span class="pre">getPublicMethods()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.utils.getDecoratedMethods"><code class="docutils literal notranslate"><span class="pre">getDecoratedMethods()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.utils.getPyiCubInfo"><code class="docutils literal notranslate"><span class="pre">getPyiCubInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.utils.firstAvailablePort"><code class="docutils literal notranslate"><span class="pre">firstAvailablePort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.utils.importFromJSONFile"><code class="docutils literal notranslate"><span class="pre">importFromJSONFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.utils.exportJSONFile"><code class="docutils literal notranslate"><span class="pre">exportJSONFile()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.actions.html">pyicub.actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.requests.html">pyicub.requests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.rest.html">pyicub.rest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.fsm.html">pyicub.fsm</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PyiCub</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Api.html">Python API Documentation</a></li>
+      <li class="breadcrumb-item active">pyicub.utils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/pyicub.utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pyicub.utils">
+<span id="pyicub-utils"></span><h1>pyicub.utils<a class="headerlink" href="#module-pyicub.utils" title="Link to this heading"></a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.utils.exportJSONFile" title="pyicub.utils.exportJSONFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exportJSONFile</span></code></a>(filepath, obj)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.utils.firstAvailablePort" title="pyicub.utils.firstAvailablePort"><code class="xref py py-obj docutils literal notranslate"><span class="pre">firstAvailablePort</span></code></a>(host, start_port)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.utils.getDecoratedMethods" title="pyicub.utils.getDecoratedMethods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getDecoratedMethods</span></code></a>(obj, decorator_name)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.utils.getPublicMethods" title="pyicub.utils.getPublicMethods"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getPublicMethods</span></code></a>(obj)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.utils.getPyiCubInfo" title="pyicub.utils.getPyiCubInfo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getPyiCubInfo</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.utils.importFromJSONFile" title="pyicub.utils.importFromJSONFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">importFromJSONFile</span></code></a>(JSON_file)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.utils.norm" title="pyicub.utils.norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">norm</span></code></a>(v)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.utils.vector_distance" title="pyicub.utils.vector_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vector_distance</span></code></a>(v, w)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.utils.SingletonMeta" title="pyicub.utils.SingletonMeta"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SingletonMeta</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.utils.SingletonMeta">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.utils.</span></span><span class="sig-name descname"><span class="pre">SingletonMeta</span></span><a class="headerlink" href="#pyicub.utils.SingletonMeta" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyicub.utils.vector_distance">
+<span class="sig-prename descclassname"><span class="pre">pyicub.utils.</span></span><span class="sig-name descname"><span class="pre">vector_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.utils.vector_distance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyicub.utils.norm">
+<span class="sig-prename descclassname"><span class="pre">pyicub.utils.</span></span><span class="sig-name descname"><span class="pre">norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.utils.norm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyicub.utils.getPublicMethods">
+<span class="sig-prename descclassname"><span class="pre">pyicub.utils.</span></span><span class="sig-name descname"><span class="pre">getPublicMethods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.utils.getPublicMethods" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyicub.utils.getDecoratedMethods">
+<span class="sig-prename descclassname"><span class="pre">pyicub.utils.</span></span><span class="sig-name descname"><span class="pre">getDecoratedMethods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decorator_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.utils.getDecoratedMethods" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyicub.utils.getPyiCubInfo">
+<span class="sig-prename descclassname"><span class="pre">pyicub.utils.</span></span><span class="sig-name descname"><span class="pre">getPyiCubInfo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.utils.getPyiCubInfo" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyicub.utils.firstAvailablePort">
+<span class="sig-prename descclassname"><span class="pre">pyicub.utils.</span></span><span class="sig-name descname"><span class="pre">firstAvailablePort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_port</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.utils.firstAvailablePort" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyicub.utils.importFromJSONFile">
+<span class="sig-prename descclassname"><span class="pre">pyicub.utils.</span></span><span class="sig-name descname"><span class="pre">importFromJSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSON_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.utils.importFromJSONFile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyicub.utils.exportJSONFile">
+<span class="sig-prename descclassname"><span class="pre">pyicub.utils.</span></span><span class="sig-name descname"><span class="pre">exportJSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.utils.exportJSONFile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyicub.proc.fsmizer.html" class="btn btn-neutral float-left" title="pyicub.proc.fsmizer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyicub.actions.html" class="btn btn-neutral float-right" title="pyicub.actions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Davide De Tommaso.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

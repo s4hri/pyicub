@@ -1,0 +1,560 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyicub.actions &mdash; PyiCub  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=54433ac4" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/custom.js?v=7f86f365"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyicub.requests" href="pyicub.requests.html" />
+    <link rel="prev" title="pyicub.utils" href="pyicub.utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PyiCub
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Api.html">Python API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pyicub.core.html">pyicub.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.controllers.html">pyicub.controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.proc.html">pyicub.proc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.utils.html">pyicub.utils</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pyicub.actions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.actions.JointsTrajectoryCheckpoint"><code class="docutils literal notranslate"><span class="pre">JointsTrajectoryCheckpoint</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.JointsTrajectoryCheckpoint.toJSON"><code class="docutils literal notranslate"><span class="pre">JointsTrajectoryCheckpoint.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.actions.LimbMotion"><code class="docutils literal notranslate"><span class="pre">LimbMotion</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.LimbMotion.createJointsTrajectory"><code class="docutils literal notranslate"><span class="pre">LimbMotion.createJointsTrajectory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.LimbMotion.toJSON"><code class="docutils literal notranslate"><span class="pre">LimbMotion.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.actions.PyiCubCustomCall"><code class="docutils literal notranslate"><span class="pre">PyiCubCustomCall</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.PyiCubCustomCall.toJSON"><code class="docutils literal notranslate"><span class="pre">PyiCubCustomCall.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.actions.GazeMotion"><code class="docutils literal notranslate"><span class="pre">GazeMotion</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.GazeMotion.addCheckpoint"><code class="docutils literal notranslate"><span class="pre">GazeMotion.addCheckpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.GazeMotion.toJSON"><code class="docutils literal notranslate"><span class="pre">GazeMotion.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep.prepare"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.prepare()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep.createCustomCall"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.createCustomCall()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep.createGazeMotion"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.createGazeMotion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep.createPart"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.createPart()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep.createLimbMotion"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.createLimbMotion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep.exportJSONFile"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.exportJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep.importFromJSONDict"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.importFromJSONDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep.importFromJSONFile"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.importFromJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep.join"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.join()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep.setLimbMotion"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.setLimbMotion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep.setCustomCall"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.setCustomCall()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep.setGazeMotion"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.setGazeMotion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyStep.toJSON"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.actions.iCubFullbodyAction"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyAction.prepare"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.prepare()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyAction.addAction"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.addAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyAction.addStep"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.addStep()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyAction.importFromJSONDict"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.importFromJSONDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyAction.importFromJSONFile"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.importFromJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyAction.exportJSONFile"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.exportJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyAction.setName"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.setName()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyAction.setDescription"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.setDescription()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyAction.setOffset"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.setOffset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubFullbodyAction.toJSON"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.actions.TemplateParameter"><code class="docutils literal notranslate"><span class="pre">TemplateParameter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.TemplateParameter.value"><code class="docutils literal notranslate"><span class="pre">TemplateParameter.value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.TemplateParameter.name"><code class="docutils literal notranslate"><span class="pre">TemplateParameter.name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.TemplateParameter.exportJSONFile"><code class="docutils literal notranslate"><span class="pre">TemplateParameter.exportJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.TemplateParameter.toJSON"><code class="docutils literal notranslate"><span class="pre">TemplateParameter.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.actions.iCubActionTemplate"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubActionTemplate.prepare_params"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.prepare_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubActionTemplate.createParam"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.createParam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubActionTemplate.getActionDict"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.getActionDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubActionTemplate.getAction"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.getAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubActionTemplate.getParams"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.getParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubActionTemplate.getParam"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.getParam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubActionTemplate.setParams"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.setParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubActionTemplate.setParam"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.setParam()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.actions.iCubActionTemplateImportedJSON"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplateImportedJSON</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubActionTemplateImportedJSON.getActionDict"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplateImportedJSON.getActionDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubActionTemplateImportedJSON.prepare_params"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplateImportedJSON.prepare_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubActionTemplateImportedJSON.prepare"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplateImportedJSON.prepare()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.iCubActionTemplateImportedJSON.setParam"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplateImportedJSON.setParam()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.actions.ActionsManager"><code class="docutils literal notranslate"><span class="pre">ActionsManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.ActionsManager.addAction"><code class="docutils literal notranslate"><span class="pre">ActionsManager.addAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.ActionsManager.importActionsFromModule"><code class="docutils literal notranslate"><span class="pre">ActionsManager.importActionsFromModule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.ActionsManager.getAction"><code class="docutils literal notranslate"><span class="pre">ActionsManager.getAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.ActionsManager.getActions"><code class="docutils literal notranslate"><span class="pre">ActionsManager.getActions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.ActionsManager.exportActions"><code class="docutils literal notranslate"><span class="pre">ActionsManager.exportActions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.ActionsManager.importTemplateFromJSONFile"><code class="docutils literal notranslate"><span class="pre">ActionsManager.importTemplateFromJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.ActionsManager.importTemplateFromJSONDict"><code class="docutils literal notranslate"><span class="pre">ActionsManager.importTemplateFromJSONDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.actions.ActionsManager.importTemplateJSONFile"><code class="docutils literal notranslate"><span class="pre">ActionsManager.importTemplateJSONFile()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.requests.html">pyicub.requests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.rest.html">pyicub.rest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.fsm.html">pyicub.fsm</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PyiCub</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Api.html">Python API Documentation</a></li>
+      <li class="breadcrumb-item active">pyicub.actions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/pyicub.actions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pyicub.actions">
+<span id="pyicub-actions"></span><h1>pyicub.actions<a class="headerlink" href="#module-pyicub.actions" title="Link to this heading"></a></h1>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.actions.ActionsManager" title="pyicub.actions.ActionsManager"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ActionsManager</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.actions.GazeMotion" title="pyicub.actions.GazeMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GazeMotion</span></code></a>(lookat_method)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.actions.JointsTrajectoryCheckpoint" title="pyicub.actions.JointsTrajectoryCheckpoint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JointsTrajectoryCheckpoint</span></code></a>(pose[, duration, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.actions.LimbMotion" title="pyicub.actions.LimbMotion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LimbMotion</span></code></a>(part)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.actions.PyiCubCustomCall" title="pyicub.actions.PyiCubCustomCall"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyiCubCustomCall</span></code></a>(target[, args])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.actions.TemplateParameter" title="pyicub.actions.TemplateParameter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TemplateParameter</span></code></a>(name, value)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.actions.iCubActionTemplate" title="pyicub.actions.iCubActionTemplate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iCubActionTemplate</span></code></a>([name, description, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.actions.iCubActionTemplateImportedJSON" title="pyicub.actions.iCubActionTemplateImportedJSON"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iCubActionTemplateImportedJSON</span></code></a>(JSON_dict)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.actions.iCubFullbodyAction" title="pyicub.actions.iCubFullbodyAction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iCubFullbodyAction</span></code></a>([description, name, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.actions.iCubFullbodyStep" title="pyicub.actions.iCubFullbodyStep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iCubFullbodyStep</span></code></a>([offset_ms, name, ...])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.actions.JointsTrajectoryCheckpoint">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.actions.</span></span><span class="sig-name descname"><span class="pre">JointsTrajectoryCheckpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.controllers.html#pyicub.controllers.position.JointPose" title="pyicub.controllers.position.JointPose"><span class="pre">JointPose</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joints_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.JointsTrajectoryCheckpoint" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.JointsTrajectoryCheckpoint.toJSON">
+<span class="sig-name descname"><span class="pre">toJSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.JointsTrajectoryCheckpoint.toJSON" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.actions.LimbMotion">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.actions.</span></span><span class="sig-name descname"><span class="pre">LimbMotion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">part</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.controllers.html#pyicub.controllers.position.iCubPart" title="pyicub.controllers.position.iCubPart"><span class="pre">iCubPart</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.LimbMotion" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.LimbMotion.createJointsTrajectory">
+<span class="sig-name descname"><span class="pre">createJointsTrajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.controllers.html#pyicub.controllers.position.JointPose" title="pyicub.controllers.position.JointPose"><span class="pre">JointPose</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joints_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.LimbMotion.createJointsTrajectory" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.LimbMotion.toJSON">
+<span class="sig-name descname"><span class="pre">toJSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.LimbMotion.toJSON" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.actions.PyiCubCustomCall">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.actions.</span></span><span class="sig-name descname"><span class="pre">PyiCubCustomCall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.PyiCubCustomCall" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.PyiCubCustomCall.toJSON">
+<span class="sig-name descname"><span class="pre">toJSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.PyiCubCustomCall.toJSON" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.actions.GazeMotion">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.actions.</span></span><span class="sig-name descname"><span class="pre">GazeMotion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lookat_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.GazeMotion" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.GazeMotion.addCheckpoint">
+<span class="sig-name descname"><span class="pre">addCheckpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.GazeMotion.addCheckpoint" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.GazeMotion.toJSON">
+<span class="sig-name descname"><span class="pre">toJSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.GazeMotion.toJSON" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.actions.</span></span><span class="sig-name descname"><span class="pre">iCubFullbodyStep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JSON_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JSON_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep.prepare" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep.createCustomCall">
+<span class="sig-name descname"><span class="pre">createCustomCall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep.createCustomCall" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep.createGazeMotion">
+<span class="sig-name descname"><span class="pre">createGazeMotion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lookat_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep.createGazeMotion" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep.createPart">
+<span class="sig-name descname"><span class="pre">createPart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_part</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joints_nr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joints_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joints_speed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep.createPart" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep.createLimbMotion">
+<span class="sig-name descname"><span class="pre">createLimbMotion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">part</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.controllers.html#pyicub.controllers.position.iCubPart" title="pyicub.controllers.position.iCubPart"><span class="pre">iCubPart</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep.createLimbMotion" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep.exportJSONFile">
+<span class="sig-name descname"><span class="pre">exportJSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep.exportJSONFile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep.importFromJSONDict">
+<span class="sig-name descname"><span class="pre">importFromJSONDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep.importFromJSONDict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep.importFromJSONFile">
+<span class="sig-name descname"><span class="pre">importFromJSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSON_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep.importFromJSONFile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep.join">
+<span class="sig-name descname"><span class="pre">join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep.join" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep.setLimbMotion">
+<span class="sig-name descname"><span class="pre">setLimbMotion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">limb_motion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.html#pyicub.actions.LimbMotion" title="pyicub.actions.LimbMotion"><span class="pre">LimbMotion</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep.setLimbMotion" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep.setCustomCall">
+<span class="sig-name descname"><span class="pre">setCustomCall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">custom_call</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.html#pyicub.actions.PyiCubCustomCall" title="pyicub.actions.PyiCubCustomCall"><span class="pre">PyiCubCustomCall</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep.setCustomCall" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep.setGazeMotion">
+<span class="sig-name descname"><span class="pre">setGazeMotion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gaze_motion</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.html#pyicub.actions.GazeMotion" title="pyicub.actions.GazeMotion"><span class="pre">GazeMotion</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep.setGazeMotion" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyStep.toJSON">
+<span class="sig-name descname"><span class="pre">toJSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyStep.toJSON" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyAction">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.actions.</span></span><span class="sig-name descname"><span class="pre">iCubFullbodyAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'empty'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JSON_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JSON_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyAction" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyAction.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyAction.prepare" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyAction.addAction">
+<span class="sig-name descname"><span class="pre">addAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyAction.addAction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyAction.addStep">
+<span class="sig-name descname"><span class="pre">addStep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.html#pyicub.actions.iCubFullbodyStep" title="pyicub.actions.iCubFullbodyStep"><span class="pre">iCubFullbodyStep</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_for_completed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyAction.addStep" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyAction.importFromJSONDict">
+<span class="sig-name descname"><span class="pre">importFromJSONDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyAction.importFromJSONDict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyAction.importFromJSONFile">
+<span class="sig-name descname"><span class="pre">importFromJSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSON_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyAction.importFromJSONFile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyAction.exportJSONFile">
+<span class="sig-name descname"><span class="pre">exportJSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyAction.exportJSONFile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyAction.setName">
+<span class="sig-name descname"><span class="pre">setName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyAction.setName" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyAction.setDescription">
+<span class="sig-name descname"><span class="pre">setDescription</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">description</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyAction.setDescription" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyAction.setOffset">
+<span class="sig-name descname"><span class="pre">setOffset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offset_ms</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyAction.setOffset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubFullbodyAction.toJSON">
+<span class="sig-name descname"><span class="pre">toJSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubFullbodyAction.toJSON" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.actions.TemplateParameter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.actions.</span></span><span class="sig-name descname"><span class="pre">TemplateParameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.TemplateParameter" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.TemplateParameter.value">
+<span class="sig-name descname"><span class="pre">value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.TemplateParameter.value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.TemplateParameter.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.TemplateParameter.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.TemplateParameter.exportJSONFile">
+<span class="sig-name descname"><span class="pre">exportJSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.TemplateParameter.exportJSONFile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.TemplateParameter.toJSON">
+<span class="sig-name descname"><span class="pre">toJSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.TemplateParameter.toJSON" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplate">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.actions.</span></span><span class="sig-name descname"><span class="pre">iCubActionTemplate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'TemplateAction'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'empty'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplate" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplate.prepare_params">
+<span class="sig-name descname"><span class="pre">prepare_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplate.prepare_params" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplate.createParam">
+<span class="sig-name descname"><span class="pre">createParam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplate.createParam" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplate.getActionDict">
+<span class="sig-name descname"><span class="pre">getActionDict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplate.getActionDict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplate.getAction">
+<span class="sig-name descname"><span class="pre">getAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplate.getAction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplate.getParams">
+<span class="sig-name descname"><span class="pre">getParams</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplate.getParams" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplate.getParam">
+<span class="sig-name descname"><span class="pre">getParam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplate.getParam" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplate.setParams">
+<span class="sig-name descname"><span class="pre">setParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplate.setParams" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplate.setParam">
+<span class="sig-name descname"><span class="pre">setParam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplate.setParam" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplateImportedJSON">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.actions.</span></span><span class="sig-name descname"><span class="pre">iCubActionTemplateImportedJSON</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSON_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplateImportedJSON" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplateImportedJSON.getActionDict">
+<span class="sig-name descname"><span class="pre">getActionDict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplateImportedJSON.getActionDict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplateImportedJSON.prepare_params">
+<span class="sig-name descname"><span class="pre">prepare_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplateImportedJSON.prepare_params" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplateImportedJSON.prepare">
+<span class="sig-name descname"><span class="pre">prepare</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplateImportedJSON.prepare" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.iCubActionTemplateImportedJSON.setParam">
+<span class="sig-name descname"><span class="pre">setParam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSON_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.iCubActionTemplateImportedJSON.setParam" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.actions.ActionsManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.actions.</span></span><span class="sig-name descname"><span class="pre">ActionsManager</span></span><a class="headerlink" href="#pyicub.actions.ActionsManager" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.ActionsManager.addAction">
+<span class="sig-name descname"><span class="pre">addAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.html#pyicub.actions.iCubFullbodyAction" title="pyicub.actions.iCubFullbodyAction"><span class="pre">iCubFullbodyAction</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.ActionsManager.addAction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.ActionsManager.importActionsFromModule">
+<span class="sig-name descname"><span class="pre">importActionsFromModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.ActionsManager.importActionsFromModule" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.ActionsManager.getAction">
+<span class="sig-name descname"><span class="pre">getAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.ActionsManager.getAction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.ActionsManager.getActions">
+<span class="sig-name descname"><span class="pre">getActions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.ActionsManager.getActions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.ActionsManager.exportActions">
+<span class="sig-name descname"><span class="pre">exportActions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.ActionsManager.exportActions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.ActionsManager.importTemplateFromJSONFile">
+<span class="sig-name descname"><span class="pre">importTemplateFromJSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSON_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.ActionsManager.importTemplateFromJSONFile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.ActionsManager.importTemplateFromJSONDict">
+<span class="sig-name descname"><span class="pre">importTemplateFromJSONDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSON_dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.ActionsManager.importTemplateFromJSONDict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.actions.ActionsManager.importTemplateJSONFile">
+<span class="sig-name descname"><span class="pre">importTemplateJSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSON_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.actions.ActionsManager.importTemplateJSONFile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyicub.utils.html" class="btn btn-neutral float-left" title="pyicub.utils" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyicub.requests.html" class="btn btn-neutral float-right" title="pyicub.requests" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Davide De Tommaso.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

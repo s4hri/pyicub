@@ -1,0 +1,948 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyicub.rest &mdash; PyiCub  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=54433ac4" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/custom.js?v=7f86f365"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyicub.fsm" href="pyicub.fsm.html" />
+    <link rel="prev" title="pyicub.requests" href="pyicub.requests.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PyiCub
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Api.html">Python API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pyicub.core.html">pyicub.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.controllers.html">pyicub.controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.proc.html">pyicub.proc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.utils.html">pyicub.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.actions.html">pyicub.actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.requests.html">pyicub.requests</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pyicub.rest</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.GenericType"><code class="docutils literal notranslate"><span class="pre">GenericType</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.custom_serializer"><code class="docutils literal notranslate"><span class="pre">custom_serializer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.RESTJSON"><code class="docutils literal notranslate"><span class="pre">RESTJSON</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.RESTJSON.fromJSON"><code class="docutils literal notranslate"><span class="pre">RESTJSON.fromJSON()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.RESTJSON.toJSON"><code class="docutils literal notranslate"><span class="pre">RESTJSON.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.RESTRobot"><code class="docutils literal notranslate"><span class="pre">RESTRobot</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.RESTApp"><code class="docutils literal notranslate"><span class="pre">RESTApp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.RESTTopic"><code class="docutils literal notranslate"><span class="pre">RESTTopic</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.iCubRESTService"><code class="docutils literal notranslate"><span class="pre">iCubRESTService</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.RESTService"><code class="docutils literal notranslate"><span class="pre">RESTService</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.iCubRESTServer"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.logger"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.logger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.header"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.header()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.server_rule"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.server_rule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.robot_rule"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.robot_rule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.app_rule"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.app_rule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.target_rule"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.target_rule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.run_forever"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.run_forever()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.shutdown"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.shutdown()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.wrapper_target"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.wrapper_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.process_target_remote"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.process_target_remote()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.info"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.get_tree"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.get_tree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.get_robots"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.get_robots()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.get_apps"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.get_apps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.get_services"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.get_services()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.is_local_register"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.is_local_register()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.remote_register"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.remote_register()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.remote_unregister"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.remote_unregister()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.register"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.register()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.unregister"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.unregister()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.remote_subscribe"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.remote_subscribe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.remote_unsubscribe"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.remote_unsubscribe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.remote_notify"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.remote_notify()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.subscribe"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.subscribe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTServer.unsubscribe"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.unsubscribe()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.iCubRESTManager"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.request_manager"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.request_manager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.proxy_host"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.proxy_host</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.proxy_rule"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.proxy_rule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.amiproxy"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.amiproxy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.requests"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.processes"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.processes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.proc_info"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.proc_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.req_info"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.req_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.single_req_info"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.single_req_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.subscribe_topic"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.subscribe_topic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.unsubscribe_topic"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.unsubscribe_topic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.target_requests"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.target_requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.status_requests"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.status_requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.subscribers"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.subscribers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.pending_requests"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.pending_requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.process_target"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.process_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.notify_subscriber"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.notify_subscriber()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.register_target"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.register_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTManager.unregister_target"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.unregister_target()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.PyiCubApp"><code class="docutils literal notranslate"><span class="pre">PyiCubApp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubApp.logger"><code class="docutils literal notranslate"><span class="pre">PyiCubApp.logger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubApp.request_manager"><code class="docutils literal notranslate"><span class="pre">PyiCubApp.request_manager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubApp.rest_manager"><code class="docutils literal notranslate"><span class="pre">PyiCubApp.rest_manager</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.rest_service"><code class="docutils literal notranslate"><span class="pre">rest_service()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer.custom_rest_services"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.custom_rest_services</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer.configure"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.configure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer.name"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer.robot_name"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.robot_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer.fsm"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.fsm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer.getServices"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.getServices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer.getArgsTemplate"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.getArgsTemplate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer.initHelper"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.initHelper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer.getArgs"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.getArgs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer.setArgs"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.setArgs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer.getArg"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.getArg()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer.setArg"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.setArg()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulServer.setFSM"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.setFSM()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.iCubRESTApp"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTApp.configure"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.configure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTApp.info"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTApp.importActionFromJSONFile"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.importActionFromJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTApp.importActions"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.importActions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTApp.importActionFromJSONDict"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.importActionFromJSONDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTApp.playAction"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.playAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTApp.getActions"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.getActions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTApp.importAction"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.importAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTApp.icub"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.icub</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.iCubRESTSubscriber"><code class="docutils literal notranslate"><span class="pre">iCubRESTSubscriber</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTSubscriber.subscribe_topic"><code class="docutils literal notranslate"><span class="pre">iCubRESTSubscriber.subscribe_topic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubRESTSubscriber.run_forever"><code class="docutils literal notranslate"><span class="pre">iCubRESTSubscriber.run_forever()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.RESTSubscriberFSM"><code class="docutils literal notranslate"><span class="pre">RESTSubscriberFSM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.RESTSubscriberFSM.refresh_targets"><code class="docutils literal notranslate"><span class="pre">RESTSubscriberFSM.refresh_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.RESTSubscriberFSM.on_enter_state"><code class="docutils literal notranslate"><span class="pre">RESTSubscriberFSM.on_enter_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.RESTSubscriberFSM.on_exit_state"><code class="docutils literal notranslate"><span class="pre">RESTSubscriberFSM.on_exit_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.RESTSubscriberFSM.on_enter_fsm"><code class="docutils literal notranslate"><span class="pre">RESTSubscriberFSM.on_enter_fsm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.RESTSubscriberFSM.on_exit_fsm"><code class="docutils literal notranslate"><span class="pre">RESTSubscriberFSM.on_exit_fsm()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.iCubFSM"><code class="docutils literal notranslate"><span class="pre">iCubFSM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubFSM.actions"><code class="docutils literal notranslate"><span class="pre">iCubFSM.actions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubFSM.icub"><code class="docutils literal notranslate"><span class="pre">iCubFSM.icub</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubFSM.setApp"><code class="docutils literal notranslate"><span class="pre">iCubFSM.setApp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubFSM.addAction"><code class="docutils literal notranslate"><span class="pre">iCubFSM.addAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubFSM.addTemplate"><code class="docutils literal notranslate"><span class="pre">iCubFSM.addTemplate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubFSM.importFromJSONDict"><code class="docutils literal notranslate"><span class="pre">iCubFSM.importFromJSONDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.iCubFSM.exportJSONFile"><code class="docutils literal notranslate"><span class="pre">iCubFSM.exportJSONFile()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient.fsm_runStep"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.fsm_runStep()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient.get_fsm"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_fsm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient.get_version"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient.get_robots"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_robots()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient.get_apps"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_apps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient.get_services"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_services()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient.get_robot_actions"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_robot_actions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient.play_action"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.play_action()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient.run_target"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.run_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient.run_target_async"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.run_target_async()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient.get_request_info"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_request_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient.is_request_running"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.is_request_running()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.PyiCubRESTfulClient.wait_until_completed"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.wait_until_completed()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pyicub.rest.FSMsManager"><code class="docutils literal notranslate"><span class="pre">FSMsManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.FSMsManager.addFSM"><code class="docutils literal notranslate"><span class="pre">FSMsManager.addFSM()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.FSMsManager.importFSMsFromModule"><code class="docutils literal notranslate"><span class="pre">FSMsManager.importFSMsFromModule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.FSMsManager.getFSM"><code class="docutils literal notranslate"><span class="pre">FSMsManager.getFSM()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.FSMsManager.getFSMs"><code class="docutils literal notranslate"><span class="pre">FSMsManager.getFSMs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.rest.FSMsManager.exportFSMs"><code class="docutils literal notranslate"><span class="pre">FSMsManager.exportFSMs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.fsm.html">pyicub.fsm</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PyiCub</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Api.html">Python API Documentation</a></li>
+      <li class="breadcrumb-item active">pyicub.rest</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/pyicub.rest.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pyicub.rest">
+<span id="pyicub-rest"></span><h1>pyicub.rest<a class="headerlink" href="#module-pyicub.rest" title="Link to this heading"></a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.custom_serializer" title="pyicub.rest.custom_serializer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">custom_serializer</span></code></a>(obj)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.rest_service" title="pyicub.rest.rest_service"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rest_service</span></code></a>(func)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.FSMsManager" title="pyicub.rest.FSMsManager"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FSMsManager</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.GenericType" title="pyicub.rest.GenericType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GenericType</span></code></a>(data)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.PyiCubApp" title="pyicub.rest.PyiCubApp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyiCubApp</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.PyiCubRESTfulClient" title="pyicub.rest.PyiCubRESTfulClient"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyiCubRESTfulClient</span></code></a>(host, port[, rule_prefix])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.PyiCubRESTfulServer" title="pyicub.rest.PyiCubRESTfulServer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyiCubRESTfulServer</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.RESTApp" title="pyicub.rest.RESTApp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RESTApp</span></code></a>([name, url, json_dict])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.RESTJSON" title="pyicub.rest.RESTJSON"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RESTJSON</span></code></a>([json_dict])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.RESTRobot" title="pyicub.rest.RESTRobot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RESTRobot</span></code></a>([name, url, json_dict])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.RESTService" title="pyicub.rest.RESTService"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RESTService</span></code></a>([service, json_dict])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.RESTSubscriberFSM" title="pyicub.rest.RESTSubscriberFSM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RESTSubscriberFSM</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.RESTTopic" title="pyicub.rest.RESTTopic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RESTTopic</span></code></a>([name, robot_name, app_name, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.iCubFSM" title="pyicub.rest.iCubFSM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iCubFSM</span></code></a>([JSON_dict, JSON_file])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.iCubRESTApp" title="pyicub.rest.iCubRESTApp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iCubRESTApp</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.iCubRESTManager" title="pyicub.rest.iCubRESTManager"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iCubRESTManager</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.iCubRESTServer" title="pyicub.rest.iCubRESTServer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iCubRESTServer</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.iCubRESTService" title="pyicub.rest.iCubRESTService"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iCubRESTService</span></code></a>([name, robot_name, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.html#pyicub.rest.iCubRESTSubscriber" title="pyicub.rest.iCubRESTSubscriber"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iCubRESTSubscriber</span></code></a>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.GenericType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">GenericType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.GenericType" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyicub.rest.custom_serializer">
+<span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">custom_serializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#pyicub.rest.custom_serializer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.RESTJSON">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">RESTJSON</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.RESTJSON" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.RESTJSON.fromJSON">
+<span class="sig-name descname"><span class="pre">fromJSON</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">json_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.RESTJSON.fromJSON" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.RESTJSON.toJSON">
+<span class="sig-name descname"><span class="pre">toJSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.RESTJSON.toJSON" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.RESTRobot">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">RESTRobot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.RESTRobot" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.RESTApp">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">RESTApp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.RESTApp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.RESTTopic">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">RESTTopic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscriber_rule</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.RESTTopic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTService">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">iCubRESTService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTService" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.RESTService">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">RESTService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.html#pyicub.rest.iCubRESTService" title="pyicub.rest.iCubRESTService"><span class="pre">iCubRESTService</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.RESTService" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">iCubRESTServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer" title="Link to this definition"></a></dt>
+<dd><dl class="py property">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.logger">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.logger" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.header">
+<span class="sig-name descname"><span class="pre">header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.header" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.server_rule">
+<span class="sig-name descname"><span class="pre">server_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.server_rule" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.robot_rule">
+<span class="sig-name descname"><span class="pre">robot_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.robot_rule" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.app_rule">
+<span class="sig-name descname"><span class="pre">app_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.app_rule" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.target_rule">
+<span class="sig-name descname"><span class="pre">target_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.target_rule" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.run_forever">
+<span class="sig-name descname"><span class="pre">run_forever</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.run_forever" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.shutdown">
+<span class="sig-name descname"><span class="pre">shutdown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.shutdown" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.wrapper_target">
+<span class="sig-name descname"><span class="pre">wrapper_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.wrapper_target" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.process_target_remote">
+<span class="sig-name descname"><span class="pre">process_target_remote</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.process_target_remote" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.info" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.get_tree">
+<span class="sig-name descname"><span class="pre">get_tree</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.get_tree" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.get_robots">
+<span class="sig-name descname"><span class="pre">get_robots</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.get_robots" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.get_apps">
+<span class="sig-name descname"><span class="pre">get_apps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.get_apps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.get_services">
+<span class="sig-name descname"><span class="pre">get_services</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.get_services" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.is_local_register">
+<span class="sig-name descname"><span class="pre">is_local_register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.is_local_register" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.remote_register">
+<span class="sig-name descname"><span class="pre">remote_register</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.remote_register" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.remote_unregister">
+<span class="sig-name descname"><span class="pre">remote_unregister</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.remote_unregister" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.register">
+<span class="sig-name descname"><span class="pre">register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_signature</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.register" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.unregister">
+<span class="sig-name descname"><span class="pre">unregister</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.unregister" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.remote_subscribe">
+<span class="sig-name descname"><span class="pre">remote_subscribe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.remote_subscribe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.remote_unsubscribe">
+<span class="sig-name descname"><span class="pre">remote_unsubscribe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.remote_unsubscribe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.remote_notify">
+<span class="sig-name descname"><span class="pre">remote_notify</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.remote_notify" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.subscribe">
+<span class="sig-name descname"><span class="pre">subscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic_uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_enter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_exit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.subscribe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTServer.unsubscribe">
+<span class="sig-name descname"><span class="pre">unsubscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic_uri</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTServer.unsubscribe" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">iCubRESTManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager" title="Link to this definition"></a></dt>
+<dd><dl class="py property">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.request_manager">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">request_manager</span></span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.request_manager" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.proxy_host">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">proxy_host</span></span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.proxy_host" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.proxy_rule">
+<span class="sig-name descname"><span class="pre">proxy_rule</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.proxy_rule" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.amiproxy">
+<span class="sig-name descname"><span class="pre">amiproxy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.amiproxy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.requests">
+<span class="sig-name descname"><span class="pre">requests</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.processes">
+<span class="sig-name descname"><span class="pre">processes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.processes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.proc_info">
+<span class="sig-name descname"><span class="pre">proc_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.proc_info" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.req_info">
+<span class="sig-name descname"><span class="pre">req_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.req_info" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.single_req_info">
+<span class="sig-name descname"><span class="pre">single_req_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.single_req_info" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.subscribe_topic">
+<span class="sig-name descname"><span class="pre">subscribe_topic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscriber_rule</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.subscribe_topic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.unsubscribe_topic">
+<span class="sig-name descname"><span class="pre">unsubscribe_topic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subscriber_rule</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.unsubscribe_topic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.target_requests">
+<span class="sig-name descname"><span class="pre">target_requests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.target_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.status_requests">
+<span class="sig-name descname"><span class="pre">status_requests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.status_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.subscribers">
+<span class="sig-name descname"><span class="pre">subscribers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.subscribers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.pending_requests">
+<span class="sig-name descname"><span class="pre">pending_requests</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.pending_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.process_target">
+<span class="sig-name descname"><span class="pre">process_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.process_target" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.notify_subscriber">
+<span class="sig-name descname"><span class="pre">notify_subscriber</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subscriber_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_rule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">req</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_json</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.notify_subscriber" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.register_target">
+<span class="sig-name descname"><span class="pre">register_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_signature</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.register_target" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTManager.unregister_target">
+<span class="sig-name descname"><span class="pre">unregister_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTManager.unregister_target" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubApp">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">PyiCubApp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubApp" title="Link to this definition"></a></dt>
+<dd><dl class="py property">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubApp.logger">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#pyicub.rest.PyiCubApp.logger" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubApp.request_manager">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">request_manager</span></span><a class="headerlink" href="#pyicub.rest.PyiCubApp.request_manager" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubApp.rest_manager">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rest_manager</span></span><a class="headerlink" href="#pyicub.rest.PyiCubApp.rest_manager" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyicub.rest.rest_service">
+<span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">rest_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.rest_service" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">PyiCubRESTfulServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer" title="Link to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer.custom_rest_services">
+<span class="sig-name descname"><span class="pre">custom_rest_services</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer.custom_rest_services" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer.configure">
+<span class="sig-name descname"><span class="pre">configure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer.configure" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer.name">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer.robot_name">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">robot_name</span></span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer.robot_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer.fsm">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fsm</span></span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer.fsm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer.getServices">
+<span class="sig-name descname"><span class="pre">getServices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer.getServices" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer.getArgsTemplate">
+<span class="sig-name descname"><span class="pre">getArgsTemplate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer.getArgsTemplate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer.initHelper">
+<span class="sig-name descname"><span class="pre">initHelper</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer.initHelper" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer.getArgs">
+<span class="sig-name descname"><span class="pre">getArgs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer.getArgs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer.setArgs">
+<span class="sig-name descname"><span class="pre">setArgs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer.setArgs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer.getArg">
+<span class="sig-name descname"><span class="pre">getArg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer.getArg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer.setArg">
+<span class="sig-name descname"><span class="pre">setArg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer.setArg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulServer.setFSM">
+<span class="sig-name descname"><span class="pre">setFSM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.html#pyicub.fsm.FSM" title="pyicub.fsm.FSM"><span class="pre">FSM</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulServer.setFSM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTApp">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">iCubRESTApp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTApp" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTApp.configure">
+<span class="sig-name descname"><span class="pre">configure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTApp.configure" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTApp.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTApp.info" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTApp.importActionFromJSONFile">
+<span class="sig-name descname"><span class="pre">importActionFromJSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSON_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTApp.importActionFromJSONFile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTApp.importActions">
+<span class="sig-name descname"><span class="pre">importActions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTApp.importActions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTApp.importActionFromJSONDict">
+<span class="sig-name descname"><span class="pre">importActionFromJSONDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSON_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTApp.importActionFromJSONDict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTApp.playAction">
+<span class="sig-name descname"><span class="pre">playAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_for_completed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTApp.playAction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTApp.getActions">
+<span class="sig-name descname"><span class="pre">getActions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTApp.getActions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTApp.importAction">
+<span class="sig-name descname"><span class="pre">importAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.html#pyicub.actions.iCubFullbodyAction" title="pyicub.actions.iCubFullbodyAction"><span class="pre">iCubFullbodyAction</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTApp.importAction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTApp.icub">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">icub</span></span><a class="headerlink" href="#pyicub.rest.iCubRESTApp.icub" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTSubscriber">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">iCubRESTSubscriber</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTSubscriber" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTSubscriber.subscribe_topic">
+<span class="sig-name descname"><span class="pre">subscribe_topic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic_uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_enter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_exit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTSubscriber.subscribe_topic" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubRESTSubscriber.run_forever">
+<span class="sig-name descname"><span class="pre">run_forever</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubRESTSubscriber.run_forever" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.RESTSubscriberFSM">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">RESTSubscriberFSM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.RESTSubscriberFSM" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.RESTSubscriberFSM.refresh_targets">
+<span class="sig-name descname"><span class="pre">refresh_targets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.RESTSubscriberFSM.refresh_targets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.RESTSubscriberFSM.on_enter_state">
+<span class="sig-name descname"><span class="pre">on_enter_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsm_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.RESTSubscriberFSM.on_enter_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.RESTSubscriberFSM.on_exit_state">
+<span class="sig-name descname"><span class="pre">on_exit_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsm_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.RESTSubscriberFSM.on_exit_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.RESTSubscriberFSM.on_enter_fsm">
+<span class="sig-name descname"><span class="pre">on_enter_fsm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsm_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_count</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.RESTSubscriberFSM.on_enter_fsm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.RESTSubscriberFSM.on_exit_fsm">
+<span class="sig-name descname"><span class="pre">on_exit_fsm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fsm_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_count</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.RESTSubscriberFSM.on_exit_fsm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.iCubFSM">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">iCubFSM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">JSON_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JSON_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubFSM" title="Link to this definition"></a></dt>
+<dd><dl class="py property">
+<dt class="sig sig-object py" id="pyicub.rest.iCubFSM.actions">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">actions</span></span><a class="headerlink" href="#pyicub.rest.iCubFSM.actions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyicub.rest.iCubFSM.icub">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">icub</span></span><a class="headerlink" href="#pyicub.rest.iCubFSM.icub" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubFSM.setApp">
+<span class="sig-name descname"><span class="pre">setApp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.html#pyicub.rest.iCubRESTApp" title="pyicub.rest.iCubRESTApp"><span class="pre">iCubRESTApp</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubFSM.setApp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubFSM.addAction">
+<span class="sig-name descname"><span class="pre">addAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.html#pyicub.actions.iCubFullbodyAction" title="pyicub.actions.iCubFullbodyAction"><span class="pre">iCubFullbodyAction</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubFSM.addAction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubFSM.addTemplate">
+<span class="sig-name descname"><span class="pre">addTemplate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.html#pyicub.actions.iCubActionTemplate" title="pyicub.actions.iCubActionTemplate"><span class="pre">iCubActionTemplate</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubFSM.addTemplate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubFSM.importFromJSONDict">
+<span class="sig-name descname"><span class="pre">importFromJSONDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubFSM.importFromJSONDict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.iCubFSM.exportJSONFile">
+<span class="sig-name descname"><span class="pre">exportJSONFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.iCubFSM.exportJSONFile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">PyiCubRESTfulClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">host</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rule_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pyicub'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient.fsm_runStep">
+<span class="sig-name descname"><span class="pre">fsm_runStep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trigger</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient.fsm_runStep" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient.get_fsm">
+<span class="sig-name descname"><span class="pre">get_fsm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient.get_fsm" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient.get_version">
+<span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient.get_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient.get_robots">
+<span class="sig-name descname"><span class="pre">get_robots</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient.get_robots" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient.get_apps">
+<span class="sig-name descname"><span class="pre">get_apps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient.get_apps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient.get_services">
+<span class="sig-name descname"><span class="pre">get_services</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient.get_services" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient.get_robot_actions">
+<span class="sig-name descname"><span class="pre">get_robot_actions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient.get_robot_actions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient.play_action">
+<span class="sig-name descname"><span class="pre">play_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sync</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient.play_action" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient.run_target">
+<span class="sig-name descname"><span class="pre">run_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient.run_target" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient.run_target_async">
+<span class="sig-name descname"><span class="pre">run_target_async</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient.run_target_async" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient.get_request_info">
+<span class="sig-name descname"><span class="pre">get_request_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient.get_request_info" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient.is_request_running">
+<span class="sig-name descname"><span class="pre">is_request_running</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient.is_request_running" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.PyiCubRESTfulClient.wait_until_completed">
+<span class="sig-name descname"><span class="pre">wait_until_completed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.PyiCubRESTfulClient.wait_until_completed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.rest.FSMsManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.rest.</span></span><span class="sig-name descname"><span class="pre">FSMsManager</span></span><a class="headerlink" href="#pyicub.rest.FSMsManager" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.FSMsManager.addFSM">
+<span class="sig-name descname"><span class="pre">addFSM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">machine</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.html#pyicub.rest.iCubFSM" title="pyicub.rest.iCubFSM"><span class="pre">iCubFSM</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">machine_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.FSMsManager.addFSM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.FSMsManager.importFSMsFromModule">
+<span class="sig-name descname"><span class="pre">importFSMsFromModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.FSMsManager.importFSMsFromModule" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.FSMsManager.getFSM">
+<span class="sig-name descname"><span class="pre">getFSM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">machine_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.FSMsManager.getFSM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.FSMsManager.getFSMs">
+<span class="sig-name descname"><span class="pre">getFSMs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.FSMsManager.getFSMs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.rest.FSMsManager.exportFSMs">
+<span class="sig-name descname"><span class="pre">exportFSMs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.rest.FSMsManager.exportFSMs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyicub.requests.html" class="btn btn-neutral float-left" title="pyicub.requests" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyicub.fsm.html" class="btn btn-neutral float-right" title="pyicub.fsm" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Davide De Tommaso.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

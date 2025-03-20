@@ -1,0 +1,471 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyicub.controllers.position &mdash; PyiCub  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=54433ac4" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/custom.js?v=7f86f365"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyicub.proc" href="pyicub.proc.html" />
+    <link rel="prev" title="pyicub.controllers.gaze" href="pyicub.controllers.gaze.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PyiCub
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Api.html">Python API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pyicub.core.html">pyicub.core</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="pyicub.controllers.html">pyicub.controllers</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pyicub.controllers.gaze.html">pyicub.controllers.gaze</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pyicub.controllers.position</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.controllers.position.ICUB_PARTS"><code class="docutils literal notranslate"><span class="pre">ICUB_PARTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.controllers.position.iCubPart"><code class="docutils literal notranslate"><span class="pre">iCubPart</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.controllers.position.JointPose"><code class="docutils literal notranslate"><span class="pre">JointPose</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.controllers.position.RemoteControlboard"><code class="docutils literal notranslate"><span class="pre">RemoteControlboard</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.controllers.position.PositionController"><code class="docutils literal notranslate"><span class="pre">PositionController</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.proc.html">pyicub.proc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.utils.html">pyicub.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.actions.html">pyicub.actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.requests.html">pyicub.requests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.rest.html">pyicub.rest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.fsm.html">pyicub.fsm</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PyiCub</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Api.html">Python API Documentation</a></li>
+          <li class="breadcrumb-item"><a href="pyicub.controllers.html">pyicub.controllers</a></li>
+      <li class="breadcrumb-item active">pyicub.controllers.position</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/pyicub.controllers.position.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pyicub.controllers.position">
+<span id="pyicub-controllers-position"></span><h1>pyicub.controllers.position<a class="headerlink" href="#module-pyicub.controllers.position" title="Link to this heading"></a></h1>
+<p>Module: position.py</p>
+<p>This module provides classes and functionalities to manage the position control of iCub robot parts using YARP.
+It includes definitions for robot parts, joint configurations, and controllers to move and control the joints of the robot.</p>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.controllers.html#pyicub.controllers.position.ICUB_PARTS" title="pyicub.controllers.position.ICUB_PARTS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ICUB_PARTS</span></code></a>()</p></td>
+<td><p>Enumeration of iCub robot parts.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.controllers.html#pyicub.controllers.position.JointPose" title="pyicub.controllers.position.JointPose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">JointPose</span></code></a>(target_joints[, joints_list])</p></td>
+<td><p>Represents a target pose for robot joints.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.controllers.html#pyicub.controllers.position.PositionController" title="pyicub.controllers.position.PositionController"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PositionController</span></code></a>(robot_name, part, logger)</p></td>
+<td><p>Controls joint movement of a robot part.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.controllers.html#pyicub.controllers.position.RemoteControlboard" title="pyicub.controllers.position.RemoteControlboard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RemoteControlboard</span></code></a>(robot_name, part)</p></td>
+<td><p>Interface for controlling an iCub robot part remotely using YARP.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.controllers.html#pyicub.controllers.position.iCubPart" title="pyicub.controllers.position.iCubPart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">iCubPart</span></code></a>(name, robot_part, joints_nr, ...)</p></td>
+<td><p>Represents an individual iCub robot part with its joint configuration.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.controllers.position.ICUB_PARTS">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.controllers.position.</span></span><span class="sig-name descname"><span class="pre">ICUB_PARTS</span></span><a class="headerlink" href="#pyicub.controllers.position.ICUB_PARTS" title="Link to this definition"></a></dt>
+<dd><p>Enumeration of iCub robot parts.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.ICUB_PARTS.HEAD">
+<span class="sig-name descname"><span class="pre">HEAD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'head'</span></em><a class="headerlink" href="#pyicub.controllers.position.ICUB_PARTS.HEAD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.ICUB_PARTS.FACE">
+<span class="sig-name descname"><span class="pre">FACE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'face'</span></em><a class="headerlink" href="#pyicub.controllers.position.ICUB_PARTS.FACE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.ICUB_PARTS.TORSO">
+<span class="sig-name descname"><span class="pre">TORSO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'torso'</span></em><a class="headerlink" href="#pyicub.controllers.position.ICUB_PARTS.TORSO" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.ICUB_PARTS.LEFT_ARM">
+<span class="sig-name descname"><span class="pre">LEFT_ARM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'left_arm'</span></em><a class="headerlink" href="#pyicub.controllers.position.ICUB_PARTS.LEFT_ARM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.ICUB_PARTS.RIGHT_ARM">
+<span class="sig-name descname"><span class="pre">RIGHT_ARM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'right_arm'</span></em><a class="headerlink" href="#pyicub.controllers.position.ICUB_PARTS.RIGHT_ARM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.ICUB_PARTS.LEFT_LEG">
+<span class="sig-name descname"><span class="pre">LEFT_LEG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'left_leg'</span></em><a class="headerlink" href="#pyicub.controllers.position.ICUB_PARTS.LEFT_LEG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.ICUB_PARTS.RIGHT_LEG">
+<span class="sig-name descname"><span class="pre">RIGHT_LEG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'right_leg'</span></em><a class="headerlink" href="#pyicub.controllers.position.ICUB_PARTS.RIGHT_LEG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.controllers.position.iCubPart">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.controllers.position.</span></span><span class="sig-name descname"><span class="pre">iCubPart</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">robot_part</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joints_nr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joints_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joints_speed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.iCubPart" title="Link to this definition"></a></dt>
+<dd><p>Represents an individual iCub robot part with its joint configuration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.iCubPart.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pyicub.controllers.position.iCubPart.name" title="Link to this definition"></a></dt>
+<dd><p>Name of the robot part.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.iCubPart.robot_part">
+<span class="sig-name descname"><span class="pre">robot_part</span></span><a class="headerlink" href="#pyicub.controllers.position.iCubPart.robot_part" title="Link to this definition"></a></dt>
+<dd><p>Corresponding robot section (head, torso, etc.).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.iCubPart.joints_nr">
+<span class="sig-name descname"><span class="pre">joints_nr</span></span><a class="headerlink" href="#pyicub.controllers.position.iCubPart.joints_nr" title="Link to this definition"></a></dt>
+<dd><p>Number of joints in the part.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.iCubPart.joints_list">
+<span class="sig-name descname"><span class="pre">joints_list</span></span><a class="headerlink" href="#pyicub.controllers.position.iCubPart.joints_list" title="Link to this definition"></a></dt>
+<dd><p>List of joint indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.iCubPart.joints_speed">
+<span class="sig-name descname"><span class="pre">joints_speed</span></span><a class="headerlink" href="#pyicub.controllers.position.iCubPart.joints_speed" title="Link to this definition"></a></dt>
+<dd><p>List of speeds for each joint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.iCubPart.toJSON">
+<span class="sig-name descname"><span class="pre">toJSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.iCubPart.toJSON" title="Link to this definition"></a></dt>
+<dd><p>Converts the iCub part object to a JSON string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>str</em> – JSON representation of the object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.controllers.position.JointPose">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.controllers.position.</span></span><span class="sig-name descname"><span class="pre">JointPose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_joints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joints_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.JointPose" title="Link to this definition"></a></dt>
+<dd><p>Represents a target pose for robot joints.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.JointPose.target_joints">
+<span class="sig-name descname"><span class="pre">target_joints</span></span><a class="headerlink" href="#pyicub.controllers.position.JointPose.target_joints" title="Link to this definition"></a></dt>
+<dd><p>Desired joint positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.JointPose.joints_list">
+<span class="sig-name descname"><span class="pre">joints_list</span></span><a class="headerlink" href="#pyicub.controllers.position.JointPose.joints_list" title="Link to this definition"></a></dt>
+<dd><p>Specific joints to be controlled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[int] or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.JointPose.toJSON">
+<span class="sig-name descname"><span class="pre">toJSON</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.JointPose.toJSON" title="Link to this definition"></a></dt>
+<dd><p>Converts the JointPose object to a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>dict</em> – Dictionary representation of the object.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.controllers.position.RemoteControlboard">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.controllers.position.</span></span><span class="sig-name descname"><span class="pre">RemoteControlboard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">part</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.RemoteControlboard" title="Link to this definition"></a></dt>
+<dd><p>Interface for controlling an iCub robot part remotely using YARP.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.RemoteControlboard.getDriver">
+<span class="sig-name descname"><span class="pre">getDriver</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.RemoteControlboard.getDriver" title="Link to this definition"></a></dt>
+<dd><p>Returns the YARP driver instance.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.controllers.position.</span></span><span class="sig-name descname"><span class="pre">PositionController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">part</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController" title="Link to this definition"></a></dt>
+<dd><p>Controls joint movement of a robot part.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.WAITMOTIONDONE_PERIOD">
+<span class="sig-name descname"><span class="pre">WAITMOTIONDONE_PERIOD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.02</span></em><a class="headerlink" href="#pyicub.controllers.position.PositionController.WAITMOTIONDONE_PERIOD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.MOTION_COMPLETE_AT">
+<span class="sig-name descname"><span class="pre">MOTION_COMPLETE_AT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.9</span></em><a class="headerlink" href="#pyicub.controllers.position.PositionController.MOTION_COMPLETE_AT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.isValid">
+<span class="sig-name descname"><span class="pre">isValid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.isValid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.init">
+<span class="sig-name descname"><span class="pre">init</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.init" title="Link to this definition"></a></dt>
+<dd><p>Initializes the control interfaces.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.PolyDriver">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PolyDriver</span></span><a class="headerlink" href="#pyicub.controllers.position.PositionController.PolyDriver" title="Link to this definition"></a></dt>
+<dd><p>Returns:
+yarp.PolyDriver: PolyDriver instance controlling the robot part.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.getIPositionControl">
+<span class="sig-name descname"><span class="pre">getIPositionControl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.getIPositionControl" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.getIEncoders">
+<span class="sig-name descname"><span class="pre">getIEncoders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.getIEncoders" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.getIControlLimits">
+<span class="sig-name descname"><span class="pre">getIControlLimits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.getIControlLimits" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.isMoving">
+<span class="sig-name descname"><span class="pre">isMoving</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.isMoving" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">joints_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.stop" title="Link to this definition"></a></dt>
+<dd><p>Stops the movement of specified joints by setting their reference speed to zero.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>joints_list<span class="classifier">list of int, optional</span></dt><dd><p>List of joint indices to stop. If None, all joints will be stopped. Default is None.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>float</dt><dd><p>Always returns 0.0.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.move">
+<span class="sig-name descname"><span class="pre">move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.controllers.html#pyicub.controllers.position.JointPose" title="pyicub.controllers.position.JointPose"><span class="pre">JointPose</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">req_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joints_speed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[10.0]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">waitMotionDone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'default'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.move" title="Link to this definition"></a></dt>
+<dd><p>Moves the robot to the specified joint positions.
+Parameters
+———-
+pose : JointPose</p>
+<blockquote>
+<div><p>The target joint positions and the list of joints to move.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>req_time<span class="classifier">float, optional</span></dt><dd><p>The requested time to complete the motion (default is 0.0).</p>
+</dd>
+<dt>timeout<span class="classifier">float, optional</span></dt><dd><p>The maximum time to wait for the motion to complete (default is DEFAULT_TIMEOUT).</p>
+</dd>
+<dt>joints_speed<span class="classifier">list, optional</span></dt><dd><p>The speed for each joint (default is an empty list, which sets all speeds to 10.0).</p>
+</dd>
+<dt>waitMotionDone<span class="classifier">bool, optional</span></dt><dd><p>Whether to wait for the motion to complete before returning (default is True).</p>
+</dd>
+<dt>tag<span class="classifier">str, optional</span></dt><dd><p>A tag for logging purposes (default is ‘default’).</p>
+</dd>
+</dl>
+<section id="id1">
+<h2>Returns<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>bool</dt><dd><p>True if the motion completed successfully, False if it timed out.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<p>This method sets the position control mode for the specified joints,
+initiates the motion, and optionally waits for the motion to complete.
+It logs the start and end of the motion, including whether it completed
+successfully or timed out.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.setPositionControlMode">
+<span class="sig-name descname"><span class="pre">setPositionControlMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">joints_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.setPositionControlMode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.setCustomWaitMotionDone">
+<span class="sig-name descname"><span class="pre">setCustomWaitMotionDone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">motion_complete_at</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.setCustomWaitMotionDone" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.unsetCustomWaitMotionDone">
+<span class="sig-name descname"><span class="pre">unsetCustomWaitMotionDone</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.unsetCustomWaitMotionDone" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.waitMotionDone">
+<span class="sig-name descname"><span class="pre">waitMotionDone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">motion_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.waitMotionDone" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.waitMotionDone2">
+<span class="sig-name descname"><span class="pre">waitMotionDone2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.waitMotionDone2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.waitMotionDone3">
+<span class="sig-name descname"><span class="pre">waitMotionDone3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.waitMotionDone3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.waitMotionDone4">
+<span class="sig-name descname"><span class="pre">waitMotionDone4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.waitMotionDone4" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyicub.controllers.gaze.html" class="btn btn-neutral float-left" title="pyicub.controllers.gaze" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyicub.proc.html" class="btn btn-neutral float-right" title="pyicub.proc" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Davide De Tommaso.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

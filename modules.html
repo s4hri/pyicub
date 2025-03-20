@@ -1,0 +1,503 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyicub &mdash; PyiCub  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=54433ac4" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/custom.js?v=7f86f365"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            PyiCub
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Examples.html">Examples</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Api.html">Python API Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PyiCub</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">pyicub</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pyicub">
+<h1>pyicub<a class="headerlink" href="#pyicub" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pyicub.html">pyicub package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.controllers.html">pyicub.controllers package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.controllers.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.controllers.html#module-pyicub.controllers.gaze">pyicub.controllers.gaze module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.controllers.html#module-pyicub.controllers.position">pyicub.controllers.position module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.controllers.html#module-pyicub.controllers">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.core.html">pyicub.core package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.core.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.core.html#module-pyicub.core.logger">pyicub.core.logger module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.core.html#module-pyicub.core.ports">pyicub.core.ports module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.core.html#module-pyicub.core.rpc">pyicub.core.rpc module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.core.html#module-pyicub.core">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.modules.html">pyicub.modules package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.modules.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.modules.html#module-pyicub.modules.camera">pyicub.modules.camera module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.modules.html#module-pyicub.modules.emotions">pyicub.modules.emotions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.modules.html#module-pyicub.modules.face">pyicub.modules.face module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.modules.html#module-pyicub.modules.faceLandmarks">pyicub.modules.faceLandmarks module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.modules.html#module-pyicub.modules.speech">pyicub.modules.speech module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.modules.html#module-pyicub.modules">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.html#module-pyicub.actions">pyicub.actions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.actions.JointsTrajectoryCheckpoint"><code class="docutils literal notranslate"><span class="pre">JointsTrajectoryCheckpoint</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.JointsTrajectoryCheckpoint.toJSON"><code class="docutils literal notranslate"><span class="pre">JointsTrajectoryCheckpoint.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.actions.LimbMotion"><code class="docutils literal notranslate"><span class="pre">LimbMotion</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.LimbMotion.createJointsTrajectory"><code class="docutils literal notranslate"><span class="pre">LimbMotion.createJointsTrajectory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.LimbMotion.toJSON"><code class="docutils literal notranslate"><span class="pre">LimbMotion.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.actions.PyiCubCustomCall"><code class="docutils literal notranslate"><span class="pre">PyiCubCustomCall</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.PyiCubCustomCall.toJSON"><code class="docutils literal notranslate"><span class="pre">PyiCubCustomCall.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.actions.GazeMotion"><code class="docutils literal notranslate"><span class="pre">GazeMotion</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.GazeMotion.addCheckpoint"><code class="docutils literal notranslate"><span class="pre">GazeMotion.addCheckpoint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.GazeMotion.toJSON"><code class="docutils literal notranslate"><span class="pre">GazeMotion.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep.prepare"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.prepare()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep.createCustomCall"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.createCustomCall()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep.createGazeMotion"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.createGazeMotion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep.createPart"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.createPart()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep.createLimbMotion"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.createLimbMotion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep.exportJSONFile"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.exportJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep.importFromJSONDict"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.importFromJSONDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep.importFromJSONFile"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.importFromJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep.join"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.join()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep.setLimbMotion"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.setLimbMotion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep.setCustomCall"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.setCustomCall()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep.setGazeMotion"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.setGazeMotion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyStep.toJSON"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyStep.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyAction"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyAction.prepare"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.prepare()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyAction.addAction"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.addAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyAction.addStep"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.addStep()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyAction.importFromJSONDict"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.importFromJSONDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyAction.importFromJSONFile"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.importFromJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyAction.exportJSONFile"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.exportJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyAction.setName"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.setName()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyAction.setDescription"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.setDescription()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyAction.setOffset"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.setOffset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubFullbodyAction.toJSON"><code class="docutils literal notranslate"><span class="pre">iCubFullbodyAction.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.actions.TemplateParameter"><code class="docutils literal notranslate"><span class="pre">TemplateParameter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.TemplateParameter.value"><code class="docutils literal notranslate"><span class="pre">TemplateParameter.value()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.TemplateParameter.name"><code class="docutils literal notranslate"><span class="pre">TemplateParameter.name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.TemplateParameter.exportJSONFile"><code class="docutils literal notranslate"><span class="pre">TemplateParameter.exportJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.TemplateParameter.toJSON"><code class="docutils literal notranslate"><span class="pre">TemplateParameter.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplate"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplate.prepare_params"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.prepare_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplate.createParam"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.createParam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplate.getActionDict"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.getActionDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplate.getAction"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.getAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplate.getParams"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.getParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplate.getParam"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.getParam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplate.setParams"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.setParams()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplate.setParam"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplate.setParam()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplateImportedJSON"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplateImportedJSON</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplateImportedJSON.getActionDict"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplateImportedJSON.getActionDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplateImportedJSON.prepare_params"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplateImportedJSON.prepare_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplateImportedJSON.prepare"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplateImportedJSON.prepare()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.iCubActionTemplateImportedJSON.setParam"><code class="docutils literal notranslate"><span class="pre">iCubActionTemplateImportedJSON.setParam()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.actions.ActionsManager"><code class="docutils literal notranslate"><span class="pre">ActionsManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.ActionsManager.addAction"><code class="docutils literal notranslate"><span class="pre">ActionsManager.addAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.ActionsManager.importActionsFromModule"><code class="docutils literal notranslate"><span class="pre">ActionsManager.importActionsFromModule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.ActionsManager.getAction"><code class="docutils literal notranslate"><span class="pre">ActionsManager.getAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.ActionsManager.getActions"><code class="docutils literal notranslate"><span class="pre">ActionsManager.getActions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.ActionsManager.exportActions"><code class="docutils literal notranslate"><span class="pre">ActionsManager.exportActions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.ActionsManager.importTemplateFromJSONFile"><code class="docutils literal notranslate"><span class="pre">ActionsManager.importTemplateFromJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.ActionsManager.importTemplateFromJSONDict"><code class="docutils literal notranslate"><span class="pre">ActionsManager.importTemplateFromJSONDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.actions.ActionsManager.importTemplateJSONFile"><code class="docutils literal notranslate"><span class="pre">ActionsManager.importTemplateJSONFile()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.html#module-pyicub.fsm">pyicub.fsm module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM"><code class="docutils literal notranslate"><span class="pre">FSM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.INIT_STATE"><code class="docutils literal notranslate"><span class="pre">FSM.INIT_STATE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.name"><code class="docutils literal notranslate"><span class="pre">FSM.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.on_exit_init"><code class="docutils literal notranslate"><span class="pre">FSM.on_exit_init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.addState"><code class="docutils literal notranslate"><span class="pre">FSM.addState()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.addTransition"><code class="docutils literal notranslate"><span class="pre">FSM.addTransition()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.draw"><code class="docutils literal notranslate"><span class="pre">FSM.draw()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.exportJSONFile"><code class="docutils literal notranslate"><span class="pre">FSM.exportJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.getCurrentState"><code class="docutils literal notranslate"><span class="pre">FSM.getCurrentState()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.getState"><code class="docutils literal notranslate"><span class="pre">FSM.getState()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.getStates"><code class="docutils literal notranslate"><span class="pre">FSM.getStates()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.getTransitions"><code class="docutils literal notranslate"><span class="pre">FSM.getTransitions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.getTriggers"><code class="docutils literal notranslate"><span class="pre">FSM.getTriggers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.getCurrentTriggers"><code class="docutils literal notranslate"><span class="pre">FSM.getCurrentTriggers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.getStateTriggers"><code class="docutils literal notranslate"><span class="pre">FSM.getStateTriggers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.importFromJSONDict"><code class="docutils literal notranslate"><span class="pre">FSM.importFromJSONDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.importFromJSONFile"><code class="docutils literal notranslate"><span class="pre">FSM.importFromJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.runStep"><code class="docutils literal notranslate"><span class="pre">FSM.runStep()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.setSessionID"><code class="docutils literal notranslate"><span class="pre">FSM.setSessionID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.getSessionID"><code class="docutils literal notranslate"><span class="pre">FSM.getSessionID()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.getSessionCount"><code class="docutils literal notranslate"><span class="pre">FSM.getSessionCount()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.fsm.FSM.toJSON"><code class="docutils literal notranslate"><span class="pre">FSM.toJSON()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.html#module-pyicub.helper">pyicub.helper module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.helper.iCubSingleton"><code class="docutils literal notranslate"><span class="pre">iCubSingleton</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub"><code class="docutils literal notranslate"><span class="pre">iCub</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.close"><code class="docutils literal notranslate"><span class="pre">iCub.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.logger"><code class="docutils literal notranslate"><span class="pre">iCub.logger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.gaze"><code class="docutils literal notranslate"><span class="pre">iCub.gaze</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.face"><code class="docutils literal notranslate"><span class="pre">iCub.face</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.facelandmarks"><code class="docutils literal notranslate"><span class="pre">iCub.facelandmarks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.cam_right"><code class="docutils literal notranslate"><span class="pre">iCub.cam_right</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.cam_left"><code class="docutils literal notranslate"><span class="pre">iCub.cam_left</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.request_manager"><code class="docutils literal notranslate"><span class="pre">iCub.request_manager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.actions_manager"><code class="docutils literal notranslate"><span class="pre">iCub.actions_manager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.emo"><code class="docutils literal notranslate"><span class="pre">iCub.emo</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.speech"><code class="docutils literal notranslate"><span class="pre">iCub.speech</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.parts"><code class="docutils literal notranslate"><span class="pre">iCub.parts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.robot_name"><code class="docutils literal notranslate"><span class="pre">iCub.robot_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.addRuntimeModule"><code class="docutils literal notranslate"><span class="pre">iCub.addRuntimeModule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.addAction"><code class="docutils literal notranslate"><span class="pre">iCub.addAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.exists"><code class="docutils literal notranslate"><span class="pre">iCub.exists()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.getPositionController"><code class="docutils literal notranslate"><span class="pre">iCub.getPositionController()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.portmonitor"><code class="docutils literal notranslate"><span class="pre">iCub.portmonitor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.execCustomCall"><code class="docutils literal notranslate"><span class="pre">iCub.execCustomCall()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.execCustomCalls"><code class="docutils literal notranslate"><span class="pre">iCub.execCustomCalls()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.exportAction"><code class="docutils literal notranslate"><span class="pre">iCub.exportAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.getAction"><code class="docutils literal notranslate"><span class="pre">iCub.getAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.getActions"><code class="docutils literal notranslate"><span class="pre">iCub.getActions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.importAction"><code class="docutils literal notranslate"><span class="pre">iCub.importAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.importActionFromJSONDict"><code class="docutils literal notranslate"><span class="pre">iCub.importActionFromJSONDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.importActionFromJSONFile"><code class="docutils literal notranslate"><span class="pre">iCub.importActionFromJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.importActionFromTemplate"><code class="docutils literal notranslate"><span class="pre">iCub.importActionFromTemplate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.importTemplate"><code class="docutils literal notranslate"><span class="pre">iCub.importTemplate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.movePart"><code class="docutils literal notranslate"><span class="pre">iCub.movePart()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.moveStep"><code class="docutils literal notranslate"><span class="pre">iCub.moveStep()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.moveSteps"><code class="docutils literal notranslate"><span class="pre">iCub.moveSteps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.playAction"><code class="docutils literal notranslate"><span class="pre">iCub.playAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.runAction"><code class="docutils literal notranslate"><span class="pre">iCub.runAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.iCub.moveGaze"><code class="docutils literal notranslate"><span class="pre">iCub.moveGaze()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.helper.PortMonitor"><code class="docutils literal notranslate"><span class="pre">PortMonitor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.PortMonitor.start"><code class="docutils literal notranslate"><span class="pre">PortMonitor.start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.PortMonitor.stop"><code class="docutils literal notranslate"><span class="pre">PortMonitor.stop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.helper.PortMonitor.worker"><code class="docutils literal notranslate"><span class="pre">PortMonitor.worker()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.html#module-pyicub.requests">pyicub.requests module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest"><code class="docutils literal notranslate"><span class="pre">iCubRequest</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.INIT"><code class="docutils literal notranslate"><span class="pre">iCubRequest.INIT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.RUNNING"><code class="docutils literal notranslate"><span class="pre">iCubRequest.RUNNING</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.TIMEOUT"><code class="docutils literal notranslate"><span class="pre">iCubRequest.TIMEOUT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.DONE"><code class="docutils literal notranslate"><span class="pre">iCubRequest.DONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.FAILED"><code class="docutils literal notranslate"><span class="pre">iCubRequest.FAILED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.TIMEOUT_REQUEST"><code class="docutils literal notranslate"><span class="pre">iCubRequest.TIMEOUT_REQUEST</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.creation_time"><code class="docutils literal notranslate"><span class="pre">iCubRequest.creation_time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.duration"><code class="docutils literal notranslate"><span class="pre">iCubRequest.duration</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.end_time"><code class="docutils literal notranslate"><span class="pre">iCubRequest.end_time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.exception"><code class="docutils literal notranslate"><span class="pre">iCubRequest.exception</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.future_target"><code class="docutils literal notranslate"><span class="pre">iCubRequest.future_target</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.future_req"><code class="docutils literal notranslate"><span class="pre">iCubRequest.future_req</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.req_id"><code class="docutils literal notranslate"><span class="pre">iCubRequest.req_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.retval"><code class="docutils literal notranslate"><span class="pre">iCubRequest.retval</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.status"><code class="docutils literal notranslate"><span class="pre">iCubRequest.status</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.start_time"><code class="docutils literal notranslate"><span class="pre">iCubRequest.start_time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.tag"><code class="docutils literal notranslate"><span class="pre">iCubRequest.tag</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.target"><code class="docutils literal notranslate"><span class="pre">iCubRequest.target</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.run"><code class="docutils literal notranslate"><span class="pre">iCubRequest.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.cancel"><code class="docutils literal notranslate"><span class="pre">iCubRequest.cancel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.wait_for_completed"><code class="docutils literal notranslate"><span class="pre">iCubRequest.wait_for_completed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequest.info"><code class="docutils literal notranslate"><span class="pre">iCubRequest.info()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequestsManager"><code class="docutils literal notranslate"><span class="pre">iCubRequestsManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequestsManager.CSV_COLUMNS"><code class="docutils literal notranslate"><span class="pre">iCubRequestsManager.CSV_COLUMNS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequestsManager.pending_futures"><code class="docutils literal notranslate"><span class="pre">iCubRequestsManager.pending_futures</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequestsManager.logger"><code class="docutils literal notranslate"><span class="pre">iCubRequestsManager.logger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequestsManager.create"><code class="docutils literal notranslate"><span class="pre">iCubRequestsManager.create()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequestsManager.join_requests"><code class="docutils literal notranslate"><span class="pre">iCubRequestsManager.join_requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequestsManager.join_pending_requests"><code class="docutils literal notranslate"><span class="pre">iCubRequestsManager.join_pending_requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.requests.iCubRequestsManager.run_request"><code class="docutils literal notranslate"><span class="pre">iCubRequestsManager.run_request()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.html#module-pyicub.rest">pyicub.rest module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.GenericType"><code class="docutils literal notranslate"><span class="pre">GenericType</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.custom_serializer"><code class="docutils literal notranslate"><span class="pre">custom_serializer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.RESTJSON"><code class="docutils literal notranslate"><span class="pre">RESTJSON</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.RESTJSON.fromJSON"><code class="docutils literal notranslate"><span class="pre">RESTJSON.fromJSON()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.RESTJSON.toJSON"><code class="docutils literal notranslate"><span class="pre">RESTJSON.toJSON()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.RESTRobot"><code class="docutils literal notranslate"><span class="pre">RESTRobot</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.RESTApp"><code class="docutils literal notranslate"><span class="pre">RESTApp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.RESTTopic"><code class="docutils literal notranslate"><span class="pre">RESTTopic</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTService"><code class="docutils literal notranslate"><span class="pre">iCubRESTService</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.RESTService"><code class="docutils literal notranslate"><span class="pre">RESTService</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.logger"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.logger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.header"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.header()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.server_rule"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.server_rule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.robot_rule"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.robot_rule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.app_rule"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.app_rule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.target_rule"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.target_rule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.run_forever"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.run_forever()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.shutdown"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.shutdown()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.wrapper_target"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.wrapper_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.process_target_remote"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.process_target_remote()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.info"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.get_tree"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.get_tree()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.get_robots"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.get_robots()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.get_apps"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.get_apps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.get_services"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.get_services()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.is_local_register"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.is_local_register()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.remote_register"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.remote_register()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.remote_unregister"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.remote_unregister()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.register"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.register()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.unregister"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.unregister()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.remote_subscribe"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.remote_subscribe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.remote_unsubscribe"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.remote_unsubscribe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.remote_notify"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.remote_notify()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.subscribe"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.subscribe()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTServer.unsubscribe"><code class="docutils literal notranslate"><span class="pre">iCubRESTServer.unsubscribe()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.request_manager"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.request_manager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.proxy_host"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.proxy_host</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.proxy_rule"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.proxy_rule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.amiproxy"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.amiproxy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.requests"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.processes"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.processes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.proc_info"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.proc_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.req_info"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.req_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.single_req_info"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.single_req_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.subscribe_topic"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.subscribe_topic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.unsubscribe_topic"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.unsubscribe_topic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.target_requests"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.target_requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.status_requests"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.status_requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.subscribers"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.subscribers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.pending_requests"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.pending_requests()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.process_target"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.process_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.notify_subscriber"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.notify_subscriber()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.register_target"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.register_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTManager.unregister_target"><code class="docutils literal notranslate"><span class="pre">iCubRESTManager.unregister_target()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubApp"><code class="docutils literal notranslate"><span class="pre">PyiCubApp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubApp.logger"><code class="docutils literal notranslate"><span class="pre">PyiCubApp.logger</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubApp.request_manager"><code class="docutils literal notranslate"><span class="pre">PyiCubApp.request_manager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubApp.rest_manager"><code class="docutils literal notranslate"><span class="pre">PyiCubApp.rest_manager</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.rest_service"><code class="docutils literal notranslate"><span class="pre">rest_service()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer.custom_rest_services"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.custom_rest_services</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer.configure"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.configure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer.name"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer.robot_name"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.robot_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer.fsm"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.fsm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer.getServices"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.getServices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer.getArgsTemplate"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.getArgsTemplate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer.initHelper"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.initHelper()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer.getArgs"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.getArgs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer.setArgs"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.setArgs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer.getArg"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.getArg()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer.setArg"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.setArg()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulServer.setFSM"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulServer.setFSM()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTApp"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTApp.configure"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.configure()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTApp.info"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTApp.importActionFromJSONFile"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.importActionFromJSONFile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTApp.importActions"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.importActions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTApp.importActionFromJSONDict"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.importActionFromJSONDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTApp.playAction"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.playAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTApp.getActions"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.getActions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTApp.importAction"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.importAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTApp.icub"><code class="docutils literal notranslate"><span class="pre">iCubRESTApp.icub</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTSubscriber"><code class="docutils literal notranslate"><span class="pre">iCubRESTSubscriber</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTSubscriber.subscribe_topic"><code class="docutils literal notranslate"><span class="pre">iCubRESTSubscriber.subscribe_topic()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubRESTSubscriber.run_forever"><code class="docutils literal notranslate"><span class="pre">iCubRESTSubscriber.run_forever()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.RESTSubscriberFSM"><code class="docutils literal notranslate"><span class="pre">RESTSubscriberFSM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.RESTSubscriberFSM.refresh_targets"><code class="docutils literal notranslate"><span class="pre">RESTSubscriberFSM.refresh_targets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.RESTSubscriberFSM.on_enter_state"><code class="docutils literal notranslate"><span class="pre">RESTSubscriberFSM.on_enter_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.RESTSubscriberFSM.on_exit_state"><code class="docutils literal notranslate"><span class="pre">RESTSubscriberFSM.on_exit_state()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.RESTSubscriberFSM.on_enter_fsm"><code class="docutils literal notranslate"><span class="pre">RESTSubscriberFSM.on_enter_fsm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.RESTSubscriberFSM.on_exit_fsm"><code class="docutils literal notranslate"><span class="pre">RESTSubscriberFSM.on_exit_fsm()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubFSM"><code class="docutils literal notranslate"><span class="pre">iCubFSM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubFSM.actions"><code class="docutils literal notranslate"><span class="pre">iCubFSM.actions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubFSM.icub"><code class="docutils literal notranslate"><span class="pre">iCubFSM.icub</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubFSM.setApp"><code class="docutils literal notranslate"><span class="pre">iCubFSM.setApp()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubFSM.addAction"><code class="docutils literal notranslate"><span class="pre">iCubFSM.addAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubFSM.addTemplate"><code class="docutils literal notranslate"><span class="pre">iCubFSM.addTemplate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubFSM.importFromJSONDict"><code class="docutils literal notranslate"><span class="pre">iCubFSM.importFromJSONDict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.iCubFSM.exportJSONFile"><code class="docutils literal notranslate"><span class="pre">iCubFSM.exportJSONFile()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient.fsm_runStep"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.fsm_runStep()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient.get_fsm"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_fsm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient.get_version"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient.get_robots"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_robots()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient.get_apps"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_apps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient.get_services"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_services()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient.get_robot_actions"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_robot_actions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient.play_action"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.play_action()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient.run_target"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.run_target()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient.run_target_async"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.run_target_async()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient.get_request_info"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.get_request_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient.is_request_running"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.is_request_running()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.PyiCubRESTfulClient.wait_until_completed"><code class="docutils literal notranslate"><span class="pre">PyiCubRESTfulClient.wait_until_completed()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.rest.FSMsManager"><code class="docutils literal notranslate"><span class="pre">FSMsManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.FSMsManager.addFSM"><code class="docutils literal notranslate"><span class="pre">FSMsManager.addFSM()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.FSMsManager.importFSMsFromModule"><code class="docutils literal notranslate"><span class="pre">FSMsManager.importFSMsFromModule()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.FSMsManager.getFSM"><code class="docutils literal notranslate"><span class="pre">FSMsManager.getFSM()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.FSMsManager.getFSMs"><code class="docutils literal notranslate"><span class="pre">FSMsManager.getFSMs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyicub.html#pyicub.rest.FSMsManager.exportFSMs"><code class="docutils literal notranslate"><span class="pre">FSMsManager.exportFSMs()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.html#module-pyicub.utils">pyicub.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.utils.SingletonMeta"><code class="docutils literal notranslate"><span class="pre">SingletonMeta</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.utils.vector_distance"><code class="docutils literal notranslate"><span class="pre">vector_distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.utils.norm"><code class="docutils literal notranslate"><span class="pre">norm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.utils.getPublicMethods"><code class="docutils literal notranslate"><span class="pre">getPublicMethods()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.utils.getDecoratedMethods"><code class="docutils literal notranslate"><span class="pre">getDecoratedMethods()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.utils.getPyiCubInfo"><code class="docutils literal notranslate"><span class="pre">getPyiCubInfo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.utils.firstAvailablePort"><code class="docutils literal notranslate"><span class="pre">firstAvailablePort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.utils.importFromJSONFile"><code class="docutils literal notranslate"><span class="pre">importFromJSONFile()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.html#pyicub.utils.exportJSONFile"><code class="docutils literal notranslate"><span class="pre">exportJSONFile()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.html#module-pyicub">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Davide De Tommaso.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
