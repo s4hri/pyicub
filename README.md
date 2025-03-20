@@ -8,7 +8,7 @@ Introduction
 
 Documentation
 --------------
-For usage examples, check out the [Examples Documentation](https://ep3896.github.io/pyicub/).
+For usage examples, check out the [Examples Documentation](https://s4hri.github.io/pyicub/).
 
 Requirements
 -------------
