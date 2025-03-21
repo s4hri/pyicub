@@ -25,7 +25,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install --upgrade pip setuptools wheel  # Ensure latest packaging tools
+          pip install --upgrade pip setuptools wheel
           pip install sphinx sphinx-rtd-theme
           pip install -r requirements.txt
           pip install -e .
@@ -34,16 +34,21 @@ jobs:
 
       - name: Verify Sphinx Installation
         run: |
-          sphinx-build --version  # Check if sphinx-build is available
+          sphinx-build --version
 
       - name: Build Sphinx documentation
         run: |
           sphinx-apidoc -o docs/source pyicub  
-          sphinx-build -b html docs/source _build/html
+          sphinx-build -b html docs/source docs/build/html -D html_static_path=docs/static -D html_extra_path=docs/extras -D autosummary_generate=True
+
+      - name: Rename autosummary and sources folders
+        run: |
+          mv docs/build/html/_autosummary docs/build/html/autosummary
+          mv docs/build/html/_sources docs/build/html/sources
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages  # Deploy to the gh-pages branch
-          folder: _build/html  # Directory containing the generated HTML
+          folder: docs/build/html  # Directory containing the generated HTML
           clean: true  # Remove old files before deploying
