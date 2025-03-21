@@ -3,7 +3,7 @@ name: Deploy Sphinx Docs to GitHub Pages
 on:
   push:
     branches:
-      - master  # Adjust if your default branch is different
+      - master  
 
 jobs:
   build:
@@ -41,9 +41,13 @@ jobs:
           sphinx-apidoc -o docs/source pyicub  
           sphinx-build -b html docs/source _build/html
 
+      - name: Add .nojekyll file
+        run: |
+          touch _build/html/.nojekyll
+
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages  # Deploy to the gh-pages branch
-          folder: _build/html  # Directory containing the generated HTML
-          clean: true  # Remove old files before deploying
+          branch: gh-pages  
+          folder: _build/html  
+          clean: true  
