@@ -76,6 +76,7 @@ class iCub(metaclass=iCubSingleton):
         self._facelandmarks_          = None
         self._cam_right_              = None
         self._cam_left_               = None
+        self._attention_              = None
         self._monitors_               = []
         self._logger_                 = YarpLogger.getLogger() #PyicubLogger.getLogger()
         self._request_manager_        = request_manager
@@ -201,7 +202,7 @@ class iCub(metaclass=iCubSingleton):
                 self._logger_.warning('cameraPyCtrl (left) not correctly initialized!')
                 return None
         return self._cam_left_
-
+    
     @property
     def request_manager(self):
         return self._request_manager_
@@ -224,6 +225,17 @@ class iCub(metaclass=iCubSingleton):
                 self._logger_.error('iSpeakPyCtrl not correctly initialized!')
                 self._speech_ = None
         return self._speech_
+
+    @property
+    def attention(self):
+        if self._attention_ is None:
+            try:
+                from pyicub.modules.attention import VisualAttention
+                self._attention_ = VisualAttention(self.gaze)
+            except:
+                self._logger_.warning('VisualAttention not correctly initialized!')
+                return None
+        return self._attention_
 
     @property
     def parts(self):
