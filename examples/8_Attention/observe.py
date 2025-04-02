@@ -28,7 +28,7 @@
 
 
 """
-observe_workspace.py
+observe.py
 ============
 
 This script ...

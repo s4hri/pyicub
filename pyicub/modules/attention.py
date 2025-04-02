@@ -57,11 +57,11 @@ class VisualTarget:
     def flush(self):
         self.callable_flush()
 
-class VisualAttention():
-    AZI_MIN = -30
-    AZI_MAX = 30
-    ELE_MIN = -25
-    ELE_MAX = 20
+class VisualAttention:
+    AZI_MIN = -40
+    AZI_MAX = 40
+    ELE_MIN = -35
+    ELE_MAX = 30
     VER_MIN = 0
     VER_MAX = 10
 
@@ -101,8 +101,11 @@ class VisualAttention():
     def targets(self):
         return self.__visual_targets__
 
-    def add_visual_target(self, name, callable_position, callable_flush):
-        self.__visual_targets__[name] = VisualTarget(name, callable_position, callable_flush)
+    #def add_visual_target(self, name, callable_position, callable_flush):
+    #    self.__visual_targets__[name] = VisualTarget(name, callable_position, callable_flush)
+
+    def add_visual_target(self, target: VisualTarget):
+        self.__visual_targets__[target.name] = target
 
     def grid_ellipsoid(self, P, a, b, c, num_points):
         """
