@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2025, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -37,6 +37,7 @@ from pyicub.modules.speech import iSpeakPyCtrl
 from pyicub.modules.face import facePyCtrl
 from pyicub.modules.faceLandmarks import faceLandmarksPyCtrl
 from pyicub.modules.camera import cameraPyCtrl
+from pyicub.modules.attention import VisualAttention
 from pyicub.core.ports import BufferedReadPort
 from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequest, iCubRequestsManager
@@ -229,12 +230,7 @@ class iCub(metaclass=iCubSingleton):
     @property
     def attention(self):
         if self._attention_ is None:
-            try:
-                from pyicub.modules.attention import VisualAttention
-                self._attention_ = VisualAttention(self.gaze)
-            except:
-                self._logger_.warning('VisualAttention not correctly initialized!')
-                return None
+            self._attention_ = VisualAttention(self.gaze)
         return self._attention_
 
     @property

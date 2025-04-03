@@ -26,39 +26,64 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 """
 observe.py
 ============
 
-This script ...
+This script controls an iCub robot to systematically observe and scan two defined regions:
+1. Workspace area (e.g., a table surface).
+2. General scene area (e.g., space in front of the robot).
 
 Usage:
 ------
-...
-
+python observe.py
 """
 
+# Import the helper class to interface with iCub robot
 from pyicub.helper import iCub
 
+# Main function to control robot observation
 def observe():
+    # Initialize an instance of the iCub robot
     icub = iCub()
 
-    Table_center = (-1.0, 0.0, 0.0)
-    Table_width = 0.6
-    Table_depth = 0.4
-    num_points=10
-    fixation_time=1.0
-    lookat_point_timeout=5.0
+    # Define parameters for observing the workspace (e.g., table surface)
+    Table_center = (-1.0, 0.0, 0.0)     # Coordinates for the center of the workspace
+    Table_width = 0.6                   # Width of the workspace area
+    Table_depth = 0.4                   # Depth of the workspace area
 
-    Area_center = (-1.0, 0.0, 0.5)
-    Area_width = 1.0
-    Area_height = 0.5
+    # Common parameters for observation
+    num_points = 10                     # Number of fixation points during observation
+    fixation_time = 1.0                 # Time (in seconds) the robot fixates on each point
+    lookat_point_timeout = 5.0          # Timeout (in seconds) for reaching a fixation point
 
-    icub.attention.observe_workspace(center=Table_center, width=Table_width, depth=Table_depth, num_points=num_points, fixation_time=fixation_time, lookat_point_timeout=lookat_point_timeout, waitMotionDone=True)
+    # Define parameters for observing the general scene area (above the workspace)
+    Area_center = (-1.0, 0.0, 0.5)      # Coordinates for the center of the observation area
+    Area_width = 1.0                    # Width of the observation area
+    Area_height = 0.5                   # Height of the observation area
 
-    icub.attention.observe_scene(center=Area_center, width=Area_width, height=Area_height, num_points=num_points, fixation_time=fixation_time, lookat_point_timeout=lookat_point_timeout, waitMotionDone=True)
+    # Command the robot to observe points within the workspace (table surface)
+    icub.attention.observe_workspace(
+        center=Table_center,
+        width=Table_width,
+        depth=Table_depth,
+        num_points=num_points,
+        fixation_time=fixation_time,
+        lookat_point_timeout=lookat_point_timeout,
+        waitMotionDone=True             # Wait until motion is completed before proceeding
+    )
 
+    # Command the robot to observe points within the general scene area
+    icub.attention.observe_scene(
+        center=Area_center,
+        width=Area_width,
+        height=Area_height,
+        num_points=num_points,
+        fixation_time=fixation_time,
+        lookat_point_timeout=lookat_point_timeout,
+        waitMotionDone=True             # Wait until motion is completed before proceeding
+    )
+
+# Execute the observation behavior if this script is run as main
 if __name__ == "__main__":
     observe()
-

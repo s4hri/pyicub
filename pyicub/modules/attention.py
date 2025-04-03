@@ -101,9 +101,6 @@ class VisualAttention:
     def targets(self):
         return self.__visual_targets__
 
-    #def add_visual_target(self, name, callable_position, callable_flush):
-    #    self.__visual_targets__[name] = VisualTarget(name, callable_position, callable_flush)
-
     def add_visual_target(self, target: VisualTarget):
         self.__visual_targets__[target.name] = target
 
@@ -148,9 +145,6 @@ class VisualAttention:
 
         # Ensure the list contains exactly num_points points
         return points[:num_points]
-
-    def hello_world(self, name: str='you'):
-        return "Hello world %s!" % name
     
     def observe_area(self, P, a, b, c, num_points=10, fixation_time=2.0, lookat_point_timeout=5.0, waitMotionDone=True):
         """
