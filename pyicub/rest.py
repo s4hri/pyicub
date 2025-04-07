@@ -782,6 +782,8 @@ class iCubRESTApp(PyiCubRESTfulServer):
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.cam_right, class_name='cam_right')
         if self.icub.cam_left:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.cam_left, class_name='cam_left')
+        if self.icub.attention:
+            self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.attention, class_name='attention')
 
     def importActionFromJSONFile(self, JSON_file):
         JSON_dict = importFromJSONFile(JSON_file)
