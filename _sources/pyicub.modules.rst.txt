@@ -4,6 +4,14 @@ pyicub.modules package
 Submodules
 ----------
 
+pyicub.modules.attention module
+-------------------------------
+
+.. automodule:: pyicub.modules.attention
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 pyicub.modules.camera module
 ----------------------------
 
