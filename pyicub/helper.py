@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2023, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2025, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -37,6 +37,7 @@ from pyicub.modules.speech import iSpeakPyCtrl
 from pyicub.modules.face import facePyCtrl
 from pyicub.modules.faceLandmarks import faceLandmarksPyCtrl
 from pyicub.modules.camera import cameraPyCtrl
+from pyicub.modules.attention import VisualAttention
 from pyicub.core.ports import BufferedReadPort
 from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequest, iCubRequestsManager
@@ -76,6 +77,7 @@ class iCub(metaclass=iCubSingleton):
         self._facelandmarks_          = None
         self._cam_right_              = None
         self._cam_left_               = None
+        self._attention_              = None
         self._monitors_               = []
         self._logger_                 = YarpLogger.getLogger() #PyicubLogger.getLogger()
         self._request_manager_        = request_manager
@@ -201,7 +203,7 @@ class iCub(metaclass=iCubSingleton):
                 self._logger_.warning('cameraPyCtrl (left) not correctly initialized!')
                 return None
         return self._cam_left_
-
+    
     @property
     def request_manager(self):
         return self._request_manager_
@@ -224,6 +226,12 @@ class iCub(metaclass=iCubSingleton):
                 self._logger_.error('iSpeakPyCtrl not correctly initialized!')
                 self._speech_ = None
         return self._speech_
+
+    @property
+    def attention(self):
+        if self._attention_ is None:
+            self._attention_ = VisualAttention(self.gaze)
+        return self._attention_
 
     @property
     def parts(self):
