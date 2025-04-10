@@ -1,0 +1,12 @@
+pyicub.modules.faceLandmarks
+============================
+
+.. automodule:: pyicub.modules.faceLandmarks
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      faceLandmarksPyCtrl
+   

@@ -1,0 +1,13 @@
+pyicub.modules.attention
+========================
+
+.. automodule:: pyicub.modules.attention
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      VisualAttention
+      VisualTarget
+   

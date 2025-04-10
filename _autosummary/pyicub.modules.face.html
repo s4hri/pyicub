@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyicub.proc &mdash; PyiCub  documentation</title>
+  <title>pyicub.modules.face &mdash; PyiCub  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=54433ac4" />
@@ -21,8 +21,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="pyicub.proc.actionizer" href="pyicub.proc.actionizer.html" />
-    <link rel="prev" title="pyicub.controllers.position" href="pyicub.controllers.position.html" /> 
+    <link rel="next" title="pyicub.modules.faceLandmarks" href="pyicub.modules.faceLandmarks.html" />
+    <link rel="prev" title="pyicub.modules.emotions" href="pyicub.modules.emotions.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -52,17 +52,24 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../Api.html">Python API Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="pyicub.core.html">pyicub.core</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pyicub.controllers.html">pyicub.controllers</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">pyicub.proc</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pyicub.proc.actionizer.html">pyicub.proc.actionizer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyicub.proc.fsmizer.html">pyicub.proc.fsmizer</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.proc.html">pyicub.proc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pyicub.utils.html">pyicub.utils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pyicub.actions.html">pyicub.actions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pyicub.requests.html">pyicub.requests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pyicub.rest.html">pyicub.rest</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pyicub.fsm.html">pyicub.fsm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pyicub.modules.html">pyicub.modules</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="pyicub.modules.html">pyicub.modules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="pyicub.modules.attention.html">pyicub.modules.attention</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.modules.camera.html">pyicub.modules.camera</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.modules.emotions.html">pyicub.modules.emotions</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pyicub.modules.face</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.modules.face.facePyCtrl"><code class="docutils literal notranslate"><span class="pre">facePyCtrl</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.modules.faceLandmarks.html">pyicub.modules.faceLandmarks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.modules.speech.html">pyicub.modules.speech</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -82,9 +89,10 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../Api.html">Python API Documentation</a></li>
-      <li class="breadcrumb-item active">pyicub.proc</li>
+          <li class="breadcrumb-item"><a href="pyicub.modules.html">pyicub.modules</a></li>
+      <li class="breadcrumb-item active">pyicub.modules.face</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/_autosummary/pyicub.proc.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/_autosummary/pyicub.modules.face.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -92,27 +100,34 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-pyicub.proc">
-<span id="pyicub-proc"></span><h1>pyicub.proc<a class="headerlink" href="#module-pyicub.proc" title="Link to this heading"></a></h1>
-<p class="rubric">Modules</p>
+  <section id="module-pyicub.modules.face">
+<span id="pyicub-modules-face"></span><h1>pyicub.modules.face<a class="headerlink" href="#module-pyicub.modules.face" title="Link to this heading"></a></h1>
+<p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="pyicub.proc.actionizer.html#module-pyicub.proc.actionizer" title="pyicub.proc.actionizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">actionizer</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="pyicub.proc.fsmizer.html#module-pyicub.proc.fsmizer" title="pyicub.proc.fsmizer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fsmizer</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.modules.html#pyicub.modules.face.facePyCtrl" title="pyicub.modules.face.facePyCtrl"><code class="xref py py-obj docutils literal notranslate"><span class="pre">facePyCtrl</span></code></a>(robot)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.modules.face.facePyCtrl">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.modules.face.</span></span><span class="sig-name descname"><span class="pre">facePyCtrl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">robot</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.face.facePyCtrl" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.face.facePyCtrl.sendRaw">
+<span class="sig-name descname"><span class="pre">sendRaw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.face.facePyCtrl.sendRaw" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pyicub.controllers.position.html" class="btn btn-neutral float-left" title="pyicub.controllers.position" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="pyicub.proc.actionizer.html" class="btn btn-neutral float-right" title="pyicub.proc.actionizer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pyicub.modules.emotions.html" class="btn btn-neutral float-left" title="pyicub.modules.emotions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyicub.modules.faceLandmarks.html" class="btn btn-neutral float-right" title="pyicub.modules.faceLandmarks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

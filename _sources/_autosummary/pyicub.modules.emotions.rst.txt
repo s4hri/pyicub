@@ -1,0 +1,12 @@
+pyicub.modules.emotions
+=======================
+
+.. automodule:: pyicub.modules.emotions
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      emotionsPyCtrl
+   

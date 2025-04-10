@@ -1,0 +1,12 @@
+pyicub.modules.face
+===================
+
+.. automodule:: pyicub.modules.face
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      facePyCtrl
+   

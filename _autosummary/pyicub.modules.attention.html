@@ -1,0 +1,357 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyicub.modules.attention &mdash; PyiCub  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=54433ac4" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/custom.js?v=7f86f365"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pyicub.modules.camera" href="pyicub.modules.camera.html" />
+    <link rel="prev" title="pyicub.modules" href="pyicub.modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PyiCub
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Examples.html">Examples</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../Api.html">Python API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pyicub.core.html">pyicub.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.controllers.html">pyicub.controllers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.proc.html">pyicub.proc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.utils.html">pyicub.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.actions.html">pyicub.actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.requests.html">pyicub.requests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.rest.html">pyicub.rest</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyicub.fsm.html">pyicub.fsm</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="pyicub.modules.html">pyicub.modules</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">pyicub.modules.attention</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.modules.attention.VisualTarget"><code class="docutils literal notranslate"><span class="pre">VisualTarget</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pyicub.modules.attention.VisualAttention"><code class="docutils literal notranslate"><span class="pre">VisualAttention</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.modules.camera.html">pyicub.modules.camera</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.modules.emotions.html">pyicub.modules.emotions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.modules.face.html">pyicub.modules.face</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.modules.faceLandmarks.html">pyicub.modules.faceLandmarks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pyicub.modules.speech.html">pyicub.modules.speech</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PyiCub</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../Api.html">Python API Documentation</a></li>
+          <li class="breadcrumb-item"><a href="pyicub.modules.html">pyicub.modules</a></li>
+      <li class="breadcrumb-item active">pyicub.modules.attention</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/pyicub.modules.attention.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-pyicub.modules.attention">
+<span id="pyicub-modules-attention"></span><h1>pyicub.modules.attention<a class="headerlink" href="#module-pyicub.modules.attention" title="Link to this heading"></a></h1>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../pyicub.modules.html#pyicub.modules.attention.VisualAttention" title="pyicub.modules.attention.VisualAttention"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisualAttention</span></code></a>(gazectrl)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../pyicub.modules.html#pyicub.modules.attention.VisualTarget" title="pyicub.modules.attention.VisualTarget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">VisualTarget</span></code></a>(name, callable_position, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualTarget">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.modules.attention.</span></span><span class="sig-name descname"><span class="pre">VisualTarget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callable_position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callable_flush</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualTarget" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualTarget.get_position">
+<span class="sig-name descname"><span class="pre">get_position</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualTarget.get_position" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualTarget.flush">
+<span class="sig-name descname"><span class="pre">flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualTarget.flush" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyicub.modules.attention.</span></span><span class="sig-name descname"><span class="pre">VisualAttention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gazectrl</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention" title="Link to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.AZI_MIN">
+<span class="sig-name descname"><span class="pre">AZI_MIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-40</span></em><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.AZI_MIN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.AZI_MAX">
+<span class="sig-name descname"><span class="pre">AZI_MAX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">40</span></em><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.AZI_MAX" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.ELE_MIN">
+<span class="sig-name descname"><span class="pre">ELE_MIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-35</span></em><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.ELE_MIN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.ELE_MAX">
+<span class="sig-name descname"><span class="pre">ELE_MAX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">30</span></em><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.ELE_MAX" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.VER_MIN">
+<span class="sig-name descname"><span class="pre">VER_MIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.VER_MIN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.VER_MAX">
+<span class="sig-name descname"><span class="pre">VER_MAX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.VER_MAX" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.targets">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">targets</span></span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.targets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.add_visual_target">
+<span class="sig-name descname"><span class="pre">add_visual_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="../pyicub.modules.html#pyicub.modules.attention.VisualTarget" title="pyicub.modules.attention.VisualTarget"><span class="pre">VisualTarget</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.add_visual_target" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.grid_ellipsoid">
+<span class="sig-name descname"><span class="pre">grid_ellipsoid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.grid_ellipsoid" title="Link to this definition"></a></dt>
+<dd><p>Generate well-distributed points on the surface of an ellipsoid, balancing the variation on x, y, and z
+according to the proportions of the ellipsoid’s semi-major axes.</p>
+<p>Parameters:
+- P (tuple): The center of the ellipsoid (x, y, z).
+- a, b, c (float): The semi-major axes of the ellipsoid along the x, y, and z directions.
+- num_points (int): The number of points to generate on the surface.</p>
+<p>Returns:
+- List of tuples representing points on the surface of the ellipsoid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.observe_area">
+<span class="sig-name descname"><span class="pre">observe_area</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixation_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookat_point_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">waitMotionDone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.observe_area" title="Link to this definition"></a></dt>
+<dd><p>Random observation of points within a 3D ellipse centered at P.</p>
+<p>Parameters:
+- P (tuple): The center of the ellipse (x, y, z).
+- a (float): Semi-major axis length along the x-axis.
+- b (float): Semi-major axis length along the y-axis.
+- c (float): Semi-major axis length along the z-axis.
+- num_points (int, optional): The number of points to observe. Default is 10.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.observe_workspace">
+<span class="sig-name descname"><span class="pre">observe_workspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixation_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookat_point_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">waitMotionDone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.observe_workspace" title="Link to this definition"></a></dt>
+<dd><p>Observes random, well-distributed points within a desk-like workspace.</p>
+<p>Parameters:
+- center (tuple): The center of the workspace (x, y, z).
+- width (float): The width of the workspace along the y-axis.
+- depth (float): The depth of the workspace along the x-axis.
+- num_points (int, optional): The number of points to observe. Default is 10.
+- fixation_time (float, optional): Time in seconds the robot should observe each point. Default is 2.0 seconds.
+- lookat_point_timeout (float, optional): Timeout for each point. Default is 5.0 seconds.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.observe_scene">
+<span class="sig-name descname"><span class="pre">observe_scene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixation_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookat_point_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">waitMotionDone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.observe_scene" title="Link to this definition"></a></dt>
+<dd><p>Observes well-distributed points within a scene in front of the robot.</p>
+<p>Parameters:
+- center (tuple): The center of the scene in front of the robot (x, y, z).
+- width (float): The width of the scene along the y-axis.
+- height (float): The height of the scene along the z-axis.
+- num_points (int, optional): The number of points to observe. Default is 10.
+- fixation_time (float, optional): Time in seconds the robot should observe each point. Default is 2.0 seconds.
+- lookat_point_timeout (float, optional): Timeout for each point. Default is 5.0 seconds.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.observe_points">
+<span class="sig-name descname"><span class="pre">observe_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixation_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookat_point_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">waitMotionDone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.observe_points" title="Link to this definition"></a></dt>
+<dd><p>Sequenced observation of a list of predefined 3D points with a specified fixation time.</p>
+<p>Parameters:
+- points_list (list of tuples): A list of 3D points to observe (each point is a tuple (x, y, z)).
+- fixation_time (float, optional): The time in seconds the robot should observe each point. Default is 1.0 seconds.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.track_moving_point">
+<span class="sig-name descname"><span class="pre">track_moving_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track_duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixation_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookat_point_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">waitMotionDone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.track_moving_point" title="Link to this definition"></a></dt>
+<dd><p>Track a moving point over a specified duration, updating at a given rate.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.visual_search_in_workspace">
+<span class="sig-name descname"><span class="pre">visual_search_in_workspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixation_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookat_point_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.visual_search_in_workspace" title="Link to this definition"></a></dt>
+<dd><p>Continuously observe points in the workspace until the target is detected or timeout is reached.</p>
+<p>Parameters:
+- center (tuple): The center of the workspace (x, y, z).
+- width (float): The width of the workspace along the y-axis.
+- depth (float): The depth of the workspace along the x-axis.
+- target (str): The name of the visual target to be detected.
+- num_points (int, optional): The number of points to observe. Default is 10.
+- fixation_time (float, optional): Time in seconds the robot should observe each point. Default is 2.0 seconds.
+- lookat_point_timeout (float, optional): Timeout for each point. Default is 5.0 seconds.
+- timeout (float, optional): Maximum time in seconds to search for the target. Default is 30.0 seconds.</p>
+<p>Returns:
+- dict: A dictionary containing the positions of the detected target.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.visual_search_in_scene">
+<span class="sig-name descname"><span class="pre">visual_search_in_scene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixation_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookat_point_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.visual_search_in_scene" title="Link to this definition"></a></dt>
+<dd><p>Continuously observe points in the scene until the target is detected or timeout is reached.</p>
+<p>Parameters:
+- center (tuple): The center of the scene in front of the robot (x, y, z).
+- width (float): The width of the scene along the y-axis.
+- height (float): The height of the scene along the z-axis.
+- target (str): The name of the visual target to be detected.
+- num_points (int, optional): The number of points to observe. Default is 10.
+- fixation_time (float, optional): Time in seconds the robot should observe each point. Default is 2.0 seconds.
+- lookat_point_timeout (float, optional): Timeout for each point. Default is 5.0 seconds.
+- timeout (float, optional): Maximum time in seconds to search for the target. Default is 30.0 seconds.</p>
+<p>Returns:
+- dict: A dictionary containing the positions of the detected target.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.visual_tracking_scene">
+<span class="sig-name descname"><span class="pre">visual_tracking_scene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">starting_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixation_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookat_point_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track_duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.visual_tracking_scene" title="Link to this definition"></a></dt>
+<dd><p>Perform visual search in the scene to detect the target, then start tracking once a stable point is found.</p>
+<p>Parameters:
+- starting_point (tuple): The starting point to track (x, y, z).
+- target (str): The name of the visual target to be detected.
+- fixation_time (float, optional): Time in seconds the robot should observe each point. Default is 2.0 seconds.
+- lookat_point_timeout (float, optional): Timeout for each point. Default is 5.0 seconds.
+- track_duration (float, optional): Duration in seconds for tracking the target once detected. Default is 30.0 seconds.</p>
+<p>Returns:
+- str: Status of tracking.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.visual_tracking_workspace">
+<span class="sig-name descname"><span class="pre">visual_tracking_workspace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">starting_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixation_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookat_point_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track_duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.visual_tracking_workspace" title="Link to this definition"></a></dt>
+<dd><p>Perform visual search in the workspace to detect the target, then start tracking once a stable point is found.</p>
+<p>Parameters:
+- starting_point (tuple): The starting point to track (x, y, z).
+- target (str): The name of the visual target to be detected.
+- fixation_time (float, optional): Time in seconds the robot should observe each point. Default is 2.0 seconds.
+- lookat_point_timeout (float, optional): Timeout for each point. Default is 5.0 seconds.
+- track_duration (float, optional): Duration in seconds for tracking the target once detected. Default is 30.0 seconds.</p>
+<p>Returns:
+- str: Status of tracking.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.stop_tracking">
+<span class="sig-name descname"><span class="pre">stop_tracking</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.stop_tracking" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.modules.attention.VisualAttention.wait_stable_target">
+<span class="sig-name descname"><span class="pre">wait_stable_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene_center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene_width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene_height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stable_duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_motion_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracking_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.modules.attention.VisualAttention.wait_stable_target" title="Link to this definition"></a></dt>
+<dd><p>Wait for a visual target to appear, then start tracking until the target is stable for a requested amount of time.</p>
+<p>Parameters:
+- target (str): The name of the visual target to be detected.
+- wait_timeout (float, optional): Maximum time in seconds to wait for the target to appear. Default is 10.0 seconds.
+- stable_duration (float, optional): Duration in seconds that the target needs to stay stable. Default is 1.0 seconds.
+- max_motion_radius (float, optional): Maximum distance in meters that the target can move to be considered stable. Default is 0.05 meters.
+- tracking_timeout (float, optional): Maximum time in seconds for the tracking phase. Default is 10.0 seconds.</p>
+<p>Returns:
+- dict: A dictionary containing the position of the detected target if stable, or an empty list if not detected or not stable.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pyicub.modules.html" class="btn btn-neutral float-left" title="pyicub.modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pyicub.modules.camera.html" class="btn btn-neutral float-right" title="pyicub.modules.camera" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Davide De Tommaso.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

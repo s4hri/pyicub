@@ -1,0 +1,13 @@
+pyicub.modules.speech
+=====================
+
+.. automodule:: pyicub.modules.speech
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      iSpeakPyCtrl
+      speechPyCtrl
+   

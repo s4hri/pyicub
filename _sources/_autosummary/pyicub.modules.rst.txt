@@ -1,0 +1,18 @@
+﻿pyicub.modules
+==============
+
+.. automodule:: pyicub.modules
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   attention
+   camera
+   emotions
+   face
+   faceLandmarks
+   speech

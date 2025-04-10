@@ -1,0 +1,12 @@
+pyicub.modules.camera
+=====================
+
+.. automodule:: pyicub.modules.camera
+
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      cameraPyCtrl
+   
