@@ -15,5 +15,5 @@ Python API Documentation
    pyicub.requests
    pyicub.rest
    pyicub.fsm
-   pyicub.attention
+   pyicub.modules
 
