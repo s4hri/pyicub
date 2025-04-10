@@ -78,13 +78,13 @@ def move_head():
 if __name__ == "__main__":
     move_head()
 
-from pyicub.helper import iCub, JointPose, ICUB_HEAD
+# from pyicub.helper import iCub, JointPose, ICUB_HEAD
 
-icub = iCub()
-head_ctrl = icub.getPositionController(ICUB_HEAD)
+# icub = iCub()
+# head_ctrl = icub.getPositionController(ICUB_HEAD)
 
-up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+# up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+# home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
-head_ctrl.move(up)
-head_ctrl.move(home)
+# head_ctrl.move(up)
+# head_ctrl.move(home)
