@@ -18,13 +18,13 @@ jobs:
       - name: Checkout this repository (pyicub fork or original)
         uses: actions/checkout@v4
 
-      - name: Clone s4hri-docker repository
+      - name: Clone s4hri-docker repository (private)
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git clone -b pyicub-ubuntu22.04-robotologyv2024.x https://github.com/s4hri/s4hri-docker.git
+          git clone -b pyicub-ubuntu22.04-robotologyv2024.x https://x-access-token:${TOKEN}@github.com/s4hri/s4hri-docker.git
           cd s4hri-docker 
-
+          
       - name: Build the image using .dockyman
         run: |
           PYICUB_URL=${{env.GITHUB_URL}} PYICUB_BRANCH=${{env.GITHUB_BRANCH}} make -C .dockyman build
