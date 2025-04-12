@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2025, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -429,9 +429,9 @@ class PositionController:
         t0 = time.perf_counter()
         elapsed_time = 0.0
         while elapsed_time <= motion_time:
+            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
             if not self.isMoving():
                 return True
-            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
             elapsed_time = time.perf_counter() - t0
         
         return False
