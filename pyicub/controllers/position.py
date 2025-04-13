@@ -222,6 +222,34 @@ class PositionController:
     def isMoving(self):
         return not self.__IPositionControl__.checkMotionDone()
 
+    def getEncoders(self):
+        """
+        Returns the current joint positions.
+        """
+        encs = yarp.Vector(self.__joints__)
+        while not self.__IEncoders__.getEncoders(encs.data()):
+            yarp.delay(0.1)
+        return encs
+
+    def getEncodersSpeeds(self):
+        """
+        Returns the current joint speeds.
+        """
+        vel = yarp.Vector(self.__joints__)
+        while not self.__IEncoders__.getEncoderSpeeds(vel.data()):
+            yarp.delay(0.1)
+        return vel
+    
+    def getJointLimits(self):
+        """
+        Returns the joint limits for the robot part.
+        """
+        min_limits = yarp.Vector(self.__joints__)
+        max_limits = yarp.Vector(self.__joints__)
+        self.__IControlLimits__.getLimits(min_limits.data(), max_limits.data())
+        return min_limits, max_limits
+
+
     def __move__(self, target_joints, joints_list, req_time, joints_speed):
         """
         Move the joints to the target positions.
@@ -433,7 +461,10 @@ class PositionController:
             if not self.isMoving():
                 return True
             elapsed_time = time.perf_counter() - t0
-        
+        return True
+        while elapsed_time <= timeout:
+            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
+            elapsed_time = time.perf_counter() - t0
         return False
 
     def waitMotionDone2(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
