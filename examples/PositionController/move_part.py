@@ -37,48 +37,26 @@ them sequentially.
 
 Usage:
 ------
-Run this script to move the iCub's head through a series of predefined positions and
+Run this script to move the iCub's neck through a series of predefined positions and
 coordinate the movement of its eyes.
 
 
 """
 
-from pyicub.helper import iCub, JointPose, LimbMotion, ICUB_HEAD, ICUB_EYES
+from pyicub.helper import iCub, JointPose, LimbMotion, ICUB_NECK, ICUB_EYES
 
-# Define head poses (Up, Down, Home)
-head_up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-head_down = JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-head_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-
-# Create a motion trajectory for the head
-head_motion = LimbMotion(ICUB_HEAD)
-head_motion.createJointsTrajectory(head_up)
-head_motion.createJointsTrajectory(head_down)
-head_motion.createJointsTrajectory(head_home)
-
-# Define eye movements
-eyes_left = JointPose(target_joints=[0.0, 20.0, 5.0])
-eyes_right = JointPose(target_joints=[0.0, -20.0, 5.0])
-eyes_home = JointPose(target_joints=[0.0, 0.0, 0.0])
-
-# Create a motion trajectory for the eyes
-eyes_motion = LimbMotion(ICUB_EYES)
-eyes_motion.createJointsTrajectory(eyes_left)
-eyes_motion.createJointsTrajectory(eyes_right)
-eyes_motion.createJointsTrajectory(eyes_home)
-
-def move_head_and_eyes():
+def move_neck_and_eyes():
     """
-    Moves the iCub's head and eyes through predefined motion sequences.
+    Moves the iCub's neck and eyes through predefined motion sequences.
 
     Steps
     -----
-    1. Moves the head through a sequence: "Up" -> "Down" -> "Home".
+    1. Moves the neck through a sequence: "Up" -> "Down" -> "Home".
     2. Moves the eyes through a sequence: "Left" -> "Right" -> "Home".
 
     Example
     -------
-    >>> move_head_and_eyes()
+    >>> move_neck_and_eyes()
 
     Notes
     -----
@@ -89,10 +67,32 @@ def move_head_and_eyes():
     # Create an instance of the iCub robot
     icub = iCub()
 
+    # Define neck poses (Up, Down, Home)
+    neck_up = JointPose(target_joints=[20.0, 0.0, 0.0])
+    neck_down = JointPose(target_joints=[-20.0, 0.0, 0.0])
+    neck_home = JointPose(target_joints=[0.0, 0.0, 0.0])
+
+    # Create a motion trajectory for the neck
+    neck_motion = LimbMotion(ICUB_NECK)
+    neck_motion.createJointsTrajectory(neck_up)
+    neck_motion.createJointsTrajectory(neck_down)
+    neck_motion.createJointsTrajectory(neck_home)
+
+    # Define eye movements
+    eyes_left = JointPose(target_joints=[0.0, 20.0, 5.0])
+    eyes_right = JointPose(target_joints=[0.0, -20.0, 5.0])
+    eyes_home = JointPose(target_joints=[0.0, 0.0, 0.0])
+
+    # Create a motion trajectory for the eyes
+    eyes_motion = LimbMotion(ICUB_EYES)
+    eyes_motion.createJointsTrajectory(eyes_left)
+    eyes_motion.createJointsTrajectory(eyes_right)
+    eyes_motion.createJointsTrajectory(eyes_home)
+
     # Execute head and eye movement sequences
-    icub.movePart(head_motion)
-    icub.movePart(eyes_motion)
+    icub.movePart(neck_motion)
+    icub.movePart(neck_motion)
 
 if __name__ == "__main__":
-    move_head_and_eyes()
+    move_neck_and_eyes()
 

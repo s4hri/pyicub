@@ -41,28 +41,12 @@ bash go
 How to test pyicub
 -------------
 
-To test the pyicub repository, follow these steps:
+To run the tests:
 
-1. Clone the testing repository:
+1. Run pytest from the main directory:
     ```
-    git clone -b pyicub-ubuntu22.04-robotologyv2024.x https://github.com/s4hri/s4hri-docker.git
+    pytest -v
     ```
-
-2. Navigate to the cloned directory:
-    ```
-    cd s4hri-docker/
-    ```
-
-3. Update the environment variables in the `dockyman.env` file:
-    - **PYICUB_URL**: Set this to the URL of the pyicub repository you want to test.
-    - **PYICUB_BRANCH**: Set this to the branch of the pyicub repository you want to test.
-    - **COMPOSE_PROFILE**: Set this to `test`.
-
-4. Run the following command to execute the test:
-    ```
-    bash go
-    ```
-
 
 Acknowledgments
 -------------
