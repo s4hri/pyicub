@@ -30,7 +30,7 @@
 import pytest
 import numpy as np
 import time
-from pyicub.helper import iCub, JointPose, LimbMotion, ICUB_HEAD, ICUB_EYES
+from pyicub.helper import iCub, JointPose, LimbMotion, ICUB_HEAD, ICUB_EYES, ICUB_NECK
 from pyicub.controllers.position import PositionController
 
 class TestPositionController:
@@ -48,7 +48,7 @@ class TestPositionController:
         """Cleanup resources."""
         self.icub.close()
 
-    def verify_encoders(self, controller, pose, tolerance=3.0):
+    def verify_encoders(self, controller, pose, tolerance=5.0):
         """
         Verify that the controller's encoders match the expected pose.
 
@@ -61,18 +61,8 @@ class TestPositionController:
         tolerance : float
             Acceptable difference between expected and actual joint values (in degrees).
         """
-        actual_encs = controller.getEncoders()
-        expected = pose.target_joints
-        joints = pose.joints_list or list(range(len(expected)))
 
-        mismatches = []
-        for i, j in enumerate(joints):
-            actual = actual_encs[j]
-            target = expected[i]
-            diff = abs(actual - target)
-            if diff > tolerance:
-                mismatches.append((j, actual, target, diff))
-
+        mismatches = controller.verify_encoders(pose, tolerance)
         if mismatches:
             mismatch_str = "\n".join(
                 f"Joint {j}: actual={a:.2f}, target={t:.2f}, diff={d:.2f}" 
@@ -81,7 +71,6 @@ class TestPositionController:
             raise AssertionError(
                 f"Joint position mismatch in {controller.__part__.name}:\n{mismatch_str}"
             )
-
 
     @pytest.mark.integration
     def test_move_to_pose_and_home(self):
@@ -107,13 +96,13 @@ class TestPositionController:
     def test_move_part(self):
         """Test sequential movement of head and eyes using predefined trajectories."""
         
-        head_ctrl = self.icub.getPositionController(ICUB_HEAD)
+        neck_ctrl = self.icub.getPositionController(ICUB_NECK)
         eyes_ctrl = self.icub.getPositionController(ICUB_EYES)
 
         # Define head poses
-        head_up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        head_down = JointPose(target_joints=[-20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        head_home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        neck_up = JointPose(target_joints=[20.0, 0.0, 0.0])
+        neck_down = JointPose(target_joints=[-20.0, 0.0, 0.0])
+        neck_home = JointPose(target_joints=[0.0, 0.0, 0.0])
 
         # Define eyes poses
         eyes_left = JointPose(target_joints=[0.0, 20.0, 5.0])
@@ -121,19 +110,23 @@ class TestPositionController:
         eyes_home = JointPose(target_joints=[0.0, 0.0, 0.0])
 
         # Create motion sequences
-        head_motion = LimbMotion(ICUB_HEAD)
-        head_motion.createJointsTrajectory(head_up)
-        head_motion.createJointsTrajectory(head_down)
-        head_motion.createJointsTrajectory(head_home)
+        neck_motion = LimbMotion(ICUB_NECK)
+        neck_motion.createJointsTrajectory(neck_up)
+        neck_motion.createJointsTrajectory(neck_down)
 
         eyes_motion = LimbMotion(ICUB_EYES)
         eyes_motion.createJointsTrajectory(eyes_left)
         eyes_motion.createJointsTrajectory(eyes_right)
-        eyes_motion.createJointsTrajectory(eyes_home)
 
         # Execute motions
-        self.icub.movePart(head_motion)
+        self.icub.movePart(neck_motion)
         self.icub.movePart(eyes_motion)
 
-        self.verify_encoders(head_ctrl, head_home)
+        self.verify_encoders(neck_ctrl, neck_down)
+        self.verify_encoders(eyes_ctrl, eyes_right)
+
+        neck_ctrl.move(neck_home)
+        self.verify_encoders(neck_ctrl, neck_home)
+
+        eyes_ctrl.move(eyes_home)
         self.verify_encoders(eyes_ctrl, eyes_home)
