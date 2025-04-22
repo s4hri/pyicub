@@ -43,10 +43,11 @@ How to test pyicub
 
 To run the tests:
 
-1. Run pytest from the main directory:
+Run pytest from the main directory:
     ```
     pytest -v
     ```
+
 
 Acknowledgments
 -------------
