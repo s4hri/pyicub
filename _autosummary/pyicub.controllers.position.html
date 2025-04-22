@@ -321,6 +321,13 @@ It includes definitions for robot parts, joint configurations, and controllers t
 yarp.PolyDriver: PolyDriver instance controlling the robot part.</p>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.part">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">part</span></span><a class="headerlink" href="#pyicub.controllers.position.PositionController.part" title="Link to this definition"></a></dt>
+<dd><p>Returns:
+iCubPart: The part being controlled.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.getIPositionControl">
 <span class="sig-name descname"><span class="pre">getIPositionControl</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.getIPositionControl" title="Link to this definition"></a></dt>
@@ -340,6 +347,24 @@ yarp.PolyDriver: PolyDriver instance controlling the robot part.</p>
 <dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.isMoving">
 <span class="sig-name descname"><span class="pre">isMoving</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.isMoving" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.getEncoders">
+<span class="sig-name descname"><span class="pre">getEncoders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.getEncoders" title="Link to this definition"></a></dt>
+<dd><p>Returns the current joint positions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.getEncodersSpeeds">
+<span class="sig-name descname"><span class="pre">getEncodersSpeeds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.getEncodersSpeeds" title="Link to this definition"></a></dt>
+<dd><p>Returns the current joint speeds.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.getJointLimits">
+<span class="sig-name descname"><span class="pre">getJointLimits</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.getJointLimits" title="Link to this definition"></a></dt>
+<dd><p>Returns the joint limits for the robot part.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.stop">
@@ -420,19 +445,32 @@ successfully or timed out.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.waitMotionDone2">
-<span class="sig-name descname"><span class="pre">waitMotionDone2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.waitMotionDone2" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.waitMotionDone3">
-<span class="sig-name descname"><span class="pre">waitMotionDone3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.waitMotionDone3" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.waitMotionDone4">
-<span class="sig-name descname"><span class="pre">waitMotionDone4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.waitMotionDone4" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="pyicub.controllers.position.PositionController.verify_encoders">
+<span class="sig-name descname"><span class="pre">verify_encoders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pose</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyicub.controllers.position.PositionController.verify_encoders" title="Link to this definition"></a></dt>
+<dd><p>Verify that the actual controller’s encoders match the expected pose.</p>
+<section id="id2">
+<h2>Parameters<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>pose<span class="classifier">JointPose</span></dt><dd><p>The expected target joint pose.</p>
+</dd>
+<dt>tolerance<span class="classifier">float</span></dt><dd><p>Acceptable difference between expected and actual joint values (in degrees).</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h2>Returns<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>list of tuples</dt><dd><p>A list of tuples containing joint index, actual encoder value, target value, and difference.
+Each tuple is in the format (joint_index, actual_value, target_value, difference).</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h2>Notes<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<p>This method compares the actual encoder values with the expected target values.
+If the difference exceeds the specified tolerance, it adds the joint to the mismatch list.</p>
+</section>
+</dd></dl>
 
 </dd></dl>
 

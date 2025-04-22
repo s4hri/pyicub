@@ -65,7 +65,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-PositionController.move_part">PositionController.move_part module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#move-part-py">move_part.py</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#PositionController.move_part.move_head_and_eyes"><code class="docutils literal notranslate"><span class="pre">move_head_and_eyes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#PositionController.move_part.move_neck_and_eyes"><code class="docutils literal notranslate"><span class="pre">move_neck_and_eyes()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-PositionController.move_request">PositionController.move_request module</a><ul>
@@ -270,24 +270,24 @@ It demonstrates how to define motion trajectories using multiple joint poses and
 them sequentially.</p>
 <section id="id10">
 <h4>Usage:<a class="headerlink" href="#id10" title="Link to this heading"></a></h4>
-<p>Run this script to move the iCub’s head through a series of predefined positions and
+<p>Run this script to move the iCub’s neck through a series of predefined positions and
 coordinate the movement of its eyes.</p>
 </section>
 </section>
 <dl class="py function">
-<dt class="sig sig-object py" id="PositionController.move_part.move_head_and_eyes">
-<span class="sig-prename descclassname"><span class="pre">PositionController.move_part.</span></span><span class="sig-name descname"><span class="pre">move_head_and_eyes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PositionController.move_part.move_head_and_eyes" title="Link to this definition"></a></dt>
-<dd><p>Moves the iCub’s head and eyes through predefined motion sequences.</p>
+<dt class="sig sig-object py" id="PositionController.move_part.move_neck_and_eyes">
+<span class="sig-prename descclassname"><span class="pre">PositionController.move_part.</span></span><span class="sig-name descname"><span class="pre">move_neck_and_eyes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#PositionController.move_part.move_neck_and_eyes" title="Link to this definition"></a></dt>
+<dd><p>Moves the iCub’s neck and eyes through predefined motion sequences.</p>
 <section id="id11">
 <h3>Steps<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
 <ol class="arabic simple">
-<li><p>Moves the head through a sequence: “Up” -&gt; “Down” -&gt; “Home”.</p></li>
+<li><p>Moves the neck through a sequence: “Up” -&gt; “Down” -&gt; “Home”.</p></li>
 <li><p>Moves the eyes through a sequence: “Left” -&gt; “Right” -&gt; “Home”.</p></li>
 </ol>
 </section>
 <section id="id12">
 <h3>Example<a class="headerlink" href="#id12" title="Link to this heading"></a></h3>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">move_head_and_eyes</span><span class="p">()</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">move_neck_and_eyes</span><span class="p">()</span>
 </pre></div>
 </div>
 </section>
