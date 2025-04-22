@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2025, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -41,17 +41,6 @@ Run this script to move the iCub's head to an "up" position and then return it t
 
 from pyicub.helper import iCub, JointPose, ICUB_HEAD
 
-# Create an instance of the iCub robot
-icub = iCub()
-
-# Retrieve the position controller for the iCub's head
-head_ctrl = icub.getPositionController(ICUB_HEAD)
-
-# Define the "up" pose for the head
-up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-
-# Define the "home" pose for the head (neutral position)
-home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
 def move_head():
     """
@@ -72,19 +61,20 @@ def move_head():
     - The function uses predefined `JointPose` objects to specify joint configurations.
     - This script is useful for verifying that the head position controller is functioning correctly.
     """
+    # Create an instance of the iCub robot
+    icub = iCub()
+
+    # Retrieve the position controller for the iCub's head
+    head_ctrl = icub.getPositionController(ICUB_HEAD)
+
+    # Define the "up" pose for the head
+    up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+
+    # Define the "home" pose for the head (neutral position)
+    home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+
     head_ctrl.move(up)
     head_ctrl.move(home)
 
 if __name__ == "__main__":
     move_head()
-
-# from pyicub.helper import iCub, JointPose, ICUB_HEAD
-
-# icub = iCub()
-# head_ctrl = icub.getPositionController(ICUB_HEAD)
-
-# up = JointPose(target_joints=[20.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-# home = JointPose(target_joints=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-
-# head_ctrl.move(up)
-# head_ctrl.move(home)

@@ -1,6 +1,6 @@
 # BSD 2-Clause License
 #
-# Copyright (c) 2024, Social Cognition in Human-Robot Interaction,
+# Copyright (c) 2025, Social Cognition in Human-Robot Interaction,
 #                     Istituto Italiano di Tecnologia, Genova
 #
 # All rights reserved.
@@ -210,6 +210,15 @@ class PositionController:
         """
         return self.__driver__.getDriver()
 
+    @property
+    def part(self):
+        """
+        Returns:
+            iCubPart: The part being controlled.
+        """
+        return self.__part__
+
+
     def getIPositionControl(self):
         return self.__IPositionControl__
 
@@ -221,6 +230,34 @@ class PositionController:
 
     def isMoving(self):
         return not self.__IPositionControl__.checkMotionDone()
+
+    def getEncoders(self):
+        """
+        Returns the current joint positions.
+        """
+        encs = yarp.Vector(self.__joints__)
+        while not self.__IEncoders__.getEncoders(encs.data()):
+            yarp.delay(0.1)
+        return encs
+
+    def getEncodersSpeeds(self):
+        """
+        Returns the current joint speeds.
+        """
+        vel = yarp.Vector(self.__joints__)
+        while not self.__IEncoders__.getEncoderSpeeds(vel.data()):
+            yarp.delay(0.1)
+        return vel
+    
+    def getJointLimits(self):
+        """
+        Returns the joint limits for the robot part.
+        """
+        min_limits = yarp.Vector(self.__joints__)
+        max_limits = yarp.Vector(self.__joints__)
+        self.__IControlLimits__.getLimits(min_limits.data(), max_limits.data())
+        return min_limits, max_limits
+
 
     def __move__(self, target_joints, joints_list, req_time, joints_speed):
         """
@@ -332,7 +369,7 @@ class PositionController:
         target_joints = pose.target_joints
         joints_list = pose.joints_list
         if joints_list is None:
-            joints_list = range(0, self.__joints__)
+            joints_list = self.part.joints_list
 
         self.setPositionControlMode(joints_list=joints_list)
             
@@ -425,64 +462,79 @@ class PositionController:
     def unsetCustomWaitMotionDone(self):
         self.__waitMotionDone__ = self.waitMotionDone
 
-    def waitMotionDone(self, motion_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
+    def waitMotionDone(self, motion_time: float = DEFAULT_TIMEOUT, timeout: float = DEFAULT_TIMEOUT):
         t0 = time.perf_counter()
         elapsed_time = 0.0
-        while elapsed_time <= motion_time:
+
+        # Step 1: Wait for the robot to actually start moving (e.g., within 1 sec)
+        started_moving = False
+        start_timeout = 1.0  # configurable: how long we wait to see if movement starts
+
+        while elapsed_time <= start_timeout:
+            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
+            if self.isMoving():
+                started_moving = True
+                break
+            elapsed_time = time.perf_counter() - t0
+
+        if not started_moving:
+            # Movement never started
+            return False
+
+        # Step 2: Wait for the motion to be done within motion_time
+        t_start = time.perf_counter()
+        elapsed_motion_time = 0.0
+
+        while elapsed_motion_time <= motion_time:
+            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
             if not self.isMoving():
                 return True
+            elapsed_motion_time = time.perf_counter() - t_start
+
+        # Step 3: If still moving, allow extra time up to the global timeout
+        t_extra = time.perf_counter()
+        elapsed_total_time = time.perf_counter() - t0
+
+        while elapsed_total_time <= timeout:
             yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
-            elapsed_time = time.perf_counter() - t0
-        
+            if not self.isMoving():
+                return True
+            elapsed_total_time = time.perf_counter() - t0
+
         return False
 
-    def waitMotionDone2(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
-        t0 = time.perf_counter()
-        target_pos = yarp.Vector(self.__joints__)
-        encs=yarp.Vector(self.__joints__)
-        self.__IPositionControl__.getTargetPositions(target_pos.data())
-        count = 0
-        deadline = min(timeout, req_time)
-        while (time.perf_counter() - t0) < deadline:
-            while not self.__IEncoders__.getEncoders(encs.data()):
-                yarp.delay(0.05)
-            v = []
-            w = []
-            for i in range(0, self.__joints__):
-                v.append(encs[i])
-                w.append(target_pos[i])
-            if count == 0:
-                tot_disp = utils.vector_distance(v, w)
-            count+=1
-            dist = utils.vector_distance(v, w)
-            if dist <= (1.0 - PositionController.MOTION_COMPLETE_AT)*tot_disp:
-                return True
-            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
-        if (time.perf_counter() - t0) > timeout:
-            return False
-        else:
-            return True
 
-    def waitMotionDone3(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
-        onset = False
-        offset = False
-        t0 = time.perf_counter()
-        vel= yarp.Vector(self.__joints__)
-        while (time.perf_counter() - t0) < timeout:
-            self.__IEncoders__.getEncoderSpeeds(vel.data())
-            v = []
-            for i in range(0, self.__joints__):
-                v.append(vel[i])
-            if not onset:
-                if utils.norm(v) > 0:
-                    onset = True
-            elif onset and (not offset):
-                if utils.norm(v) == 0:
-                    offset = True
-                    break
-            yarp.delay(PositionController.WAITMOTIONDONE_PERIOD)
-        return onset and offset
+    def verify_encoders(self, pose, tolerance=5.0):
+        """
+        Verify that the actual controller's encoders match the expected pose.
 
-    def waitMotionDone4(self, req_time: float=DEFAULT_TIMEOUT, timeout: float=DEFAULT_TIMEOUT):
-        yarp.delay(req_time)
-        return True
+        Parameters
+        ----------
+        pose : JointPose
+            The expected target joint pose.
+        tolerance : float
+            Acceptable difference between expected and actual joint values (in degrees).
+
+
+        Returns
+        -------
+        list of tuples
+            A list of tuples containing joint index, actual encoder value, target value, and difference.
+            Each tuple is in the format (joint_index, actual_value, target_value, difference).
+        Notes
+        -----
+        This method compares the actual encoder values with the expected target values.
+        If the difference exceeds the specified tolerance, it adds the joint to the mismatch list.
+        
+        """
+        actual_encs = self.getEncoders()
+        expected = pose.target_joints
+        joints = self.part.joints_list
+        mismatches = []
+        for i, j in enumerate(joints):
+            actual = actual_encs[j]
+            target = expected[i]
+            diff = abs(actual - target)
+            if diff > tolerance:
+                mismatches.append((j, actual, target, diff))
+        return mismatches

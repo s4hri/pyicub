@@ -41,13 +41,12 @@ bash go
 How to test pyicub
 -------------
 
-To test the pyicub repository, follow these steps:
+To run the tests:
 
-1. Run pytest in your installed version of pyicub
-```
-cd pyicub
-pytest -v
-```
+Run pytest from the main directory:
+    ```
+    pytest -v
+    ```
 
 
 Acknowledgments
