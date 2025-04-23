@@ -58,6 +58,7 @@ class CirclePoints:
         self.center = center  # The center of the circle in 3D space (x, y, z)
         self.num_points = int(1 / ratio)  # Calculate the number of points based on the ratio
         self.current_index = 0  # To keep track of the current point index
+        self.point_generator = self._generate_points()  # Initialize the generator for points
 
     def _generate_points(self):
         # Infinite generator of points around the circle in 3D
@@ -82,10 +83,7 @@ class CirclePoints:
 
     def get3DPosition(self):
         # Get the next point from the generator
-        point_generator = self._generate_points()
-        point = next(point_generator)  # Retrieve the next point from the generator
-
-        return point
+        return next(self.point_generator)
 
     def flush(self):
         # Placeholder for flush behavior if needed
