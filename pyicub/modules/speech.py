@@ -31,6 +31,12 @@ import yarp
 from pyicub.core.ports import BufferedWritePort
 from pyicub.core.rpc import RpcClient
 
+import os
+
+import logging
+LOGGER = logging.getLogger("speech")
+LOGGER.setLevel(logging.INFO)
+
 class speechPyCtrl:
 
     def __init__(self, robot):
@@ -73,5 +79,24 @@ class iSpeakPyCtrl:
                 yarp.delay(0.01)
         return res.toString()
 
+    def say_from_file(self, abs_file_path, wait_action_done=True):
+        text = None
+
+        file_or_folder_exist = os.path.exists(abs_file_path)
+        if not file_or_folder_exist:
+            logging.error(f"{abs_file_path} does not exist. Make sure to use an absolute path.")
+            return "-1"
+
+        is_file = os.path.isfile(abs_file_path)
+        if not is_file:
+            logging.error(f"{abs_file_path} is not a file but a folder. Use `say_from_folder()` instead")
+            return "-1"
+
+        with open(abs_file_path, 'r') as f:
+            text = f.read()
+            text = text.strip() # remove characters such as '\n'
+
+        return self.say(something=text, waitActionDone=wait_action_done)
+        
     def close(self):
         self.__port__.close()
