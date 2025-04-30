@@ -27,7 +27,97 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from pyicub.helper import iCub
 
-icub = iCub()
-icub.speech.say("Hi, I'm iCub! Let's go to have some fun")
+"""
+1.ispeak.py
+==================
+
+This script contains examples for speech module of PyiCub.
+
+Usage:
+------
+Run this script to make iCub speak from a string, a text file, and a file chosen at random from a folder. 
+
+Before running this script, it is necessary to run the required YARP modules in separated terminals:
+>>> iSpeak
+
+>>> yarpdev --device speech --lingware-context speech --default-language en-US --pitch 120 --speed 100 --robot icubSim
+
+>>> yarp connect /iSpeak/speech-dev/rpc /icubSim/speech:rpc
+
+"""
+
+from pyicub.helper import iCub
+from pyicub.core.logger import YarpLogger
+import os
+
+def example_speech_say(icub):
+    return icub.speech.say("Hi, I'm iCub! I'm reading from a string.")
+
+def example_speech_say_from_file(icub):
+    # create text file to read
+    filename = "__tmp_example_speech_say_from_file.txt"
+    with open(filename, 'w') as f:
+        f.write("Hi, I'm iCub! I'm reading from a text file.")
+    abs_file_path = os.path.abspath(filename)
+
+    # read the file
+    res = icub.speech.say_from_file(abs_file_path, wait_action_done=True)
+
+    # clean
+    os.remove(abs_file_path)
+    return res
+
+
+
+
+
+def example_speech_say_from_folder_rnd(icub):
+    # create the folder to read from
+    folder = "__tmp_folder_example_speech_say_from_folder_rnd"
+
+    os.makedirs(folder)
+    abs_folder_path = os.path.abspath(folder)
+
+    tmp_abs_file_paths = [] 
+    for i in range(5):
+        filename = f"{str(i).zfill(2)}.txt"
+        
+        abs_file_path = os.path.join(abs_folder_path, filename)
+        with open(abs_file_path, 'w') as f:
+            f.write(f"Hi, I'm iCub! I'm reading from {filename} file chosen at random from a folder.")
+            
+        tmp_abs_file_paths.append(abs_file_path)
+    
+    # read a file chosen at random from a folder
+    res = icub.speech.say_from_folder_rnd(abs_folder_path, random_seed=0, wait_action_done=True)
+
+    # clean
+    for abs_file_path in tmp_abs_file_paths:
+        os.remove(abs_file_path)
+    
+    os.rmdir(abs_folder_path)
+
+    return res
+
+
+
+
+if __name__ == "__main__":
+    logger = YarpLogger.getLogger()
+    icub = iCub()
+
+    logger.info(f"Running example icub.speech.say()")
+    res = example_speech_say(icub)
+    logger.info(f"End example icub.speech.say(). {res=}")
+
+    logger.info(f"Running example icub.speech.say_from_file()")
+    res = example_speech_say_from_file(icub)
+    logger.info(f"End example icub.speech.say_from_file(). {res=}")
+
+    logger.info(f"Running example icub.speech.say_from_folder_rnd()")
+    res = example_speech_say_from_folder_rnd(icub)
+    logger.info(f"End example icub.speech.say_from_folder_rnd(). {res=}")
+
+    
+
