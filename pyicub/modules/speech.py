@@ -32,10 +32,14 @@ from pyicub.core.ports import BufferedWritePort
 from pyicub.core.rpc import RpcClient
 
 import os
+import numpy as np
 
-import logging
-LOGGER = logging.getLogger("speech")
-LOGGER.setLevel(logging.INFO)
+
+from pyicub.core.logger import YarpLogger
+
+LOGGER = YarpLogger.getLogger()
+
+#LOGGER.setLevel(logging.INFO)
 
 class speechPyCtrl:
 
@@ -84,19 +88,41 @@ class iSpeakPyCtrl:
 
         file_or_folder_exist = os.path.exists(abs_file_path)
         if not file_or_folder_exist:
-            logging.error(f"{abs_file_path} does not exist. Make sure to use an absolute path.")
-            return "-1"
+            LOGGER.error(f"{abs_file_path} does not exist. Make sure to use an absolute path.")
+            return "ERROR"
 
         is_file = os.path.isfile(abs_file_path)
         if not is_file:
-            logging.error(f"{abs_file_path} is not a file but a folder. Use `say_from_folder()` instead")
-            return "-1"
+            LOGGER.error(f"{abs_file_path} is not a file but a folder. Use `say_from_folder_rnd()` instead")
+            return "ERROR"
 
         with open(abs_file_path, 'r') as f:
             text = f.read()
             text = text.strip() # remove characters such as '\n'
-
-        return self.say(something=text, waitActionDone=wait_action_done)
         
+        if len(text) == 0:
+            LOGGER.warning(f"{abs_file_path} is an empty file!")
+
+        LOGGER.info(f"Speaking from {abs_file_path} file")
+        return self.say(something=text, waitActionDone=wait_action_done)
+    
+    def say_from_folder_rnd(self, abs_folder_path, random_seed=0, wait_action_done=True):
+        random_gen = np.random.default_rng(seed=random_seed)
+
+        file_or_folder_exist = os.path.exists(abs_folder_path)
+        if not file_or_folder_exist:
+            LOGGER.error(f"{abs_folder_path} does not exist. Make sure to use an absolute path.")
+            return "ERROR"
+
+        is_file = os.path.isfile(abs_folder_path)
+        if is_file:
+            LOGGER.error(f"{abs_folder_path} is not a file but a folder. Use `say_from_file()` instead")
+            return "ERROR"
+
+        filename = random_gen.choice(os.listdir(abs_folder_path))
+        filepath = os.path.join(abs_folder_path, filename)
+
+        return self.say_from_file(filepath, wait_action_done=wait_action_done)
+
     def close(self):
         self.__port__.close()
