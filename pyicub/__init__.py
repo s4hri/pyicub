@@ -31,5 +31,9 @@ __name__ = 'PyiCub'
 __authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi'
 __emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it'
 __license__ = 'BSD-2'
-__version__ = '8.2.9'
+__version____version__ = '8.2.9'
 __description__ = 'Developing iCub applications using Python'
+
+def print_version():
+    """Prints the current version of the library."""
+    print(f"pyicub version: {__version__}")
