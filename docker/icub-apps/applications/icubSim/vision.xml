@@ -1,0 +1,27 @@
+<application>
+<name>iCubSim Vision</name>
+
+        <authors>
+            <author email="davide.detommaso@iit.it">Davide De Tommaso</author>
+        </authors>
+
+        <module>
+          <name>yarpdev</name>
+          <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
+          <parameters>--device opencv_grabber</parameters>
+          <node>$ENV{ICUBSRV_NODE}</node>
+        </module>
+      
+          <module>
+            <name>yarpview</name>
+            <parameters>--name /imageview --x 0 --y 0 --p 50 --w 320 --h 240</parameters>
+            <node>$ENV{ICUBSRV_NODE}</node>
+          </module>
+
+          <connection>
+            <from>/grabber</from>
+            <to>/imageview</to>
+            <protocol>udp</protocol>
+          </connection>
+
+</application>

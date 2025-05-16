@@ -1,0 +1,67 @@
+services:
+  pyicub:
+    image: ${PYICUB_IMAGE_NAME}
+    container_name: pyicub
+
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+      args:
+        DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
+
+    command: ["/bin/bash", "-c", "bash /workspace/scripts/runSetup.sh"]
+
+    stdin_open: true
+    tty: true
+    network_mode: host
+    privileged: true
+
+    runtime: ${DOCKER_RUNTIME:-runc}
+
+    env_file:
+      - .env
+
+    environment:
+      - DISPLAY=${DISPLAY:?err}
+      - PULSE_SERVER=unix:${XDG_RUNTIME_DIR:?err}/pulse/native
+      - PULSE_COOKIE=/run/pulse/cookie
+      - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:?err}
+      - XDG_DATA_DIRS=${XDG_DATA_DIRS:?err}
+      - QT_X11_NO_MITSHM=1
+      - NO_AT_BRIDGE=1
+      - LIBGL_ALWAYS_SOFTWARE=false
+      - NVIDIA_VISIBLE_DEVICES=${GPU_DEVICES:-none}
+      - NVIDIA_DRIVER_CAPABILITIES=all
+
+    volumes:
+      - pyicub-workspace:/workspace/pyicub
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${HOME}/.config/pulse/cookie:/run/pulse/cookie
+      - ${XDG_RUNTIME_DIR:?err}/pulse:${XDG_RUNTIME_DIR:?err}/pulse
+      - ${XDG_RUNTIME_DIR:?err}/dconf:${XDG_RUNTIME_DIR:?err}/dconf
+
+    profiles: ["backend", "test"]
+
+  pyicub-frontend:
+    image: ${PYICUB_FRONTEND_IMAGE_NAME}
+    container_name: pyicub-frontend
+    
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    
+    network_mode: host
+    
+    depends_on:
+      - pyicub
+    
+    volumes: 
+      - pyicub-frontend-workspace:/workspace/pyicub-frontend
+    
+    profiles: ["frontend"]
+
+volumes:
+  pyicub-workspace:
+    name: pyicub-workspace
+  pyicub-frontend-workspace:
+    name: pyicub-frontend-workspace
