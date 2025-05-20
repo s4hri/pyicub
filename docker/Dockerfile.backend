@@ -1,7 +1,7 @@
 ARG DOCKER_SRC=ubuntu:latest
 FROM $DOCKER_SRC
 
-WORKDIR /workspace 
+WORKDIR /workspace
 
 ENV PATH=$PATH:/root/.local/bin
 
@@ -20,8 +20,5 @@ RUN git clone ${PYICUB_APPS_URL} -b ${PYICUB_APPS_BRANCH} && \
     make all
 
 ENV PYTHONPATH=/workspace/pyicub
-
-COPY ./docker/icub-apps /workspace/icub-apps
-COPY ./docker/scripts /workspace/scripts
 
 CMD ["bash"]

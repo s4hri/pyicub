@@ -9,7 +9,7 @@ services:
       args:
         DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
 
-    command: ["/bin/bash", "-c", "bash /workspace/scripts/runSetup.sh"]
+    command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/entrypoint.sh"]
 
     stdin_open: true
     tty: true
@@ -39,25 +39,26 @@ services:
       - ${HOME}/.config/pulse/cookie:/run/pulse/cookie
       - ${XDG_RUNTIME_DIR:?err}/pulse:${XDG_RUNTIME_DIR:?err}/pulse
       - ${XDG_RUNTIME_DIR:?err}/dconf:${XDG_RUNTIME_DIR:?err}/dconf
+      - /home/dave/code/icub-entrypoint:/workspace/icub-entrypoint
 
     profiles: ["backend", "test"]
 
   pyicub-frontend:
     image: ${PYICUB_FRONTEND_IMAGE_NAME}
     container_name: pyicub-frontend
-    
+
     build:
       context: .
       dockerfile: Dockerfile.frontend
-    
+
     network_mode: host
-    
+
     depends_on:
       - pyicub
-    
-    volumes: 
+
+    volumes:
       - pyicub-frontend-workspace:/workspace/pyicub-frontend
-    
+
     profiles: ["frontend"]
 
 volumes:

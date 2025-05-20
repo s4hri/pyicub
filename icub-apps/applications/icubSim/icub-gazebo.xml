@@ -6,7 +6,7 @@
 
     <module>
         <name>gzserver</name>
-        <parameters>/workspace/icub-apps/gazebo/icub-world.sdf</parameters>
+        <parameters>$ENV{ICUB_APPS}/gazebo/icub-world.sdf</parameters>
         <node>$ENV{ICUBSRV_NODE}</node>
     </module>
 
@@ -29,7 +29,7 @@
         <node>$ENV{ICUBSRV_NODE}</node>
     </module>
 
-      
+
     <module>
         <name>yarpview</name>
         <parameters>--name /imageview --x 0 --y 0 --p 50 --w 320 --h 240</parameters>
@@ -89,5 +89,3 @@
     </connection>
 
 </application>
-
-    

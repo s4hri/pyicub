@@ -1,0 +1,33 @@
+name: Run Tests on Pull Request
+
+on:
+  pull_request:
+    branches:
+      - release/8.3.0
+
+jobs:
+  docker-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Run tests with Docker Compose
+        working-directory: docker  # ✅ sets working dir for this step
+        run: |
+          echo "🔧 Enabling BuildKit and setting test profile"
+          export DOCKER_BUILDKIT=1
+          export COMPOSE_PROFILES=test
+
+          echo "🐳 Building and running services..."
+          docker compose --profile test up --build --abort-on-container-exit
+
+      - name: Clean up docker
+        working-directory: docker  # ✅ again, clean up in correct dir
+        run: |
+          echo "🧼 Cleaning up"
+          docker compose down --volumes --remove-orphans
