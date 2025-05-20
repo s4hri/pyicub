@@ -1,4 +1,5 @@
 services:
+
   pyicub:
     image: ${PYICUB_IMAGE_NAME}
     container_name: pyicub
@@ -9,7 +10,7 @@ services:
       args:
         DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
 
-    command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/entrypoint.sh"]
+    command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/run_env.sh"]
 
     stdin_open: true
     tty: true
@@ -39,9 +40,8 @@ services:
       - ${HOME}/.config/pulse/cookie:/run/pulse/cookie
       - ${XDG_RUNTIME_DIR:?err}/pulse:${XDG_RUNTIME_DIR:?err}/pulse
       - ${XDG_RUNTIME_DIR:?err}/dconf:${XDG_RUNTIME_DIR:?err}/dconf
-      - /home/dave/code/icub-entrypoint:/workspace/icub-entrypoint
 
-    profiles: ["backend", "test"]
+    profiles: ["backend"]
 
   pyicub-frontend:
     image: ${PYICUB_FRONTEND_IMAGE_NAME}
@@ -60,6 +60,38 @@ services:
       - pyicub-frontend-workspace:/workspace/pyicub-frontend
 
     profiles: ["frontend"]
+
+  pyicub-test:
+    image: ${PYICUB_IMAGE_NAME}
+    container_name: pyicub_test
+
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+      args:
+        DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
+
+    command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/run_tests.sh"]
+
+    stdin_open: true
+    tty: true
+    network_mode: host
+    privileged: true
+
+    runtime: ${DOCKER_RUNTIME:-runc}
+
+    env_file:
+      - .env
+
+    environment:
+      - DISPLAY=${DISPLAY:-99}
+      - NVIDIA_VISIBLE_DEVICES=${GPU_DEVICES:-none}
+      - NVIDIA_DRIVER_CAPABILITIES=all
+
+    volumes:
+      - pyicub-workspace:/workspace/pyicub
+
+    profiles: ["test"]
 
 volumes:
   pyicub-workspace:
