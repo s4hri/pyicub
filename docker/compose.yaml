@@ -73,18 +73,17 @@ services:
 
     command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/run_tests.sh"]
 
-    network_mode: bridge
+    network_mode: none
+
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
 
     env_file:
       - .env
 
-    environment:
-      - DISPLAY=${DISPLAY:-:0}
-      - NVIDIA_VISIBLE_DEVICES=${GPU_DEVICES:-none}
-      - NVIDIA_DRIVER_CAPABILITIES=all
-
     volumes:
       - pyicub-workspace:/workspace/pyicub
+      - /tmp/.X11-unix:/tmp/.X11-unix
 
     profiles: ["test"]
 

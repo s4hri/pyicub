@@ -8,11 +8,11 @@ start_local_yarprun >/dev/null 2>&1
 
 echo "Starting Gazebo simulation..."
 gzserver ${ICUB_APPS}/gazebo/icub-world.sdf >/dev/null 2>&1 &
-sleep 3
+sleep 5
 
 echo "Starting robot interface..."
 yarprobotinterface --context gazeboCartesianControl --config no_legs.xml --portprefix /iCubSim >/dev/null 2>&1 &
-sleep 3
+sleep 5
 
 echo "Running pytest..."
 cd /workspace/pyicub || exit 1
