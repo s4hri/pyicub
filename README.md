@@ -1,4 +1,4 @@
-![PYICUB logo](media/pyicub-logo.png?raw=true)
+PyiCub
 ====
 
 Introduction
@@ -8,7 +8,8 @@ Introduction
 
 Documentation
 --------------
-For usage examples, check out the [Examples Documentation](https://s4hri.github.io/pyicub/).
+The official documentation is available at [PyiCub Documentation](https://s4hri.github.io/pyicub-docs/).
+
 
 Requirements
 -------------
@@ -24,32 +25,23 @@ cd pyicub
 pip3 install .
 ```
 
-Quick start (using Docker)
+How to start (using Docker)
 -------------
-In order to simplify the installation procedure, we have containerized the
-essential requirements in a Docker image including YARP and icub-main.
-
-[PYICUB-LAB](https://github.com/s4hri/pyicub-lab) is a development platform
-for coding iCub applications in minutes! Try it now and leave your feedback!
+In order to simplify the installation procedure, we have containerized the essential requirements in a Docker image.
 
 ```
-git clone https://github.com/s4hri/pyicub-lab
-cd pyicub-lab
-bash go
+git clone https://github.com/s4hri/pyicub
+cd pyicub/docker
+bash build.sh
+bash run.sh
 ```
 
 How to test pyicub
 -------------
 
-To run the tests:
+To run the tests you can run this command from your host machine, levearing docker containers.
 
-Run pytest from the main directory:
     ```
-    pytest -v
+    cd pyicub/docker
+    COMPOSE_PROFILES=test ./run.sh
     ```
-
-
-Acknowledgments
--------------
-
-- pyicub logo inspired by [iCubArtwork](https://github.com/alecive/iCubArtwork)

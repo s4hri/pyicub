@@ -7,7 +7,6 @@
 
         <module>
           <name>yarpdev</name>
-          <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
           <parameters>--device opencv_grabber</parameters>
           <node>$ENV{ICUBSRV_NODE}</node>
         </module>

@@ -13,6 +13,6 @@ else
   export GPU_DEVICES=none
 fi
 
-docker compose up
+LOCAL_USER_UID=$(id -u) docker compose up
 
-docker compose down --remove-orphans
+LOCAL_USER_UID=$(id -u) docker compose down --remove-orphans

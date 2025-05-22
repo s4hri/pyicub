@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker compose build
+LOCAL_USER_UID=$(id -u) docker compose build

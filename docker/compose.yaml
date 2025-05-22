@@ -9,6 +9,8 @@ services:
       dockerfile: docker/Dockerfile.backend
       args:
         DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
+        LOCAL_USER_UID: ${LOCAL_USER_UID:-1000}
+        LOCAL_USER_NAME: ${LOCAL_USER_GID:-icub}
 
     command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/run_env.sh"]
 
@@ -36,6 +38,7 @@ services:
 
     volumes:
       - pyicub-workspace:/workspace/pyicub
+      - ./shared:/shared
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ${HOME}/.config/pulse/cookie:/run/pulse/cookie
       - ${XDG_RUNTIME_DIR:-/tmp}/pulse:${XDG_RUNTIME_DIR:-/tmp}/pulse
@@ -70,20 +73,19 @@ services:
       dockerfile: docker/Dockerfile.backend
       args:
         DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
+        LOCAL_USER_UID: ${LOCAL_USER_UID:-1000}
+        LOCAL_USER_NAME: ${LOCAL_USER_GID:-icub}
 
     command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/run_tests.sh"]
 
-    network_mode: none
-
     environment:
-      - DISPLAY=${DISPLAY:-:0}
+      - DISPLAY=:99
 
     env_file:
       - .env
 
     volumes:
-      - pyicub-workspace:/workspace/pyicub
-      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./shared:/shared
 
     profiles: ["test"]
 

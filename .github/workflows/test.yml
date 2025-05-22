@@ -19,12 +19,8 @@ jobs:
       - name: Run tests with Docker Compose
         working-directory: docker  # ✅ sets working dir for this step
         run: |
-          echo "🔧 Enabling BuildKit and setting test profile"
-          export DOCKER_BUILDKIT=1
-          export COMPOSE_PROFILES=test
-
           echo "🐳 Building and running services..."
-          docker compose --profile test up --build --abort-on-container-exit
+          COMPOSE_PROFILES=test ./run.sh
 
       - name: Clean up docker
         working-directory: docker  # ✅ again, clean up in correct dir

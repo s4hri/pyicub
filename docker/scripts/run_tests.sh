@@ -2,6 +2,10 @@
 
 source "$(dirname "$0")/common.sh"
 
+export DISPLAY=:99
+sudo Xvfb :99 -screen 0 1024x768x24 &
+sleep 1  # Give it time to start
+
 initialize_environment
 start_yarpserver >/dev/null 2>&1
 start_local_yarprun >/dev/null 2>&1
@@ -16,4 +20,5 @@ sleep 5
 
 echo "Running pytest..."
 cd /workspace/pyicub || exit 1
-pytest --html=/var/test-reports/report.html
+
+pytest --html=$PYTEST_OUTPUT_DIR/pytest_report.html
