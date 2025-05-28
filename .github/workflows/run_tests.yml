@@ -18,6 +18,7 @@ jobs:
         working-directory: docker
         run: |
           echo "Building and running services for testing..."
+          ./build.sh
           COMPOSE_PROFILES=test ./run.sh
 
       - name: Clean up docker
