@@ -1,0 +1,28 @@
+name: Run Tests
+
+on:
+  pull_request:
+    branches:
+      - release/8.3.0
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run tests with Docker Compose
+        working-directory: docker
+        run: |
+          echo "Building and running services for testing..."
+          ./build.sh
+          COMPOSE_PROFILES=test ./run.sh
+
+      - name: Clean up docker
+        working-directory: docker
+        run: |
+          echo "Cleaning up..."
+          docker compose down --volumes --remove-orphans
