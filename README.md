@@ -20,7 +20,7 @@ Requirements
 How to install the Python package
 -------------
 ```
-git clone https://github.com/s4hri/pyicub
+git clone git@github.com:s4hri/pyicub.git
 cd pyicub
 pip3 install .
 ```
@@ -30,7 +30,7 @@ How to start (using Docker)
 In order to simplify the installation procedure, we have containerized the essential requirements in a Docker image.
 
 ```
-git clone https://github.com/s4hri/pyicub
+git clone git@github.com:s4hri/pyicub.git
 cd pyicub/docker
 bash build.sh
 bash run.sh

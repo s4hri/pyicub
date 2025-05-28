@@ -9,6 +9,11 @@ initialize_environment() {
 
 start_yarpserver() {
   echo "Starting yarpserver..."
+  YARP_FORWARD_LOG_ENABLE=0 yarpserver --write
+}
+
+start_yarpserver_detached() {
+  echo "Starting yarpserver..."
   YARP_FORWARD_LOG_ENABLE=0 yarpserver --write &
   sleep 2
 }

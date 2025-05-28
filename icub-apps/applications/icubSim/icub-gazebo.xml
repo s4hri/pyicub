@@ -82,6 +82,26 @@
         <node>$ENV{ICUBSRV_NODE}</node>
     </module>
 
+    <module>
+        <name>iSpeak</name>
+        <parameters></parameters>
+        <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
+        <node>$ENV{ICUBSRV_HOST}</node>
+    </module>
+
+    <module>
+        <name>yarpdev</name>
+        <parameters>--device speech --lingware-context speech --default-language it-IT --pitch 120 --speed 100 --robot icubSim</parameters>
+        <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
+        <node>$ENV{ICUBSRV_HOST}</node>
+    </module>
+
+    <connection>
+        <from>/iSpeak/speech-dev/rpc</from>
+        <to>/icubSim/speech:rpc</to>
+        <protocol>tcp</protocol>
+    </connection>
+
     <connection>
         <from>/icubSim/cam/right/rgbImage:o</from>
         <to>/imageview</to>
