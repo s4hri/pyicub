@@ -79,7 +79,7 @@ services:
       - ${HOME}/.gitconfig:/home/icub/.gitconfig:ro
       - ${HOME}/.ssh:/home/icub/.ssh:ro
       - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
-
+      
     profiles: 
       - frontend
 
