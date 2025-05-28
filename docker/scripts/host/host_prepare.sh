@@ -3,6 +3,13 @@ set -e
 
 echo "Running host pre-launch configuration..."
 
+if [[ -n "$GITHUB_ACTIONS" ]]; then
+    echo "Running on GitHub Actions — skipping host setup."
+    export DOCKER_RUNTIME=runc
+    export GPU_DEVICES=none
+    return 0
+fi
+
 # Ensure PulseAudio is running
 if ! pactl info > /dev/null 2>&1; then
     echo "🟡 PulseAudio not running. Trying to start it..."

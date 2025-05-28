@@ -47,7 +47,7 @@ services:
       - ${XDG_RUNTIME_DIR:-/tmp}/dconf:${XDG_RUNTIME_DIR:-/tmp}/dconf
       - ${HOME}/.gitconfig:/home/icub/.gitconfig:ro
       - ${HOME}/.ssh:/home/icub/.ssh:ro
-      - ${SSH_AUTH_SOCK}:/ssh-agent
+      - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
 
     profiles: 
       - backend
@@ -78,7 +78,7 @@ services:
       - pyicub-frontend-workspace:/workspace/pyicub-frontend
       - ${HOME}/.gitconfig:/home/icub/.gitconfig:ro
       - ${HOME}/.ssh:/home/icub/.ssh:ro
-      - ${SSH_AUTH_SOCK}:/ssh-agent
+      - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
 
     profiles: 
       - frontend
