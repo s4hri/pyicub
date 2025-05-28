@@ -1,0 +1,24 @@
+ARG DOCKER_SRC=ubuntu:latest
+FROM $DOCKER_SRC
+
+WORKDIR /workspace
+
+ENV PATH=$PATH:/root/.local/bin
+
+COPY . /workspace/pyicub
+
+RUN cd /workspace/pyicub && \
+    pip3 install -r requirements.txt
+
+ARG PYICUB_APPS_URL=https://github.com/s4hri/pyicub-apps
+ARG PYICUB_APPS_BRANCH=master
+ARG PYICUB_APPS_VERSION=master
+
+RUN git clone ${PYICUB_APPS_URL} -b ${PYICUB_APPS_BRANCH} && \
+    cd pyicub-apps && \
+    git checkout ${PYICUB_APPS_VERSION} && \
+    make all
+
+ENV PYTHONPATH=/workspace/pyicub
+
+CMD ["bash"]

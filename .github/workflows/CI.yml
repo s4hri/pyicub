@@ -1,0 +1,59 @@
+name: Run Tests, Build, and Push pyicub Base Image
+
+on:
+  pull_request:
+    branches:
+      - release/8.3.0
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run tests with Docker Compose
+        working-directory: docker
+        run: |
+          echo "Building and running services for testing..."
+          COMPOSE_PROFILES=test ./run.sh
+
+      - name: Clean up docker
+        working-directory: docker
+        run: |
+          echo "Cleaning up..."
+          docker compose down --volumes --remove-orphans
+
+  build-and-push:
+    needs: test
+    if: success()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Load .env file variables
+        working-directory: docker
+        run: |
+          echo "Loading .env variables..."
+          export $(grep -v '^#' .env | xargs)
+
+          echo "PYICUB_IMAGE_NAME=${PYICUB_IMAGE_NAME}" >> $GITHUB_ENV
+
+      - name: Login to DockerHub
+        run: echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+
+      - name: Build pyicub base image
+        working-directory: docker
+        run: ./build.sh
+
+      - name: Push pyicub base image to Docker Hub
+        run: |
+          echo "Pushing image ${PYICUB_IMAGE_NAME}..."
+          docker push "${PYICUB_IMAGE_NAME}"
