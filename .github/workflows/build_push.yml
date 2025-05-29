@@ -31,6 +31,7 @@ jobs:
       - name: Build and Push Base Image
         working-directory: docker
         run: |
+          source .env
           ./build.sh
           docker push $PYICUB_IMAGE_NAME
           docker push $PYICUB_FRONTEND_IMAGE_NAME
