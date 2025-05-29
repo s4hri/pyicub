@@ -38,7 +38,7 @@ services:
       - SSH_AUTH_SOCK=/ssh-agent
 
     volumes:
-      - pyicub-workspace:/workspace/pyicub
+      - ../:/workspace/pyicub
       - yarp-config:/home/icub/.config/yarp
       - ./shared:/shared
       - /tmp/.X11-unix:/tmp/.X11-unix
@@ -49,7 +49,7 @@ services:
       - ${HOME}/.ssh:/home/icub/.ssh:ro
       - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
 
-    profiles: 
+    profiles:
       - backend
 
     depends_on:
@@ -79,8 +79,8 @@ services:
       - ${HOME}/.gitconfig:/home/icub/.gitconfig:ro
       - ${HOME}/.ssh:/home/icub/.ssh:ro
       - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
-      
-    profiles: 
+
+    profiles:
       - frontend
 
   pyicub-test:
@@ -98,11 +98,12 @@ services:
     volumes:
       - ./shared:/shared
 
-    profiles: 
+    profiles:
       - test
 
   pyicub.base:
     image: ${PYICUB_IMAGE_NAME}
+    container_name: pyicub-base
 
     build:
       context: ..
@@ -112,15 +113,13 @@ services:
 
     command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/container/run_servers.sh"]
 
-    profiles: 
+    profiles:
       - backend
 
     volumes:
       - yarp-config:/root/.config/yarp
 
 volumes:
-  pyicub-workspace:
-    name: pyicub-workspace
   pyicub-frontend-workspace:
     name: pyicub-frontend-workspace
   yarp-config:
