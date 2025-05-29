@@ -55,7 +55,7 @@ services:
     depends_on:
       - pyicub.base
 
-  pyicub-frontend:
+  pyicub.frontend:
     image: ${PYICUB_FRONTEND_IMAGE_NAME}
     container_name: pyicub-frontend
 
@@ -83,9 +83,9 @@ services:
     profiles:
       - frontend
 
-  pyicub-test:
+  pyicub.test:
     image: ${PYICUB_IMAGE_NAME}
-    container_name: pyicub_test
+    container_name: pyicub-test
 
     env_file:
       - .env
