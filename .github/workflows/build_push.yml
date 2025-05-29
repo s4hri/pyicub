@@ -32,6 +32,7 @@ jobs:
         working-directory: docker
         run: |
           source .env
-          ./build.sh
+          docker compose build pyicub.base
           docker push $PYICUB_IMAGE_NAME
+          docker compose build pyicub.frontend
           docker push $PYICUB_FRONTEND_IMAGE_NAME
