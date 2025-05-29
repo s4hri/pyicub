@@ -105,6 +105,9 @@ services:
     image: ${PYICUB_IMAGE_NAME}
     container_name: pyicub-base
 
+    env_file:
+      - .env
+
     build:
       context: ..
       dockerfile: docker/Dockerfile.pyicub
@@ -112,11 +115,15 @@ services:
         DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
 
     command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/container/run_servers.sh"]
+    
+    restart: "no"
+    network_mode: host
 
     profiles:
       - backend
 
     volumes:
+      - ../:/workspace/pyicub
       - yarp-config:/root/.config/yarp
 
 volumes:
