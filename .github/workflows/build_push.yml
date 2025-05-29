@@ -31,3 +31,4 @@ jobs:
         run: |
           ./build.sh
           docker push $PYICUB_IMAGE_NAME
+          docker push $PYICUB_FRONTEND_IMAGE_NAME
