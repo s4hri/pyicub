@@ -1,0 +1,20 @@
+FROM node:21
+
+ARG PYICUB_FRONTEND_URL=https://github.com/s4hri/pyicub-frontend
+ARG PYICUB_FRONTEND_VERSION=master
+ARG PYICUB_API_FRONTEND_PORT=9000
+
+ENV PYICUB_API_FRONTEND_PORT=${PYICUB_API_FRONTEND_PORT}
+
+RUN mkdir -p /app/pyicub-frontend
+WORKDIR /workspace/
+
+RUN git clone ${PYICUB_FRONTEND_URL} pyicub-frontend && \
+    cd pyicub-frontend && \
+    git checkout ${PYICUB_FRONTEND_VERSION}
+
+WORKDIR /workspace/pyicub-frontend
+
+RUN npm install
+
+CMD ["sh", "-c", "npm run production -- --port $PYICUB_API_FRONTEND_PORT"]

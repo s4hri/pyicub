@@ -1,0 +1,133 @@
+services:
+
+  pyicub:
+    image: ${PYICUB_IMAGE_NAME}.local
+    container_name: pyicub
+
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.pyicub.local
+      args:
+        DOCKER_SRC: ${PYICUB_IMAGE_NAME}
+        LOCAL_USER_UID: ${LOCAL_USER_UID:-1000}
+        LOCAL_USER_GID: ${LOCAL_USER_GID:-1000}
+
+    env_file:
+      - .env
+
+    command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/container/run_apps.sh"]
+
+    stdin_open: true
+    tty: true
+    network_mode: host
+    privileged: true
+
+    runtime: ${DOCKER_RUNTIME:-runc}
+
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+      - PULSE_SERVER=unix:${XDG_RUNTIME_DIR:-/tmp}/pulse/native
+      - PULSE_COOKIE=/run/pulse/cookie
+      - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/tmp}
+      - XDG_DATA_DIRS=${XDG_DATA_DIRS:-/usr/local/share:/usr/share}
+      - QT_X11_NO_MITSHM=1
+      - NO_AT_BRIDGE=1
+      - LIBGL_ALWAYS_SOFTWARE=false
+      - NVIDIA_VISIBLE_DEVICES=${GPU_DEVICES:-none}
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - SSH_AUTH_SOCK=/ssh-agent
+
+    volumes:
+      - ../:/workspace/pyicub
+      - yarp-config:/home/icub/.config/yarp
+      - ./shared:/shared
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${HOME}/.config/pulse/cookie:/run/pulse/cookie
+      - ${XDG_RUNTIME_DIR:-/tmp}/pulse:${XDG_RUNTIME_DIR:-/tmp}/pulse
+      - ${XDG_RUNTIME_DIR:-/tmp}/dconf:${XDG_RUNTIME_DIR:-/tmp}/dconf
+      - ${HOME}/.gitconfig:/home/icub/.gitconfig:ro
+      - ${HOME}/.ssh:/home/icub/.ssh:ro
+      - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
+
+    profiles:
+      - backend
+
+    depends_on:
+      - pyicub.base
+
+  pyicub-frontend:
+    image: ${PYICUB_FRONTEND_IMAGE_NAME}
+    container_name: pyicub-frontend
+
+    build:
+      context: .
+      dockerfile: Dockerfile.pyicub-frontend
+
+    env_file:
+      - .env
+
+    environment:
+      - SSH_AUTH_SOCK=/ssh-agent
+
+    network_mode: host
+
+    depends_on:
+      - pyicub
+
+    volumes:
+      - pyicub-frontend-workspace:/workspace/pyicub-frontend
+      - ${HOME}/.gitconfig:/home/icub/.gitconfig:ro
+      - ${HOME}/.ssh:/home/icub/.ssh:ro
+      - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
+
+    profiles:
+      - frontend
+
+  pyicub-test:
+    image: ${PYICUB_IMAGE_NAME}
+    container_name: pyicub_test
+
+    env_file:
+      - .env
+
+    command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/container/run_tests.sh"]
+
+    environment:
+      - DISPLAY=:99
+
+    volumes:
+      - ./shared:/shared
+
+    profiles:
+      - test
+
+  pyicub.base:
+    image: ${PYICUB_IMAGE_NAME}
+    container_name: pyicub-base
+
+    env_file:
+      - .env
+
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.pyicub
+      args:
+        DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
+
+    command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/container/run_servers.sh"]
+    
+    restart: "no"
+    network_mode: host
+
+    profiles:
+      - backend
+
+    volumes:
+      - ../:/workspace/pyicub
+      - yarp-config:/root/.config/yarp
+
+volumes:
+  pyicub-frontend-workspace:
+    name: pyicub-frontend-workspace
+  yarp-config:
+    name: yarp-config
