@@ -2,7 +2,7 @@
 
 set -e
 
-source "$(dirname "$0")/scripts/host/host_prepare.sh"
+source "$(dirname "$0")/setup.sh"
 
 LOCAL_USER_UID=$(id -u) LOCAL_USER_GID=$(id -g) docker compose up
 

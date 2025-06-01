@@ -19,6 +19,6 @@ yarprobotinterface --context gazeboCartesianControl --config no_legs.xml --portp
 sleep 5
 
 echo "Running pytest..."
-cd /workspace/pyicub || exit 1
+cd $ROBOT_CODE/pyicub || exit 1
 
 pytest --html=$PYTEST_OUTPUT_DIR/pytest_report.html

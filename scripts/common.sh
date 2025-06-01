@@ -24,6 +24,13 @@ start_local_yarprun() {
   sleep 2
 }
 
+start_icub_yarprun() {
+  echo -e "\n$ICUB_HOST is reachable. Starting remote yarprun..."
+  ssh icub@"$ICUB_HOST" \
+    "nohup yarprun --server /$ICUB_NODE --log &" &
+  sleep 2
+}
+
 wait_for_icub_host() {
   echo "Waiting for $ICUB_HOST to become reachable..."
   TIMEOUT=60
@@ -38,10 +45,6 @@ wait_for_icub_host() {
       exit 1
     fi
   done
-
-  echo -e "\n$ICUB_HOST is reachable. Starting remote yarprun..."
-  ssh icub@"$ICUB_HOST" \
-    "nohup yarprun --server /$ICUB_NODE --log &" &
 }
 
 cleanup_remote_processes() {
