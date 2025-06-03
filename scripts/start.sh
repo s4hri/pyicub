@@ -13,7 +13,9 @@ else
   echo "Running in simulation..."
 fi
 
-terminator 2>/dev/null &
+start_yarpserver_detached
+
+start_icub_yarprun
 
 start_local_yarprun
 

@@ -1,21 +1,22 @@
 services:
 
   pyicub:
-    image: ${PYICUB_IMAGE_NAME}.local
+    image: ${PYICUB_IMAGE_NAME}
     container_name: pyicub
 
     build:
       context: ..
-      dockerfile: docker/Dockerfile.pyicub.local
+      dockerfile: docker/Dockerfile.pyicub
       args:
-        DOCKER_SRC: ${PYICUB_IMAGE_NAME}
+        DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
         LOCAL_USER_UID: ${LOCAL_USER_UID:-1000}
         LOCAL_USER_GID: ${LOCAL_USER_GID:-1000}
+        WORKDIR: ${WORKDIR}
 
     env_file:
       - .env
 
-    command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/container/run_apps.sh"]
+    command: ["/bin/bash", "-c", "terminator 2>/dev/null & bash $WORKDIR/pyicub/scripts/start.sh"]
 
     stdin_open: true
     tty: true
@@ -38,8 +39,7 @@ services:
       - SSH_AUTH_SOCK=/ssh-agent
 
     volumes:
-      - ../:/workspace/pyicub
-      - yarp-config:/home/icub/.config/yarp
+      - ../:$WORKDIR/pyicub
       - ./shared:/shared
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ${HOME}/.config/pulse/cookie:/run/pulse/cookie
@@ -51,9 +51,6 @@ services:
 
     profiles:
       - backend
-
-    depends_on:
-      - pyicub.base
 
   pyicub.frontend:
     image: ${PYICUB_FRONTEND_IMAGE_NAME}
@@ -76,8 +73,8 @@ services:
 
     volumes:
       - pyicub-frontend-workspace:/workspace/pyicub-frontend
-      - ${HOME}/.gitconfig:/home/icub/.gitconfig:ro
-      - ${HOME}/.ssh:/home/icub/.ssh:ro
+      - ${HOME}/.gitconfig:/root/.gitconfig:ro
+      - ${HOME}/.ssh:/root/.ssh:ro
       - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
 
     profiles:
@@ -90,7 +87,7 @@ services:
     env_file:
       - .env
 
-    command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/container/run_tests.sh"]
+    command: ["/bin/bash", "-c", "bash $WORKDIR/pyicub/scripts/tests.sh"]
 
     environment:
       - DISPLAY=:99
@@ -101,33 +98,6 @@ services:
     profiles:
       - test
 
-  pyicub.base:
-    image: ${PYICUB_IMAGE_NAME}
-    container_name: pyicub-base
-
-    env_file:
-      - .env
-
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.pyicub
-      args:
-        DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
-
-    command: ["/bin/bash", "-c", "bash /workspace/pyicub/docker/scripts/container/run_servers.sh"]
-    
-    restart: "no"
-    network_mode: host
-
-    profiles:
-      - backend
-
-    volumes:
-      - ../:/workspace/pyicub
-      - yarp-config:/root/.config/yarp
-
 volumes:
   pyicub-frontend-workspace:
     name: pyicub-frontend-workspace
-  yarp-config:
-    name: yarp-config

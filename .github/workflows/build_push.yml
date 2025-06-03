@@ -7,7 +7,7 @@ on:
 env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-  
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -24,7 +24,7 @@ jobs:
         run: |
           echo "PYICUB_IMAGE_NAME=$(grep PYICUB_IMAGE_NAME .env | cut -d '=' -f2-)" >> $GITHUB_ENV
           echo "PYICUB_FRONTEND_IMAGE_NAME=$(grep PYICUB_FRONTEND_IMAGE_NAME .env | cut -d '=' -f2-)" >> $GITHUB_ENV
-          
+
       - name: Login to Docker registry
         run: echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
 
@@ -32,7 +32,7 @@ jobs:
         working-directory: docker
         run: |
           source .env
-          docker compose build pyicub.base
+          docker compose build pyicub
           docker push $PYICUB_IMAGE_NAME
           docker compose build pyicub.frontend
           docker push $PYICUB_FRONTEND_IMAGE_NAME
