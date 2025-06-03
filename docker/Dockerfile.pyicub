@@ -4,9 +4,9 @@ FROM $DOCKER_SRC
 ARG LOCAL_USER_UID=1000
 ARG LOCAL_USER_GID=1000
 ARG LOCAL_USER_NAME=icub
-ARG ROBOT_CODE="/usr/local/src/robot"
+ARG WORKDIR="/usr/local/src/robot"
 
-ENV ROBOT_CODE=$ROBOT_CODE
+ENV WORKDIR=$WORKDIR
 
 
 # Create group with specified GID
@@ -37,13 +37,13 @@ RUN if id "$LOCAL_USER_NAME" >/dev/null 2>&1; then \
     echo "$LOCAL_USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 
-WORKDIR ${ROBOT_CODE}
+WORKDIR ${WORKDIR}
 
 ENV PATH=$PATH:/home/${LOCAL_USER_NAME}/.local/bin
 
-COPY . $ROBOT_CODE/pyicub
+COPY . $WORKDIR/pyicub
 
-RUN cd $ROBOT_CODE/pyicub && \
+RUN cd $WORKDIR/pyicub && \
     pip3 install -r requirements.txt
 
 ARG PYICUB_APPS_URL=https://github.com/s4hri/pyicub-apps
@@ -55,12 +55,12 @@ RUN git clone ${PYICUB_APPS_URL} -b ${PYICUB_APPS_BRANCH} && \
     git checkout ${PYICUB_APPS_VERSION} && \
     make all
 
-ENV PYTHONPATH=$ROBOT_CODE/pyicub
+ENV PYTHONPATH=$WORKDIR/pyicub
 
 RUN echo "Fixing permissions for /home/$LOCAL_USER_NAME"; \
-    chown -R "$LOCAL_USER_UID:$LOCAL_USER_GID" "/home/$LOCAL_USER_NAME"
+    chown -R "$LOCAL_USER_UID:$LOCAL_USER_GID" "/home/$LOCAL_USER_NAME"; \
+    chown -R "$LOCAL_USER_UID:$LOCAL_USER_GID" $WORKDIR
 
 USER $LOCAL_USER_NAME
 
 CMD ["bash"]
-

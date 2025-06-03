@@ -11,12 +11,13 @@ services:
         DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
         LOCAL_USER_UID: ${LOCAL_USER_UID:-1000}
         LOCAL_USER_GID: ${LOCAL_USER_GID:-1000}
+        WORKDIR: ${WORKDIR}
 
     env_file:
       - .env
 
-    command: ["/bin/bash", "-c", "terminator 2>/dev/null & bash $ROBOT_CODE/pyicub/scripts/start.sh"]
-    
+    command: ["/bin/bash", "-c", "terminator 2>/dev/null & bash $WORKDIR/pyicub/scripts/start.sh"]
+
     stdin_open: true
     tty: true
     network_mode: host
@@ -38,7 +39,7 @@ services:
       - SSH_AUTH_SOCK=/ssh-agent
 
     volumes:
-      - ../:$ROBOT_CODE/pyicub
+      - ../:$WORKDIR/pyicub
       - ./shared:/shared
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ${HOME}/.config/pulse/cookie:/run/pulse/cookie
@@ -86,7 +87,7 @@ services:
     env_file:
       - .env
 
-    command: ["/bin/bash", "-c", "bash $ROBOT_CODE/pyicub/scripts/tests.sh"]
+    command: ["/bin/bash", "-c", "bash $WORKDIR/pyicub/scripts/tests.sh"]
 
     environment:
       - DISPLAY=:99
