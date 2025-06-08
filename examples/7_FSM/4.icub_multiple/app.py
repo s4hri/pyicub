@@ -67,6 +67,7 @@ class MultipleFSM(iCubRESTApp):
 
     def configure(self, input_args):
         machine_id = int(input_args['machine_id'])
+
         if machine_id == 1:
             self.setFSM(self.FSM_A)
         elif machine_id == 2:

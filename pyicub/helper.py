@@ -250,6 +250,18 @@ class iCub(metaclass=iCubSingleton):
     def addAction(self, action: iCubFullbodyAction, action_id=None):
         action_id = self.actions_manager.addAction(action, action_id=action_id)
         return action_id
+    
+    def deleteAction(self, action_id: str):
+        if action_id in self.actions_manager.getActions():
+            self.actions_manager.deleteAction(action_id)
+            return True
+        else:
+            self._logger_.error('Action <%s> not found!' % action_id)
+            return False
+        
+    def flushActions(self, name_prefix=None):
+        self.actions_manager.flushActions(name_prefix=name_prefix)
+        return True
 
     def exists(self):
         return len(self._position_controllers_.keys()) > 0

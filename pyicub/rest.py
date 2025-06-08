@@ -743,12 +743,13 @@ class iCubRESTApp(PyiCubRESTfulServer):
     
     def __configure__(self, input_args: dict):
         self.setArgs(input_args)
+        self.flushActions(name_prefix=self.name)
         self.configure(input_args)
         if self.fsm:
             for action in self.fsm.actions.values():
                 self.importAction(action, name_prefix=self.name + '.' + self.fsm.name)
         return True
-
+        
     def configure(self, input_args):
         return {}
 
@@ -772,6 +773,7 @@ class iCubRESTApp(PyiCubRESTfulServer):
             self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.playAction, target_name='actions.playAction')
             self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.getActions, target_name='actions.getActions')
             self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.importActionFromJSONDict, target_name='actions.importAction')
+            self.__register_method__(robot_name=self.__robot_name__, app_name=app_name, method=self.flushActions, target_name='actions.flushActions')
         if self.icub.gaze:
             self.__register_class__(robot_name=self.__robot_name__, app_name=app_name, cls=self.icub.gaze, class_name='gaze')
         if self.icub.speech:
@@ -808,6 +810,17 @@ class iCubRESTApp(PyiCubRESTfulServer):
             res = requests.get(res.json())
             action_id = res.json()['retval']
         return action_id
+    
+    def deleteAction(self, action_id: str):
+        if self.icub:
+            req = self.icub.deleteAction(action_id=action_id)
+            return 
+        else:
+            data = {}
+            data['action_id'] = action_id
+            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/actions.deleteAction'
+            res = requests.post(url=url, json=data)
+            return res.json()
 
     def playAction(self, action_id: str, wait_for_completed=True):
         if self.icub:
@@ -834,6 +847,19 @@ class iCubRESTApp(PyiCubRESTfulServer):
             name_prefix = self.__class__.__name__        
         json_dict = json.loads(action.toJSON())
         return self.importActionFromJSONDict(JSON_dict=json_dict, name_prefix=name_prefix)
+
+    def flushActions(self, name_prefix=None):
+        if not name_prefix:
+            name_prefix = self.__class__.__name__
+        if self.icub:
+            self.icub.flushActions(name_prefix=name_prefix)
+            return True
+        else:
+            data = {}
+            data['name_prefix'] = name_prefix
+            url = self.rest_manager.proxy_rule() + '/' + self.__robot_name__ + '/helper/actions.flushActions'
+            res = requests.post(url=url, json=data)
+            return res.json()
 
     @property
     def icub(self):

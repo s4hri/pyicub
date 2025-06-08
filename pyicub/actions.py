@@ -364,6 +364,20 @@ class ActionsManager:
             raise Exception("An error occurred adding a new action! Class name '%s' already present! Please choose different names for each class actions." % action_id)
         self.__actions__[action_id] = action
         return action_id
+    
+    def deleteAction(self, action_id: str):
+        if action_id in self.__actions__.keys():
+            del self.__actions__[action_id]
+        else:
+            raise Exception("action_id '%s' not found! Please provide an action identifier previously imported!" % action_id)
+        
+    def flushActions(self, name_prefix=None):
+        if name_prefix:
+            keys_to_delete = [k for k in self.__actions__.keys() if k.startswith(name_prefix)]
+            for k in keys_to_delete:
+                del self.__actions__[k]
+        else:
+            self.__actions__.clear()
 
     def importActionsFromModule(self, module):
         actions = self.__instantiate_actions__(module)
