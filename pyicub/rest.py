@@ -1005,7 +1005,7 @@ class iCubFSM(FSM):
                 "session_count": self._session_count_,
                 "actions": self._actions_
             }
-        data = json.dumps(data, default=lambda o: o.__dict__, indent=4)
+        data = json.dumps(data, default=lambda o: o.__dict__, indent=4, ensure_ascii=False)
         exportJSONFile(filepath, data)
    
 class PyiCubRESTfulClient:

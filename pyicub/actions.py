@@ -69,7 +69,7 @@ class PyiCubCustomCall:
         self.args = args
 
     def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, indent=4)
+        return json.dumps(self, default=lambda o: o.__dict__, indent=4, ensure_ascii=False)
 
 class GazeMotion:
     def __init__(self, lookat_method: str):
@@ -166,7 +166,7 @@ class iCubFullbodyStep:
         self.gaze_motion = gaze_motion
 
     def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, indent=4)
+        return json.dumps(self, default=lambda o: o.__dict__, indent=4, ensure_ascii=False)
 
 
 class iCubFullbodyAction:
@@ -225,7 +225,7 @@ class iCubFullbodyAction:
         self.offset_ms = offset_ms
 
     def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, indent=4)
+        return json.dumps(self, default=lambda o: o.__dict__, indent=4, ensure_ascii=False)
 
 
 class TemplateParameter:
@@ -245,8 +245,7 @@ class TemplateParameter:
         exportJSONFile(filepath, self.toJSON() )
 
     def toJSON(self):
-        #return self._param_
-        return json.dumps(self._param_, default=lambda o: o.__dict__, indent=4)
+        return json.dumps(self._param_, default=lambda o: o.__dict__, indent=4, ensure_ascii=False)
 
 class iCubActionTemplate(iCubFullbodyAction):
 
