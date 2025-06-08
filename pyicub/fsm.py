@@ -58,7 +58,7 @@ class FSM:
         self.get_graph().draw(filepath, prog='dot')       
     
     def exportJSONFile(self, filepath):
-        data = json.dumps(self.toJSON(), default=lambda o: o.__dict__, indent=4)
+        data = json.dumps(self.toJSON(), default=lambda o: o.__dict__, indent=4, ensure_ascii=False)
         exportJSONFile(filepath, data)
 
     def getCurrentState(self):
