@@ -28,8 +28,9 @@
 
 from pyicub.rest import iCubRESTApp, iCubFSM
 from pyicub.actions import iCubFullbodyAction
+from pyicub.fsm import FSM
 
-import os
+logger = FSM.getLogger()
 
 app = iCubRESTApp()
 
@@ -40,9 +41,10 @@ fsm = iCubFSM()
 head_state = fsm.addAction(head_action)
 lookat_state = fsm.addAction(lookat_action)
 
-fsm.addTransition("start", iCubFSM.INIT_STATE, head_state)
-fsm.addTransition("next", head_state, lookat_state)
-fsm.addTransition("reset", lookat_state, iCubFSM.INIT_STATE)
+fsm.addTransition(iCubFSM.INIT_STATE, head_state)
+fsm.addTransition(head_state, lookat_state)
+fsm.addTransition(lookat_state, head_state)
+fsm.addTransition(lookat_state, iCubFSM.INIT_STATE)
 
 fsm.draw('diagram.png')
 fsm.exportJSONFile('fsm.json')

@@ -3,35 +3,35 @@
     "states": [
         {
             "name": "RED",
-            "description": ""
+            "description": null
         },
         {
             "name": "YELLOW",
-            "description": ""
+            "description": null
         },
         {
             "name": "GREEN",
-            "description": ""
+            "description": null
         }
     ],
     "transitions": [
         {
-            "trigger": "start",
+            "trigger": "init>RED",
             "source": "init",
             "dest": "RED"
         },
         {
-            "trigger": "go",
+            "trigger": "RED>GREEN",
             "source": "RED",
             "dest": "GREEN"
         },
         {
-            "trigger": "slowdown",
+            "trigger": "GREEN>YELLOW",
             "source": "GREEN",
             "dest": "YELLOW"
         },
         {
-            "trigger": "stop",
+            "trigger": "YELLOW>init",
             "source": "YELLOW",
             "dest": "init"
         }

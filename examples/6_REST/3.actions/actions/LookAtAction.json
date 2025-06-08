@@ -50,6 +50,6 @@
         true
     ],
     "name": "LookAtAction",
-    "description": "empty",
+    "description": null,
     "offset_ms": null
 }

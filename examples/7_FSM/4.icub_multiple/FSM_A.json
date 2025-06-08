@@ -3,19 +3,17 @@
     "states": [
         {
             "name": "LookAtAction",
-            "description": "empty"
+            "description": null
         }
     ],
     "transitions": [
         {
-            "trigger": "start",
+            "trigger": "init>LookAtAction",
             "source": "init",
             "dest": "LookAtAction"
         }
     ],
     "initial_state": "init",
-    "session_id": 0,
-    "session_count": 0,
     "actions": {
         "LookAtAction": {
             "steps": [
@@ -69,7 +67,7 @@
                 true
             ],
             "name": "LookAtAction",
-            "description": "empty",
+            "description": null,
             "offset_ms": null
         }
     }

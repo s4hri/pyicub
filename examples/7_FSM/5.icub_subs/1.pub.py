@@ -27,7 +27,60 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from pyicub.rest import iCubRESTApp, iCubFSM
-import os
+from pyicub.helper import iCubFullbodyStep, iCubFullbodyAction
+
+
+class LookUp(iCubFullbodyStep):
+
+    def prepare(self):
+        g1 = self.createGazeMotion("lookAtFixationPoint")
+        g1.addCheckpoint([-1.0, -0.5, 1.0])
+
+class LookDown(iCubFullbodyStep):
+
+    def prepare(self):
+        g1 = self.createGazeMotion("lookAtFixationPoint")
+        g1.addCheckpoint([-1.0, 0.2, 0.1])
+
+class LookHome(iCubFullbodyStep):
+
+    def prepare(self):
+        g2 = self.createGazeMotion("lookAtAbsAngles")
+        g2.addCheckpoint([0.0, 0.0, 0.0, True, 1.5])
+
+class LookUpAction(iCubFullbodyAction):
+
+    def prepare(self):
+        self.addStep(LookUp())
+
+class LookDownAction(iCubFullbodyAction):
+
+    def prepare(self):
+        self.addStep(LookDown())
+
+class LookHomeAction(iCubFullbodyAction):
+    def prepare(self):
+        self.addStep(LookHome())
+
+
+
+action_up = LookUpAction()
+action_down = LookDownAction()
+action_home = LookHomeAction()
+
+fsm = iCubFSM()
+lookup_state = fsm.addAction(action_up)
+lookdown_state = fsm.addAction(action_down)
+lookhome_state = fsm.addAction(action_home)
+
+fsm.addTransition(iCubFSM.INIT_STATE, lookup_state)
+fsm.addTransition(lookup_state, lookdown_state)
+fsm.addTransition(lookdown_state, lookhome_state)
+fsm.addTransition(lookhome_state, iCubFSM.INIT_STATE)
+
+fsm.draw('diagram.png')
+fsm.exportJSONFile('fsm.json')
+
 
 class Publisher(iCubRESTApp):
 
@@ -36,7 +89,6 @@ class Publisher(iCubRESTApp):
         iCubRESTApp.__init__(self)
 
     def configure(self, input_args):
-        print("configuring....") 
         self.setFSM(self.myFSM)
 
 app = Publisher()

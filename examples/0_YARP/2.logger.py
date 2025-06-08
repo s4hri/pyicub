@@ -32,7 +32,9 @@ class Writer:
 if __name__ == '__main__':
 
     yarp.Network.init()
-    mylog = YarpLogger.getLogger() # PyicubLogger.getLogger()
+    mylog = YarpLogger.getLogger() 
+    #mylog = PyicubLogger.getLogger()
+
     writer = Writer(logger=mylog)
     mylog.info("init WRITER")
     reader = Reader(logger=mylog)

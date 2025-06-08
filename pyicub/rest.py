@@ -735,19 +735,21 @@ class iCubRESTApp(PyiCubRESTfulServer):
             self.__icub__ = iCub(robot_name=robot_name, request_manager=self.request_manager, proxy_host=self.rest_manager.proxy_host)
             if self.__icub__.exists():
                 self.__register_icub_helper__()
-        
-        if action_repository_path:
-            self.importActions(path=action_repository_path)
+
+        if self.__action_repository__:
+            self.importActions(path=self.__action_repository__)
 
         self.__configure__(input_args=self.__args__)
     
     def __configure__(self, input_args: dict):
         self.setArgs(input_args)
-        self.flushActions(name_prefix=self.name)
+        
         self.configure(input_args)
         if self.fsm:
+            self.flushActions(name_prefix=self.name + '.FSM')
             for action in self.fsm.actions.values():
                 self.importAction(action, name_prefix=self.name + '.' + self.fsm.name)
+        
         return True
         
     def configure(self, input_args):
@@ -892,10 +894,11 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
         fsm_name = res.json()['name']
         trigger = args["input_json"]["trigger"]
         state = self.__triggers__[trigger]
+        state_count = res.json()['states_count'][state]
         if not state == FSM.INIT_STATE:
             if state == self.__root_state__:
                 self.on_enter_fsm(fsm_name=fsm_name, session_id=session_id, session_count=session_count)
-            self.on_enter_state(fsm_name=fsm_name, session_id=session_id, session_count=session_count, state_name=state)
+            self.on_enter_state(fsm_name=fsm_name, session_id=session_id, session_count=session_count, state_name=state, state_count=state_count)            
 
 
     def __on_exit_state__(self, args):
@@ -905,8 +908,9 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
         fsm_name = res.json()['name']
         trigger = args["input_json"]["trigger"]
         state = self.__triggers__[trigger]
+        state_count = res.json()['states_count'][state]
         if not state == FSM.INIT_STATE:
-            self.on_exit_state(fsm_name=fsm_name, session_id=session_id, session_count=session_count, state_name=state)
+            self.on_exit_state(fsm_name=fsm_name, session_id=session_id, session_count=session_count, state_name=state, state_count=state_count)
             if state in self.__leaf_states__:
                 self.on_exit_fsm(fsm_name=fsm_name, session_id=session_id, session_count=session_count)
 
@@ -932,10 +936,10 @@ class RESTSubscriberFSM(iCubRESTSubscriber):
         self.subscribe_topic(topic_uri=topic_uri, on_enter=self.__on_enter_state__, on_exit=self.__on_exit_state__)
         self.refresh_targets()
 
-    def on_enter_state(self, fsm_name, session_id, session_count, state_name):
+    def on_enter_state(self, fsm_name, session_id, session_count, state_name, state_count):
         raise Exception("Method iCubRESTSubscriberFSM.on_enter_state is not implemented!")
 
-    def on_exit_state(self, fsm_name, session_id, session_count, state_name):
+    def on_exit_state(self, fsm_name, session_id, session_count, state_name, state_count):
         raise Exception("Method iCubRESTSubscriberFSM.on_exit_state is not implemented!")
 
     def on_enter_fsm(self, fsm_name, session_id, session_count):
@@ -978,19 +982,14 @@ class iCubFSM(FSM):
 
 
     def importFromJSONDict(self, data):
-        name = data.get("name", "")
-        states = data.get("states", [])
         transitions = data.get("transitions", [])
         actions = data.get("actions", {})
 
-        for state_data in states:
-            self.addState(name=state_data["name"], description=state_data["description"], on_enter_callback=self.__on_enter_action__)
-
-        for transition_data in transitions:
-            self.addTransition(trigger=transition_data["trigger"], source=transition_data["source"], dest=transition_data["dest"])
-
         for action in actions.values():
             self.addAction(iCubFullbodyAction(JSON_dict=action))
+
+        for transition_data in transitions:
+            self.addTransition(source=transition_data["source"], dest=transition_data["dest"], trigger=transition_data["trigger"])
 
         initial_state = data.get("initial_state", FSM.INIT_STATE)
         self._machine_.set_state(initial_state)
@@ -1001,8 +1000,6 @@ class iCubFSM(FSM):
                 "states": self._states_,
                 "transitions": self._transitions_,
                 "initial_state": self._machine_.initial,
-                "session_id": self._session_id_,
-                "session_count": self._session_count_,
                 "actions": self._actions_
             }
         data = json.dumps(data, default=lambda o: o.__dict__, indent=4, ensure_ascii=False)

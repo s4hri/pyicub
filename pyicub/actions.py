@@ -171,7 +171,7 @@ class iCubFullbodyStep:
 
 class iCubFullbodyAction:
 
-    def __init__(self, description='empty', name=None, offset_ms=None, JSON_dict=None, JSON_file=None):
+    def __init__(self, description=None, name=None, offset_ms=None, JSON_dict=None, JSON_file=None):
         self.steps = []
         self.wait_for_steps = []
         if not name:
@@ -249,7 +249,7 @@ class TemplateParameter:
 
 class iCubActionTemplate(iCubFullbodyAction):
 
-    def __init__(self, name='TemplateAction', description='empty', offset_ms=None):
+    def __init__(self, name='TemplateAction', description=None, offset_ms=None):
         self.name = name
         self.params = {}
         self.prepare_params()
