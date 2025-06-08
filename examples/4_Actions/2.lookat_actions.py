@@ -50,6 +50,7 @@ class LookAtAction(iCubFullbodyAction):
         self.addStep(Step1())
         self.addStep(Step2())
 
+
 action = LookAtAction()
 icub = iCub()
 action_id = icub.addAction(action)

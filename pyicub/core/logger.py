@@ -80,6 +80,7 @@ class YarpLogger(_Logger):
         self._yarp_logger = yarp.Log("",0,"") #FIXME: without params I get segfault
         self._logger = self._yarp_logger
 
+
 class PyicubLogger(_Logger):
 
     @staticmethod
@@ -88,13 +89,21 @@ class PyicubLogger(_Logger):
             PyicubLogger()
         return PyicubLogger._instance
 
-    FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+    FORMAT = '[%(levelname)s] %(message)s'
     FORMAT_VERBOSE = '%(asctime)s - %(levelname)s - %(module)s - %(process)d - %(thread)d - %(message)s'
+
     FORMAT_JSON = '{"asctime": "%(asctime)-15s", "created": %(created)f, "relativeCreated": %(relativeCreated)f, "levelname": "%(levelname)s", "module": "%(module)s", "process": %(process)d, "processName": "%(processName)s", "thread": %(thread)d, "threadName": "%(threadName)s", "message": "%(message)s"}'
-    LOGGING_LEVEL = logging.WARNING
+    LOGGING_LEVEL = logging.DEBUG
 
     def __init__(self):
         _Logger.__init__(self)
+        print("Initializing PyicubLogger")
+        self.configure(
+            logging_level=self.LOGGING_LEVEL,
+            logging_format=self.FORMAT,
+            logging_file=False,
+            logging_path='.'
+        )
 
     def configure(self, logging_level, logging_format, logging_file=False, logging_path='.'):
         self._logging_level = logging_level

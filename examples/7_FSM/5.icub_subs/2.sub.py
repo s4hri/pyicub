@@ -31,11 +31,11 @@ from pyicub.rest import RESTSubscriberFSM
 
 class Subscriber(RESTSubscriberFSM):
 
-    def on_enter_state(self, fsm_name, session_id, session_count, state_name):
-        print("on enter state: ", fsm_name, session_id, session_count, state_name)
+    def on_enter_state(self, fsm_name, session_id, session_count, state_name, state_count):
+        print("on enter state: ", fsm_name, session_id, session_count, state_name, state_count)
 
-    def on_exit_state(self, fsm_name, session_id, session_count, state_name):
-        print("on exit state: ", fsm_name, session_id, session_count, state_name)
+    def on_exit_state(self, fsm_name, session_id, session_count, state_name, state_count):
+        print("on exit state: ", fsm_name, session_id, session_count, state_name, state_count)
 
     def on_enter_fsm(self, fsm_name, session_id, session_count):
         print("on enter fsm: ", fsm_name, session_id, session_count)

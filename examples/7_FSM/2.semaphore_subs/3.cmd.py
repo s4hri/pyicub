@@ -34,7 +34,7 @@ client = PyiCubRESTfulClient(host='localhost', port=9001)
 
 print("PyiCub ver: ", client.get_version())
 
-triggers = ["start", "go", "slowdown", "stop"]
+triggers = ["init>RED", "RED>GREEN", "GREEN>YELLOW", "YELLOW>init"]
 
 while True:
     input("Press ENTER to run the FSM (CTRL+C to exit): ")

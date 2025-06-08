@@ -3,26 +3,31 @@
     "states": [
         {
             "name": "HeadAction",
-            "description": "empty"
+            "description": null
         },
         {
             "name": "LookAtAction",
-            "description": "empty"
+            "description": null
         }
     ],
     "transitions": [
         {
-            "trigger": "start",
+            "trigger": "init>HeadAction",
             "source": "init",
             "dest": "HeadAction"
         },
         {
-            "trigger": "next",
+            "trigger": "HeadAction>LookAtAction",
             "source": "HeadAction",
             "dest": "LookAtAction"
         },
         {
-            "trigger": "reset",
+            "trigger": "LookAtAction>HeadAction",
+            "source": "LookAtAction",
+            "dest": "HeadAction"
+        },
+        {
+            "trigger": "LookAtAction>init",
             "source": "LookAtAction",
             "dest": "init"
         }
@@ -161,7 +166,7 @@
                 true
             ],
             "name": "HeadAction",
-            "description": "empty",
+            "description": null,
             "offset_ms": null
         },
         "LookAtAction": {
@@ -216,7 +221,7 @@
                 true
             ],
             "name": "LookAtAction",
-            "description": "empty",
+            "description": null,
             "offset_ms": null
         }
     }

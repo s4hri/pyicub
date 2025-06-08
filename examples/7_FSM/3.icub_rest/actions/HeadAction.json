@@ -128,6 +128,6 @@
         true
     ],
     "name": "HeadAction",
-    "description": "empty",
+    "description": null,
     "offset_ms": null
 }

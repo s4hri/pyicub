@@ -28,12 +28,10 @@
 
 from pyicub.rest import PyiCubRESTfulServer
 from pyicub.fsm import FSM
-from datetime import date
 
 import time
-import logging
 
-logger = logging.getLogger("FSM/SEMAPHORE")
+logger = FSM.getLogger()
 
 class Semaphore(FSM):
 
@@ -43,10 +41,10 @@ class Semaphore(FSM):
         self.addState(name="YELLOW", on_enter_callback=self.on_YELLOW)
         self.addState(name="GREEN", on_enter_callback=self.on_GREEN)
 
-        self.addTransition("start", "init", "RED")
-        self.addTransition("go", "RED", "GREEN")
-        self.addTransition("slowdown", "GREEN", "YELLOW")
-        self.addTransition("stop", "YELLOW", "init")
+        self.addTransition(FSM.INIT_STATE, "RED")
+        self.addTransition("RED", "GREEN")
+        self.addTransition("GREEN", "YELLOW")
+        self.addTransition("YELLOW", FSM.INIT_STATE)
 
     def on_RED(self, msg='default', wait_time=6):
         logger.info("RED STATE: Stop! Received msg: %s" % msg)

@@ -27,12 +27,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from pyicub.fsm import FSM
-import enum
 import time
 import random
-import logging
 
-logger = logging.getLogger("fsm")
+logger = FSM.getLogger()
 
 def on_RED(data):
     logger.info("Stop!")
@@ -53,18 +51,17 @@ fsm.addState(name="YELLOW", on_enter_callback=on_YELLOW)
 fsm.addState(name="GREEN", on_enter_callback=on_GREEN)
 
 # The initial state is always "init"
-fsm.addTransition(trigger="start", source="init", dest="RED")
-fsm.addTransition(trigger="go", source="RED", dest="GREEN")
-fsm.addTransition(trigger="slowdown", source="GREEN", dest="YELLOW")
-fsm.addTransition(trigger="stop", source="YELLOW", dest="init")
+fsm.addTransition(FSM.INIT_STATE, dest="RED")
+fsm.addTransition(source="RED", dest="GREEN")
+fsm.addTransition(source="GREEN", dest="YELLOW")
+fsm.addTransition(source="YELLOW", dest=FSM.INIT_STATE)
 
 fsm.draw('diagram.png')
 
 for i in range(3):
-    triggers = ["start", "go", "slowdown", "stop"]
-    for trigger in triggers:
+    for trigger in fsm.triggers:
         fsm.runStep(trigger, data=random.randrange(1,2))
-    print("Session Count: ", fsm.getSessionCount())
+    logger.info("Session Count: %d" % fsm.getSessionCount())
 
 print("\nSTATES: ", fsm.getStates())
 print("\nTRANSITIONS: ", fsm.getTransitions())

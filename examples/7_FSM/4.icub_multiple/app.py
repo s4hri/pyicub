@@ -28,6 +28,7 @@
 
 from pyicub.rest import iCubRESTApp, iCubFSM
 from pyicub.actions import iCubFullbodyAction
+from pyicub.fsm import FSM
 import os
 
 
@@ -39,7 +40,7 @@ class FSM_A(iCubFSM):
     def __init__(self):
         iCubFSM.__init__(self)
         lookat_state = self.addAction(lookat_action)
-        self.addTransition("start", "init", lookat_state)
+        self.addTransition(FSM.INIT_STATE, lookat_state)
         self.exportJSONFile("FSM_A.json")
         self.draw("FSM_A.png")
 
@@ -50,9 +51,9 @@ class FSM_B(iCubFSM):
         iCubFSM.__init__(self)
         head_state = self.addAction(head_action)
         lookat_state = self.addAction(lookat_action)
-        self.addTransition("start", "init", head_state)
-        self.addTransition("next", head_state, lookat_state)
-        self.addTransition("reset", lookat_state, "init")
+        self.addTransition(FSM.INIT_STATE, head_state)
+        self.addTransition(head_state, lookat_state)
+        self.addTransition(lookat_state, FSM.INIT_STATE)
         self.exportJSONFile("FSM_B.json")
         self.draw("FSM_B.png")
 
