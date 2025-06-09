@@ -747,6 +747,7 @@ class iCubRESTApp(PyiCubRESTfulServer):
         self.configure(input_args)
         if self.fsm:
             self.flushActions(name_prefix=self.name + '.FSM')
+            self.flushActions(name_prefix=self.name + '.iCubFSM')
             for action in self.fsm.actions.values():
                 self.importAction(action, name_prefix=self.name + '.' + self.fsm.name)
         

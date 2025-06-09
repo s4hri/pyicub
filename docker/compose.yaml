@@ -72,7 +72,7 @@ services:
       - pyicub
 
     volumes:
-      - pyicub-frontend-workspace:/workspace/pyicub-frontend
+      - pyicub-frontend-workspace:${WORKDIR}/pyicub-frontend
       - ${HOME}/.gitconfig:/root/.gitconfig:ro
       - ${HOME}/.ssh:/root/.ssh:ro
       - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent

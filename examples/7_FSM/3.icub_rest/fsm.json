@@ -3,7 +3,7 @@
     "states": [
         {
             "name": "HeadAction",
-            "description": null
+            "description": "Hey hey"
         },
         {
             "name": "LookAtAction",
@@ -33,8 +33,6 @@
         }
     ],
     "initial_state": "init",
-    "session_id": 0,
-    "session_count": 0,
     "actions": {
         "HeadAction": {
             "steps": [
@@ -166,7 +164,7 @@
                 true
             ],
             "name": "HeadAction",
-            "description": null,
+            "description": "Hey hey",
             "offset_ms": null
         },
         "LookAtAction": {
