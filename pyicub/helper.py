@@ -38,6 +38,7 @@ from pyicub.modules.face import facePyCtrl
 from pyicub.modules.faceLandmarks import faceLandmarksPyCtrl
 from pyicub.modules.camera import cameraPyCtrl
 from pyicub.modules.attention import VisualAttention
+from pyicub.modules.llm import iGPT
 from pyicub.core.ports import BufferedReadPort
 from pyicub.core.logger import PyicubLogger, YarpLogger
 from pyicub.requests import iCubRequest, iCubRequestsManager
@@ -78,6 +79,7 @@ class iCub(metaclass=iCubSingleton):
         self._cam_right_              = None
         self._cam_left_               = None
         self._attention_              = None
+        self._gpt_                   = None
         self._monitors_               = []
         self._logger_                 = PyicubLogger.getLogger() #YarpLogger.getLogger()
         self._request_manager_        = request_manager
@@ -232,6 +234,12 @@ class iCub(metaclass=iCubSingleton):
         if self._attention_ is None:
             self._attention_ = VisualAttention(self.gaze)
         return self._attention_
+
+    @property
+    def gpt(self):
+        if self._gpt_ is None:
+            self._gpt_ = iGPT()
+        return self._gpt_
 
     @property
     def parts(self):
