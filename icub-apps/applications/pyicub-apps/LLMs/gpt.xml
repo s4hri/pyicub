@@ -9,4 +9,10 @@
         <environment>AZURE_API_KEY=$ENV{AZURE_API_KEY}</environment>
     </module>
 
+    <connection>
+		<from>/GPT/text:o</from>
+		<to>/iSpeak</to>
+		<protocol>tcp</protocol>
+	</connection>
+
 </application>
