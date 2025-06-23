@@ -170,6 +170,8 @@ class PositionController:
     WAITMOTIONDONE_PERIOD = 0.02
     MOTION_COMPLETE_AT = 0.90
 
+    SPEED_SCALING = 1.0
+
     def __init__(self, robot_name, part, logger):
         """
         Initializes the position controller.
@@ -278,6 +280,9 @@ class PositionController:
         float
             The time taken to complete the motion.
         """
+
+        joints_speed = [int(s*self.SPEED_SCALING) for s in joints_speed]
+
         disp  = [0]*len(joints_list)
         speeds = [0]*len(joints_list)
         times = [0]*len(joints_list)
