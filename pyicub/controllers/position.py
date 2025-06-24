@@ -283,7 +283,7 @@ class PositionController:
 
         # assert syntax: 
         #   assert condition, error_msg         OK
-        #   assert(condition, error_msg)        KO (`condition`` is ALWAYS TRUE!)
+        #   assert(condition, error_msg)        KO (assertion is ALWAYS TRUE!)
         # See https://stackoverflow.com/questions/5142418/what-is-the-use-of-assert-in-python
         assert self.SPEED_SCALING > 0.0 and self.SPEED_SCALING <= 1.0, f"PositionController.SPEED_SCALING must be in (0.0, 1.0] interval. PositionController.SPEED_SCALING={self.SPEED_SCALING} is outside!"
 
