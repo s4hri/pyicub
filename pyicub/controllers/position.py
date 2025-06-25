@@ -170,6 +170,8 @@ class PositionController:
     WAITMOTIONDONE_PERIOD = 0.02
     MOTION_COMPLETE_AT = 0.90
 
+    SPEED_SCALING = 1.0
+
     def __init__(self, robot_name, part, logger):
         """
         Initializes the position controller.
@@ -278,6 +280,15 @@ class PositionController:
         float
             The time taken to complete the motion.
         """
+
+        # assert syntax: 
+        #   assert condition, error_msg         OK
+        #   assert(condition, error_msg)        KO (assertion is ALWAYS TRUE!)
+        # See https://stackoverflow.com/questions/5142418/what-is-the-use-of-assert-in-python
+        assert self.SPEED_SCALING > 0.0 and self.SPEED_SCALING <= 1.0, f"PositionController.SPEED_SCALING must be in (0.0, 1.0] interval. PositionController.SPEED_SCALING={self.SPEED_SCALING} is outside!"
+
+        joints_speed = [int(s*self.SPEED_SCALING) for s in joints_speed]
+
         disp  = [0]*len(joints_list)
         speeds = [0]*len(joints_list)
         times = [0]*len(joints_list)
