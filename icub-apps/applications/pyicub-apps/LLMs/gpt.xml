@@ -1,0 +1,18 @@
+<application>
+
+    <name>GPT</name>
+    
+    <module>
+        <name>python3</name>
+        <parameters>$ENV{ROBOT_CODE}/pyicub-apps/apps/GPT/app.py --config $ENV{ICUB_APPS}/applications/pyicub-apps/LLMs/gpt_config.json --prompt_file ${ICUB_APPS}/applications/pyicub-apps/LLMs/gpt_prompt.txt</parameters>
+        <node>$ENV{ICUBSRV_NODE}</node>
+        <environment>AZURE_API_KEY=$ENV{AZURE_API_KEY}</environment>
+    </module>
+
+    <connection>
+		<from>/GPT/text:o</from>
+		<to>/iSpeak</to>
+		<protocol>tcp</protocol>
+	</connection>
+
+</application>

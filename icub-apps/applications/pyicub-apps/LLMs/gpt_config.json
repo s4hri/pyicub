@@ -1,0 +1,12 @@
+{
+    "endpoint": "https://<your-resource-name>.openai.azure.com/",
+    "api_version": "2024-12-01-preview",
+    "deployments": {
+      "gpt-4.5-preview": "mydeploy_gpt45preview",
+      "gpt-4o-audio-preview": "mydeploy_gpt4oaudiopreview"
+    },
+    "default_model": "gpt-4.5-preview",
+    "temperature": 0.7,
+    "top_p": 1.0,
+    "max_length": 1024
+  }
