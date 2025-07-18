@@ -19,9 +19,9 @@
         <name>yarprobotinterface</name>
         <parameters>--context gazeboCartesianControl --config no_legs.xml</parameters>
         <dependencies>
-            <port timeout="20">/icubSim/torso/state:o</port>
-            <port timeout="20">/icubSim/left_arm/state:o</port>
-            <port timeout="20">/icubSim/right_arm/state:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/torso/state:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/left_arm/state:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/right_arm/state:o</port>
         </dependencies>
         <ensure>
             <wait when="stop">5</wait>
@@ -32,7 +32,7 @@
 
     <module>
         <name>yarpview</name>
-        <parameters>--name /imageview --x 0 --y 0 --p 50 --w 320 --h 240</parameters>
+        <parameters>--name /camera_view --x 0 --y 0 --p 50 --w 320 --h 240</parameters>
         <node>$ENV{ICUBSRV_NODE}</node>
     </module>
 
@@ -40,8 +40,8 @@
         <name>iKinGazeCtrl</name>
         <parameters>--context gazeboCartesianControl --from iKinGazeCtrl.ini</parameters>
         <dependencies>
-            <port timeout="20">/icubSim/torso/state:o</port>
-            <port timeout="20">/icubSim/head/state:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/torso/state:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/head/state:o</port>
         </dependencies>
         <ensure>
             <wait when="stop">5</wait>
@@ -53,8 +53,8 @@
         <name>iKinCartesianSolver</name>
         <parameters>--context gazeboCartesianControl --part right_arm</parameters>
         <dependencies>
-            <port timeout="20">/icubSim/torso/state:o</port>
-            <port timeout="20">/icubSim/right_arm/state:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/torso/state:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/right_arm/state:o</port>
         </dependencies>
         <node>$ENV{ICUBSRV_NODE}</node>
     </module>
@@ -63,21 +63,21 @@
         <name>iKinCartesianSolver</name>
         <parameters>--context gazeboCartesianControl --part left_arm</parameters>
         <dependencies>
-            <port timeout="20">/icubSim/torso/state:o</port>
-            <port timeout="20">/icubSim/left_arm/state:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/torso/state:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/left_arm/state:o</port>
         </dependencies>
         <node>$ENV{ICUBSRV_NODE}</node>
     </module>
 
     <module>
         <name>wholeBodyDynamics</name>
-        <parameters>--robot icubSim --autoconnect --dummy_ft --headV2 --no_legs</parameters>
+        <parameters>--robot $ENV{ICUB_NAME} --autoconnect --dummy_ft --headV2 --no_legs</parameters>
         <dependencies>
-            <port timeout="20">/icubSim/head/state:o</port>
-            <port timeout="20">/icubSim/torso/state:o</port>
-            <port timeout="20">/icubSim/right_arm/state:o</port>
-            <port timeout="20">/icubSim/left_arm/state:o</port>
-            <port timeout="20">/icubSim/head/inertials/measures:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/head/state:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/torso/state:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/right_arm/state:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/left_arm/state:o</port>
+            <port timeout="20">/$ENV{ICUB_NAME}/head/inertials/measures:o</port>
         </dependencies>
         <node>$ENV{ICUBSRV_NODE}</node>
     </module>
@@ -91,20 +91,20 @@
 
     <module>
         <name>yarpdev</name>
-        <parameters>--device speech --lingware-context speech --default-language it-IT --pitch 120 --speed 100 --robot icubSim</parameters>
+        <parameters>--device speech --lingware-context speech --default-language it-IT --pitch 120 --speed 100 --robot $ENV{ICUB_NAME}</parameters>
         <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
         <node>$ENV{ICUBSRV_HOST}</node>
     </module>
 
     <connection>
         <from>/iSpeak/speech-dev/rpc</from>
-        <to>/icubSim/speech:rpc</to>
+        <to>/$ENV{ICUB_NAME}/speech:rpc</to>
         <protocol>tcp</protocol>
     </connection>
 
     <connection>
-        <from>/icubSim/cam/right/rgbImage:o</from>
-        <to>/imageview</to>
+        <from>/$ENV{ICUB_NAME}/cam/right/rgbImage:o</from>
+        <to>/camera_view</to>
         <protocol>udp</protocol>
     </connection>
 
