@@ -5,9 +5,17 @@ ARG LOCAL_USER_UID=1000
 ARG LOCAL_USER_GID=1000
 ARG LOCAL_USER_NAME=icub
 ARG WORKDIR="/usr/local/src/robot"
+ARG PYICUB_URL=https://github.com/s4hri/pyicub
+ARG PYICUB_VERSION=master
+ARG PYICUB_APPS_URL=https://github.com/s4hri/pyicub-apps
+ARG PYICUB_APPS_VERSION=master
 
 ENV WORKDIR=$WORKDIR
-
+ENV PYICUB_URL=$PYICUB_URL
+ENV PYICUB_VERSION=$PYICUB_VERSION
+ENV PYICUB_APPS_URL=$PYICUB_APPS_URL
+ENV PYICUB_APPS_VERSION=$PYICUB_APPS_VERSION
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Create group with specified GID
 RUN if getent group "$LOCAL_USER_NAME" >/dev/null 2>&1; then \
@@ -32,8 +40,6 @@ RUN if id "$LOCAL_USER_NAME" >/dev/null 2>&1; then \
         echo "Creating user $LOCAL_USER_NAME with UID $LOCAL_USER_UID and GID $LOCAL_USER_GID"; \
         useradd -m -s /bin/bash -u "$LOCAL_USER_UID" -g "$LOCAL_USER_GID" "$LOCAL_USER_NAME"; \
     fi && \
-    gpasswd -a "$LOCAL_USER_NAME" sudo && \
-    gpasswd -a "$LOCAL_USER_NAME" audio && \
     echo "$LOCAL_USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 
@@ -41,25 +47,25 @@ WORKDIR ${WORKDIR}
 
 ENV PATH=$PATH:/home/${LOCAL_USER_NAME}/.local/bin
 
-COPY . $WORKDIR/pyicub
+RUN cd $WORKDIR && \
+    git clone ${PYICUB_URL} pyicub && \
+    cd pyicub && \
+    git checkout ${PYICUB_VERSION}
 
 RUN cd $WORKDIR/pyicub && \
     pip3 install -r requirements.txt
 
-ARG PYICUB_APPS_URL=https://github.com/s4hri/pyicub-apps
-ARG PYICUB_APPS_BRANCH=master
-ARG PYICUB_APPS_VERSION=master
-
-RUN git clone ${PYICUB_APPS_URL} -b ${PYICUB_APPS_BRANCH} && \
+RUN git clone ${PYICUB_APPS_URL} -b ${PYICUB_APPS_VERSION} && \
     cd pyicub-apps && \
-    git checkout ${PYICUB_APPS_VERSION} && \
     make all
 
 ENV PYTHONPATH=$WORKDIR/pyicub
 
 RUN echo "Fixing permissions for /home/$LOCAL_USER_NAME"; \
-    chown -R "$LOCAL_USER_UID:$LOCAL_USER_GID" "/home/$LOCAL_USER_NAME"; \
-    chown -R "$LOCAL_USER_UID:$LOCAL_USER_GID" $WORKDIR
+    chown -R "$LOCAL_USER_UID:$LOCAL_USER_GID" "/home/$LOCAL_USER_NAME" $WORKDIR
+
+# to move up in robotology-superbuld docker image
+RUN apt-get install -y pulseaudio sox
 
 USER $LOCAL_USER_NAME
 

@@ -1,1 +1,0 @@
-You are a helpful robot assistant for the iCub robot. Answer concisely and politely.

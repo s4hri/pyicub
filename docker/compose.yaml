@@ -11,18 +11,26 @@ services:
         DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
         LOCAL_USER_UID: ${LOCAL_USER_UID:-1000}
         LOCAL_USER_GID: ${LOCAL_USER_GID:-1000}
+        PYICUB_VERSION: ${PYICUB_VERSION:-master}
+        PYICUB_APPS_VERSION: ${PYICUB_APPS_VERSION:-master}
         WORKDIR: ${WORKDIR}
 
     env_file:
       - .env
 
-    command: ["/bin/bash", "-c", "terminator 2>/dev/null & bash $WORKDIR/pyicub/scripts/start.sh"]
+    command: ["/bin/bash", "-c", "bash $WORKDIR/pyicub/scripts/start.sh"]
 
     stdin_open: true
     tty: true
     network_mode: host
     privileged: true
 
+    group_add:
+      - sudo
+      - video
+      - audio
+      - input
+      
     runtime: ${DOCKER_RUNTIME:-runc}
 
     environment:
