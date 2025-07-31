@@ -67,6 +67,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.pyicub-frontend
+      args:
+        - PYICUB_FRONTEND_VERSION=${PYICUB_FRONTEND_VERSION}
 
     env_file:
       - .env
