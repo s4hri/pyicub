@@ -20,6 +20,7 @@ wait_for_icub_host() {
     else
       printf "\a"
     fi
+    sleep 1;
 
 
     seconds_waited=$((seconds_waited + 1))
