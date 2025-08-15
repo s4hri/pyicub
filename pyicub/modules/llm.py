@@ -49,32 +49,40 @@ class iLLM:
         response = self.__rpcPort__.execute(btl)
         return response.toString()
 
+    def cmd(self, command_name: str, args: list):
+        to_send = f'{command_name} '
+        for i, arg in enumerate(args):
+            to_send += f'"{arg}"'
+            if i != len(args)-1:
+                to_send += ' '
+        return self._send(to_send)
+
     def status(self):
         return self._send("status")
 
     def query(self, text: str):
-        return self._send(f'query {text}')
+        return self._send(f'query "{text}"')
 
     def set_system_prompt(self, prompt: str):
-        return self._send(f'set_system_prompt {prompt}')
+        return self._send(f'set_system_prompt "{prompt}"')
 
     def create_session(self, session_id: str):
-        return self._send(f'create_session {session_id}')
+        return self._send(f'create_session "{session_id}"')
 
     def switch_session(self, session_id: str):
-        return self._send(f'switch_session {session_id}')
+        return self._send(f'switch_session "{session_id}"')
 
     def reset_session(self, session_id: str):
-        return self._send(f'reset_session {session_id}')
+        return self._send(f'reset_session "{session_id}"')
 
     def delete_session(self, session_id: str):
-        return self._send(f'delete_session {session_id}')
+        return self._send(f'delete_session "{session_id}"')
 
     def list_sessions(self):
         return self._send('list_sessions')
 
     def set_model(self, model_name: str):
-        return self._send(f'set_model {model_name}')
+        return self._send(f'set_model "{model_name}"')
 
     def quit(self):
         return self._send('quit')
