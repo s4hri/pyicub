@@ -19,8 +19,8 @@ jobs:
     - name: Checkout pyicub-doc repository (the docs)
       uses: actions/checkout@v4
       with:
-        # Replace 's4hri/pyicub-docs' with your actual organization/username if different
-        repository: s4hri/pyicub-docs
+        # Replace 'sS4HRITECH/pyicub-doc' with your actual organization/username if different
+        repository: S4HRITECH/pyicub-doc
         path: pyicub-doc-repo # Clones your pyicub-doc repo into this directory
         token: ${{ secrets.DOCS_REPO_PAT }} # Uses the PAT for write access
 
