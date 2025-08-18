@@ -1,0 +1,77 @@
+name: Build and Deploy Docs to pyicub-doc
+
+on:
+  push:
+    branches:
+      - master # Trigger on pushes to the main branch of your pyicub code repository
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout pyicub repository (the code)
+      uses: actions/checkout@v4
+      with:
+        path: pyicub-code-repo # Clones your pyicub code repo into this directory
+        fetch-depth: 0 # Needed for Git history if you use tags etc.
+
+    - name: Checkout pyicub-doc repository (the docs)
+      uses: actions/checkout@v4
+      with:
+        # Replace 's4hri/pyicub-docs' with your actual organization/username if different
+        repository: s4hri/pyicub-docs
+        path: pyicub-doc-repo # Clones your pyicub-doc repo into this directory
+        token: ${{ secrets.DOCS_REPO_PAT }} # Uses the PAT for write access
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x' # Use a Python version compatible with your projects
+
+    - name: Install documentation build dependencies in pyicub-doc
+      run: |
+        # Navigate to the pyicub-doc repository checkout
+        cd pyicub-doc-repo
+        # Install Sphinx and theme from pyicub-doc's requirements.txt
+        pip install -r requirements.txt
+#    - name: Install pyicub project dependencies (if needed for sphinx-apidoc)
+#      # This step is crucial if your pyicub code imports libraries that sphinx-apidoc needs
+#      # to successfully parse your code's docstrings and structure.
+#      # ADJUST THIS SECTION based on your pyicub project's actual dependencies.
+#      run: |
+#        cd pyicub-code-repo
+#        # Example: if your pyicub is a pip installable package
+#        # pip install -e .
+#        # Example: if your pyicub has a requirements.txt
+#         pip install -r requirements.txt
+#        # Example: if it just needs numpy
+#        # pip install numpy
+#        echo "No specific pyicub dependencies installed for sphinx-apidoc. Remove this echo if you add actual install commands."
+
+    - name: Generate API reStructuredText files using sphinx-apidoc
+      run: |
+        # Navigate to the pyicub-doc repository's source directory
+        cd pyicub-doc-repo/source
+        # Run sphinx-apidoc, pointing to the pyicub-code-repo/pyicub package
+        # The path to pyicub is relative from pyicub-doc-repo/source
+        # Assuming: pyicub-doc-repo/source/../pyicub-code-repo/pyicub
+        # This will create .rst files in pyicub-doc-repo/source/api/
+        sphinx-apidoc -o api ../../pyicub-code-repo/pyicub --force
+    - name: Build full HTML documentation in pyicub-doc
+      run: |
+        # Navigate back to the root of the pyicub-doc repository checkout
+        cd pyicub-doc-repo
+        # Run make html from the pyicub-doc root
+        make html
+    - name: Commit and Push updated docs to pyicub-doc repository
+      working-directory: pyicub-doc-repo # Perform git operations from within pyicub-doc-repo
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add . # Add all changes (new .rst files in source/api, updated HTML files in build/html)
+        # Check if there are any changes before committing to avoid empty commits
+        git diff-index --quiet HEAD || git commit -m "Automated API docs update from pyicub commit ${{ github.sha }}"
+        git push origin main # IMPORTANT: Replace 'main' with your pyicub-doc's default branch if different
+      env:
+        GITHUB_TOKEN: ${{ secrets.DOCS_REPO_PAT }} # Use the PAT for authentication
