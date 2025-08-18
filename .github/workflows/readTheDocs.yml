@@ -72,6 +72,6 @@ jobs:
         git add . # Add all changes (new .rst files in source/api, updated HTML files in build/html)
         # Check if there are any changes before committing to avoid empty commits
         git diff-index --quiet HEAD || git commit -m "Automated API docs update from pyicub commit ${{ github.sha }}"
-        git push origin main # IMPORTANT: Replace 'main' with your pyicub-doc's default branch if different
+        git push origin master # IMPORTANT: Replace 'master' with your pyicub-doc's default branch if different
       env:
         GITHUB_TOKEN: ${{ secrets.DOCS_REPO_PAT }} # Use the PAT for authentication
