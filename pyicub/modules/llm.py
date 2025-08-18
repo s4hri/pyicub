@@ -49,7 +49,7 @@ class iLLM:
         response = self.__rpcPort__.execute(btl)
         return response.toString()
 
-    def cmd(self, command_name: str, args: list):
+    def cmd(self, command_name: str, args: list=[]):
         to_send = f'{command_name} '
         for i, arg in enumerate(args):
             to_send += f'"{arg}"'
