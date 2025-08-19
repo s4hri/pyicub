@@ -8,7 +8,6 @@ source "$(dirname "$0")/setup.sh"
 PYICUB_ENV_FILE="$HOME/.pyicub_env"
 BASHRC_FILE="$HOME/.bashrc"
 
-terminator 2>/dev/null &
 
 start_yarpserver_detached
 start_local_yarprun
@@ -22,6 +21,8 @@ else
   export ICUB_SIMULATION=true
   export ICUB_NAME=icubSim
 fi
+
+terminator 2>/dev/null &
 
 # Save environment variables
 echo "Writing environment variables to $PYICUB_ENV_FILE"
