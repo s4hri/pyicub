@@ -22,7 +22,6 @@ else
   export ICUB_NAME=icubSim
 fi
 
-terminator 2>/dev/null &
 
 # Save environment variables
 echo "Writing environment variables to $PYICUB_ENV_FILE"
@@ -49,3 +48,5 @@ yarpmanager --apppath "${ICUB_APPS}/applications" --from "${ICUB_APPS}/applicati
 if [ "$ICUB_SIMULATION" = false ]; then
   cleanup_remote_processes
 fi
+
+terminator 2>/dev/null &
