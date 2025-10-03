@@ -23,6 +23,5 @@ start_local_yarprun
 echo "Launching yarpmanager..."
 yarpmanager --apppath "${ICUB_APPS}/applications" --from "${ICUB_APPS}/applications/cluster-config.xml"
 
-if [ "${ICUB_SIMULATION:-true}" != "true" ]; then
-  cleanup_remote_processes
-fi
+cleanup_remote_processes
+
