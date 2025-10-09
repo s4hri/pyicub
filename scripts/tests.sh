@@ -5,6 +5,7 @@ source "$(dirname "$0")/common.sh"
 export DISPLAY=:99
 sudo Xvfb :99 -screen 0 1024x768x24 &
 sleep 1  # Give it time to start
+export ICUB_SIMULATION=true
 
 initialize_environment
 start_yarpserver_detached >/dev/null 2>&1
