@@ -8,15 +8,18 @@ source "$(dirname "$0")/setup.sh"
 PYICUB_ENV_FILE="$HOME/.pyicub_env"
 BASHRC_FILE="$HOME/.bashrc"
 
-if wait_for_icub_host 3; then
-  ensure_ssh_key_installed
-  start_icub_yarprun
-  export ICUB_SIMULATION=false
-  export ICUB_NAME=icub
+if [[ "${ICUB_SIMULATION}" == "false" ]]; then
+  if wait_for_icub_host 5; then
+    ensure_ssh_key_installed
+    start_icub_yarprun
+    export ICUB_NAME=icub
+  else
+    exit 1;
+  fi
 else
-  export ICUB_SIMULATION=true
   export ICUB_NAME=icubSim
 fi
+
 
 # Save environment variables
 echo "Writing environment variables to $PYICUB_ENV_FILE"

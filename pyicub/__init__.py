@@ -28,8 +28,8 @@
 
 
 __name__ = 'PyiCub'
-__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi, Enrico Piacenti, Gioele Migno'
-__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it, enrico.piacenti@iit.it, gioele.migno@iit.it'
+__authors__ = 'Davide De Tommaso, Adam Lukomski, Nicola Russi, Enrico Piacenti, Gioele Migno, Mohammad Gharb'
+__emails__ = 'davide.detommaso@iit.it, adam.lukomski@iit.it, nicola.russi@iit.it, enrico.piacenti@iit.it, gioele.migno@iit.it, mohammad.gharb@iit.it'
 __license__ = 'BSD-2'
-__version__ = '8.3.1'
+__version__ = '8.3.3'
 __description__ = 'Developing iCub applications using Python'

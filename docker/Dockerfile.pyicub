@@ -64,9 +64,6 @@ ENV PYTHONPATH=$WORKDIR/pyicub
 RUN echo "Fixing permissions for /home/$LOCAL_USER_NAME"; \
     chown -R "$LOCAL_USER_UID:$LOCAL_USER_GID" "/home/$LOCAL_USER_NAME" $WORKDIR
 
-# to move up in robotology-superbuld docker image
-RUN apt-get install -y pulseaudio sox
-
 USER $LOCAL_USER_NAME
 
 CMD ["bash"]
