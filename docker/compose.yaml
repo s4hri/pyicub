@@ -9,8 +9,6 @@ services:
       dockerfile: docker/Dockerfile.pyicub
       args:
         DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
-        LOCAL_USER_UID: ${LOCAL_USER_UID:-1000}
-        LOCAL_USER_GID: ${LOCAL_USER_GID:-1000}
         PYICUB_VERSION: ${PYICUB_VERSION:-master}
         PYICUB_APPS_VERSION: ${PYICUB_APPS_VERSION:-master}
         WORKDIR: ${WORKDIR}
@@ -24,12 +22,6 @@ services:
     tty: true
     network_mode: host
     privileged: true
-
-    group_add:
-      - sudo
-      - video
-      - audio
-      - input
       
     runtime: ${DOCKER_RUNTIME:-runc}
 
@@ -47,14 +39,11 @@ services:
       - SSH_AUTH_SOCK=/ssh-agent
 
     volumes:
-      - ../:$WORKDIR/pyicub
-      - ./shared:/shared
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ${HOME}/.config/pulse/cookie:/run/pulse/cookie
       - ${XDG_RUNTIME_DIR:-/tmp}/pulse:${XDG_RUNTIME_DIR:-/tmp}/pulse
       - ${XDG_RUNTIME_DIR:-/tmp}/dconf:${XDG_RUNTIME_DIR:-/tmp}/dconf
-      - ${HOME}/.gitconfig:/home/icub/.gitconfig:ro
-      - ${HOME}/.ssh:/home/icub/.ssh:ro
+      - ${HOME}/.gitconfig:/root/.gitconfig:ro
       - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
 
     profiles:

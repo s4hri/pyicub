@@ -1,9 +1,6 @@
 ARG DOCKER_SRC=ubuntu:latest
 FROM $DOCKER_SRC
 
-ARG LOCAL_USER_UID=1000
-ARG LOCAL_USER_GID=1000
-ARG LOCAL_USER_NAME=icub
 ARG WORKDIR="/usr/local/src/robot"
 ARG PYICUB_URL=https://github.com/s4hri/pyicub
 ARG PYICUB_VERSION=master
@@ -17,35 +14,9 @@ ENV PYICUB_APPS_URL=$PYICUB_APPS_URL
 ENV PYICUB_APPS_VERSION=$PYICUB_APPS_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Create group with specified GID
-RUN if getent group "$LOCAL_USER_NAME" >/dev/null 2>&1; then \
-        CURRENT_GID=$(getent group "$LOCAL_USER_NAME" | cut -d: -f3); \
-        if [ "$CURRENT_GID" -ne "$LOCAL_USER_GID" ]; then \
-            echo "Updating GID of $LOCAL_USER_NAME from $CURRENT_GID to $LOCAL_USER_GID"; \
-            groupmod -g "$LOCAL_USER_GID" "$LOCAL_USER_NAME"; \
-        fi; \
-    else \
-        echo "Creating group $LOCAL_USER_NAME with GID $LOCAL_USER_GID"; \
-        groupadd -g "$LOCAL_USER_GID" "$LOCAL_USER_NAME"; \
-    fi
-
-# Create user with UID and assign to the correct GID
-RUN if id "$LOCAL_USER_NAME" >/dev/null 2>&1; then \
-        CURRENT_UID=$(id -u "$LOCAL_USER_NAME"); \
-        if [ "$CURRENT_UID" -ne "$LOCAL_USER_UID" ]; then \
-            echo "Updating UID of $LOCAL_USER_NAME from $CURRENT_UID to $LOCAL_USER_UID"; \
-            usermod -u "$LOCAL_USER_UID" -g "$LOCAL_USER_GID" "$LOCAL_USER_NAME"; \
-        fi; \
-    else \
-        echo "Creating user $LOCAL_USER_NAME with UID $LOCAL_USER_UID and GID $LOCAL_USER_GID"; \
-        useradd -m -s /bin/bash -u "$LOCAL_USER_UID" -g "$LOCAL_USER_GID" "$LOCAL_USER_NAME"; \
-    fi && \
-    echo "$LOCAL_USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
-
 WORKDIR ${WORKDIR}
 
-ENV PATH=$PATH:/home/${LOCAL_USER_NAME}/.local/bin
+ENV PATH=$PATH:/root/.local/bin
 
 RUN cd $WORKDIR && \
     git clone ${PYICUB_URL} pyicub && \
@@ -61,9 +32,12 @@ RUN git clone ${PYICUB_APPS_URL} -b ${PYICUB_APPS_VERSION} && \
 
 ENV PYTHONPATH=$WORKDIR/pyicub
 
-RUN echo "Fixing permissions for /home/$LOCAL_USER_NAME"; \
-    chown -R "$LOCAL_USER_UID:$LOCAL_USER_GID" "/home/$LOCAL_USER_NAME" $WORKDIR
+RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh \
+ && touch /root/.ssh/config && chmod 600 /root/.ssh/config \
+ && ssh-keyscan -H github.com >> /root/.ssh/known_hosts 2>/dev/null || true
 
-USER $LOCAL_USER_NAME
+ENV GIT_SSH_COMMAND="ssh -F /dev/null"
+
+USER root
 
 CMD ["bash"]
