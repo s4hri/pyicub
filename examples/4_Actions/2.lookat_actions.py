@@ -34,9 +34,9 @@ class Step1(iCubFullbodyStep):
 
     def prepare(self):
         g1 = self.createGazeMotion("lookAtFixationPoint")
-        g1.addCheckpoint([-1.0, -0.5, 1.0])
-        g1.addCheckpoint([-1.0, -0.2, 0.5])
-        g1.addCheckpoint([-1.0, 0.2, 0.1])
+        g1.addCheckpoint([-1.0, -0.5, 1.0, True, 2.0])
+        g1.addCheckpoint([-1.0, -0.2, 0.5, True, 2.0])
+        g1.addCheckpoint([-1.0, 0.2, 0.1, True, 2.0])
 
 class Step2(iCubFullbodyStep):
 
