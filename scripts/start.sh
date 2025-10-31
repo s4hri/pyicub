@@ -8,6 +8,9 @@ source "$(dirname "$0")/setup.sh"
 PYICUB_ENV_FILE="$HOME/.pyicub_env"
 BASHRC_FILE="$HOME/.bashrc"
 
+start_yarpserver_detached
+start_local_yarprun
+
 if [[ "${ICUB_SIMULATION}" == "false" ]]; then
   if wait_for_icub_host 5; then
     ensure_ssh_key_installed
@@ -39,9 +42,6 @@ else
 fi
 
 terminator 2>/dev/null &
-
-start_yarpserver_detached
-start_local_yarprun
 
 echo "Launching yarpmanager..."
 yarpmanager --apppath "${ICUB_APPS}/applications" --from "${ICUB_APPS}/applications/cluster-config.xml"
