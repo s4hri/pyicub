@@ -46,6 +46,6 @@ terminator 2>/dev/null &
 echo "Launching yarpmanager..."
 yarpmanager --apppath "${ICUB_APPS}/applications" --from "${ICUB_APPS}/applications/cluster-config.xml"
 
-if [ "$ICUB_SIMULATION" = false ]; then
+if [[ "${ICUB_SIMULATION}" == "false" ]]; then
   cleanup_remote_processes
 fi
