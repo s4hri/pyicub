@@ -57,7 +57,7 @@ start_yarpserver_detached() {
 
 start_local_yarprun() {
   echo "Starting local yarprun..."
-  yarprun --server /"$ICUBSRV_NODE" --log &
+  yarprun --server /"$PYICUB_NODE" --log &
   sleep 2
 }
 
@@ -90,4 +90,17 @@ ensure_ssh_key_installed() {
 
   echo "You may be prompted for the icub user's password to copy the key."
   ssh-copy-id -o StrictHostKeyChecking=no icub@"$ICUB_HOST"
+}
+
+check_existing_yarpserver() {
+  for i in {1..10}; do
+    if yarp detect --write >/dev/null 2>&1; then
+      echo "Existing yarpserver detected."
+      return
+    else
+      echo "No yarpserver detected. Attempt $i of 10."
+      sleep 2
+    fi
+  done
+  start_yarpserver_detached
 }

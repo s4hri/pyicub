@@ -18,17 +18,10 @@ WORKDIR ${WORKDIR}
 
 ENV PATH=$PATH:/root/.local/bin
 
-RUN cd $WORKDIR && \
-    git clone ${PYICUB_URL} pyicub && \
-    cd pyicub && \
-    git checkout ${PYICUB_VERSION}
+COPY .. $WORKDIR/pyicub 
 
 RUN cd $WORKDIR/pyicub && \
     pip3 install -r requirements.txt
-
-RUN git clone ${PYICUB_APPS_URL} -b ${PYICUB_APPS_VERSION} && \
-    cd pyicub-apps && \
-    make all
 
 ENV PYTHONPATH=$WORKDIR/pyicub
 
