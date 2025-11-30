@@ -1,7 +1,7 @@
 <cluster name="icub_cluster" user="icub">
 
-    <nameserver namespace="/root" node="yarpsrv"></nameserver>
-    <node display=":0.0">yarp-node</node>
+    <nameserver namespace="/root"></nameserver>
+    <node display=":0.0">pyicub-node</node>
     <node>icub-node</node>
 
 </cluster>

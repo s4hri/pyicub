@@ -8,7 +8,12 @@ source "$(dirname "$0")/setup.sh"
 PYICUB_ENV_FILE="$HOME/.pyicub_env"
 BASHRC_FILE="$HOME/.bashrc"
 
-check_existing_yarpserver
+if [[ "${YARP_SERVER}" == "true" ]]; then
+  start_yarpserver_detached
+else
+  check_existing_yarpserver
+fi
+
 start_local_yarprun
 
 if [[ "${ICUB_SIMULATION}" == "false" ]]; then

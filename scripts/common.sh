@@ -93,14 +93,13 @@ ensure_ssh_key_installed() {
 }
 
 check_existing_yarpserver() {
-  for i in {1..10}; do
+  for i in {1..5}; do
     if yarp detect --write >/dev/null 2>&1; then
       echo "Existing yarpserver detected."
       return
     else
-      echo "No yarpserver detected. Attempt $i of 10."
+      echo "No yarpserver detected. Attempt $i of 5."
       sleep 2
     fi
   done
-  start_yarpserver_detached
 }
