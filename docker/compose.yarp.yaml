@@ -4,7 +4,7 @@ services:
     image: iitschri/yarp-docker:v3.9.0
     container_name: yarpserver
 
-    command: ["/bin/bash", "-c", "yarpserver --write & sleep 2; yarprun --server /${YARPSRV_NODE:-yarp-node} --log"]
+    command: ["/bin/bash", "-c", "yarpserver --write & sleep 2; yarprun --server /${PYICUB_NODE:-yarp-node} --log"]
 
     stdin_open: true
     tty: true
