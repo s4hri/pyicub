@@ -102,4 +102,6 @@ check_existing_yarpserver() {
       sleep 2
     fi
   done
+  echo "Error: No yarpserver detected after 5 attempts." >&2
+  exit 1
 }
