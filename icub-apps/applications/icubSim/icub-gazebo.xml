@@ -7,12 +7,12 @@
     <module>
         <name>gzserver</name>
         <parameters>$ENV{ICUB_APPS}/gazebo/icub-world.sdf</parameters>
-        <node>$ENV{ICUBSRV_NODE}</node>
+        <node>$ENV{PYICUB_NODE}</node>
     </module>
 
     <module>
         <name>gzclient</name>
-        <node>$ENV{ICUBSRV_NODE}</node>
+        <node>$ENV{PYICUB_NODE}</node>
     </module>
 
     <module>
@@ -26,14 +26,14 @@
         <ensure>
             <wait when="stop">5</wait>
         </ensure>
-        <node>$ENV{ICUBSRV_NODE}</node>
+        <node>$ENV{PYICUB_NODE}</node>
     </module>
 
 
     <module>
         <name>yarpview</name>
         <parameters>--name /camera_view --x 0 --y 0 --p 50 --w 320 --h 240</parameters>
-        <node>$ENV{ICUBSRV_NODE}</node>
+        <node>$ENV{PYICUB_NODE}</node>
     </module>
 
     <module>
@@ -46,7 +46,7 @@
         <ensure>
             <wait when="stop">5</wait>
         </ensure>
-        <node>$ENV{ICUBSRV_NODE}</node>
+        <node>$ENV{PYICUB_NODE}</node>
     </module>
 
     <module>
@@ -56,7 +56,7 @@
             <port timeout="20">/$ENV{ICUB_NAME}/torso/state:o</port>
             <port timeout="20">/$ENV{ICUB_NAME}/right_arm/state:o</port>
         </dependencies>
-        <node>$ENV{ICUBSRV_NODE}</node>
+        <node>$ENV{PYICUB_NODE}</node>
     </module>
 
     <module>
@@ -66,7 +66,7 @@
             <port timeout="20">/$ENV{ICUB_NAME}/torso/state:o</port>
             <port timeout="20">/$ENV{ICUB_NAME}/left_arm/state:o</port>
         </dependencies>
-        <node>$ENV{ICUBSRV_NODE}</node>
+        <node>$ENV{PYICUB_NODE}</node>
     </module>
 
     <module>
@@ -79,21 +79,21 @@
             <port timeout="20">/$ENV{ICUB_NAME}/left_arm/state:o</port>
             <port timeout="20">/$ENV{ICUB_NAME}/head/inertials/measures:o</port>
         </dependencies>
-        <node>$ENV{ICUBSRV_NODE}</node>
+        <node>$ENV{PYICUB_NODE}</node>
     </module>
 
     <module>
         <name>iSpeak</name>
         <parameters></parameters>
         <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
-        <node>$ENV{ICUBSRV_HOST}</node>
+        <node>$ENV{PYICUB_NODE}</node>
     </module>
 
     <module>
         <name>yarpdev</name>
         <parameters>--device speech --lingware-context speech --default-language it-IT --pitch 120 --speed 100 --robot $ENV{ICUB_NAME}</parameters>
         <environment>YARP_FORWARD_LOG_ENABLE=1</environment>
-        <node>$ENV{ICUBSRV_HOST}</node>
+        <node>$ENV{PYICUB_NODE}</node>
     </module>
 
     <connection>

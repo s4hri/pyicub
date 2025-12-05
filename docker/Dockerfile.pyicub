@@ -13,22 +13,19 @@ ENV PYICUB_VERSION=$PYICUB_VERSION
 ENV PYICUB_APPS_URL=$PYICUB_APPS_URL
 ENV PYICUB_APPS_VERSION=$PYICUB_APPS_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
+ENV XDG_RUNTIME_DIR=/tmp/runtime-root
 
 WORKDIR ${WORKDIR}
 
 ENV PATH=$PATH:/root/.local/bin
 
-RUN cd $WORKDIR && \
-    git clone ${PYICUB_URL} pyicub && \
-    cd pyicub && \
-    git checkout ${PYICUB_VERSION}
+RUN mkdir -p /tmp/runtime-root && \
+    chmod 700 /tmp/runtime-root
+
+COPY .. $WORKDIR/pyicub 
 
 RUN cd $WORKDIR/pyicub && \
     pip3 install -r requirements.txt
-
-RUN git clone ${PYICUB_APPS_URL} -b ${PYICUB_APPS_VERSION} && \
-    cd pyicub-apps && \
-    make all
 
 ENV PYTHONPATH=$WORKDIR/pyicub
 
@@ -37,6 +34,8 @@ RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh \
  && ssh-keyscan -H github.com >> /root/.ssh/known_hosts 2>/dev/null || true
 
 ENV GIT_SSH_COMMAND="ssh -F /dev/null"
+
+RUN git clone https://github.com/s4hri/docker-tests.git
 
 USER root
 

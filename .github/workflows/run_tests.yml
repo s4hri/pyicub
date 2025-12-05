@@ -17,8 +17,8 @@ jobs:
         working-directory: docker
         run: |
           echo "Building and running services for testing..."
-          docker compose build pyicub
-          COMPOSE_PROFILES=test ./run.sh
+          COMPOSE_PROFILES=backend,test docker compose build
+          COMPOSE_PROFILES=test docker compose up
 
       - name: Clean up docker
         working-directory: docker

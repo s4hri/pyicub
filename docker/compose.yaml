@@ -1,8 +1,35 @@
+x-pyicub-common: &pyicub-common
+  image: ${PYICUB_IMAGE_NAME:?error}
+  stdin_open: true
+  tty: true
+  network_mode: host
+  privileged: true
+
+  
 services:
 
-  pyicub:
-    image: ${PYICUB_IMAGE_NAME}
-    container_name: pyicub
+  pyicub-yarpserver:
+    <<: *pyicub-common
+    container_name: pyicub-yarpserver
+
+    command: ["/bin/bash", "-c", "yarpserver --write"]
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "yarp detect"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 1s
+    
+    profiles:
+      - backend
+      - frontend
+
+  pyicub-backend:
+    <<: *pyicub-common
+    container_name: pyicub-backend  
 
     build:
       context: ..
@@ -11,68 +38,62 @@ services:
         DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
         PYICUB_VERSION: ${PYICUB_VERSION:-master}
         PYICUB_APPS_VERSION: ${PYICUB_APPS_VERSION:-master}
-        WORKDIR: ${WORKDIR}
+        WORKDIR: ${WORKDIR:-/usr/local/src/robot}
+
+    runtime: ${DOCKER_RUNTIME:-runc}
 
     env_file:
-      - .env
-
-    command: ["/bin/bash", "-c", "bash $WORKDIR/pyicub/scripts/start.sh"]
-
-    stdin_open: true
-    tty: true
-    network_mode: host
-    privileged: true
-      
-    runtime: ${DOCKER_RUNTIME:-runc}
+      - pyicub.env
 
     environment:
       - DISPLAY=${DISPLAY:-:0}
-      - PULSE_SERVER=unix:${XDG_RUNTIME_DIR:-/tmp}/pulse/native
+      - PULSE_SERVER=unix:${XDG_RUNTIME_DIR:?error}/pulse/native
       - PULSE_COOKIE=/run/pulse/cookie
-      - XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/tmp}
-      - XDG_DATA_DIRS=${XDG_DATA_DIRS:-/usr/local/share:/usr/share}
+      - XDG_RUNTIME_DIR=/tmp/runtime-root
+      - XDG_DATA_DIRS=${XDG_DATA_DIRS:-/usr/local/share/:/usr/share/}
       - QT_X11_NO_MITSHM=1
       - NO_AT_BRIDGE=1
-      - LIBGL_ALWAYS_SOFTWARE=false
       - NVIDIA_VISIBLE_DEVICES=${GPU_DEVICES:-none}
       - NVIDIA_DRIVER_CAPABILITIES=all
-      - SSH_AUTH_SOCK=/ssh-agent
+
+    command: ["/bin/bash", "-c", "bash ${WORKDIR:?error}/pyicub/scripts/start.sh"]
+      
+    profiles:
+      - backend
+
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "yarp ping /${PYICUB_NODE:?error}"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+    depends_on:
+      pyicub-yarpserver:
+        condition: service_healthy
 
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ${HOME}/.config/pulse/cookie:/run/pulse/cookie
-      - ${XDG_RUNTIME_DIR:-/tmp}/pulse:${XDG_RUNTIME_DIR:-/tmp}/pulse
-      - ${XDG_RUNTIME_DIR:-/tmp}/dconf:${XDG_RUNTIME_DIR:-/tmp}/dconf
-      - ${HOME}/.gitconfig:/root/.gitconfig:ro
-      - ${HOME}/.ssh:/root/.ssh:ro
-      - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
-
-    profiles:
-      - backend
+      - ${XDG_RUNTIME_DIR:?error}/pulse:${XDG_RUNTIME_DIR:?error}/pulse
 
   pyicub.frontend:
-    image: ${PYICUB_FRONTEND_IMAGE_NAME}
+    image: ${PYICUB_FRONTEND_IMAGE_NAME:?error}
     container_name: pyicub-frontend
 
     build:
       context: .
       dockerfile: Dockerfile.pyicub-frontend
       args:
-        - PYICUB_FRONTEND_VERSION=${PYICUB_FRONTEND_VERSION}
-
-    env_file:
-      - .env
+        - PYICUB_FRONTEND_VERSION=${PYICUB_FRONTEND_VERSION:?error}
 
     environment:
       - SSH_AUTH_SOCK=/ssh-agent
 
     network_mode: host
 
-    depends_on:
-      - pyicub
-
     volumes:
-      - pyicub-frontend-workspace:${WORKDIR}/pyicub-frontend
+      - pyicub-frontend-workspace:${WORKDIR:?error}/pyicub-frontend
       - ${HOME}/.gitconfig:/root/.gitconfig:ro
       - ${HOME}/.ssh:/root/.ssh:ro
       - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
@@ -80,15 +101,21 @@ services:
     profiles:
       - frontend
 
+    depends_on:
+      pyicub-yarpserver:
+        condition: service_healthy
+      pyicub-backend:
+        condition: service_healthy
+
   pyicub.test:
-    image: ${PYICUB_IMAGE_NAME}
+    <<: *pyicub-common
     container_name: pyicub-test
 
+    command: ["/bin/bash", "-c", "bash ${WORKDIR:?error}/pyicub/scripts/tests.sh"]
+
     env_file:
-      - .env
-
-    command: ["/bin/bash", "-c", "bash $WORKDIR/pyicub/scripts/tests.sh"]
-
+      - pyicub.env
+      
     environment:
       - DISPLAY=:99
 
