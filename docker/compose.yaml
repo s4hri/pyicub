@@ -79,7 +79,7 @@ services:
       - ${XDG_RUNTIME_DIR:?error}/pulse:${XDG_RUNTIME_DIR:?error}/pulse
       - ${HOME}/.gitconfig:/root/.gitconfig:ro
       - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
-      - ${HOME}/.ssh/known_hosts:/root/.ssh/known_hosts:ro
+      - ${HOME}/.ssh:/root/.ssh:ro
 
   pyicub.frontend:
     image: ${PYICUB_FRONTEND_IMAGE_NAME:?error}
