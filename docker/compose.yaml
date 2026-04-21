@@ -55,6 +55,7 @@ services:
       - NO_AT_BRIDGE=1
       - NVIDIA_VISIBLE_DEVICES=${GPU_DEVICES:-none}
       - NVIDIA_DRIVER_CAPABILITIES=all
+      - SSH_AUTH_SOCK=/ssh-agent
 
     command: ["/bin/bash", "-c", "bash ${WORKDIR:?error}/pyicub/scripts/start.sh"]
       
@@ -76,6 +77,9 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ${HOME}/.config/pulse/cookie:/run/pulse/cookie
       - ${XDG_RUNTIME_DIR:?error}/pulse:${XDG_RUNTIME_DIR:?error}/pulse
+      - ${HOME}/.gitconfig:/root/.gitconfig:ro
+      - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
+      - ${HOME}/.ssh:/root/.ssh:ro
 
   pyicub.frontend:
     image: ${PYICUB_FRONTEND_IMAGE_NAME:?error}
