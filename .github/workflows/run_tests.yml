@@ -13,15 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Run tests with Docker Compose
+      - name: Run tests
         working-directory: docker
-        run: |
-          echo "Building and running services for testing..."
-          COMPOSE_PROFILES=backend,test docker compose build
-          COMPOSE_PROFILES=test docker compose up
-
-      - name: Clean up docker
-        working-directory: docker
-        run: |
-          echo "Cleaning up..."
-          docker compose down --volumes --remove-orphans
+        run: bash run_tests.sh

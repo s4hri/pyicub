@@ -2,6 +2,13 @@
 
 source "$(dirname "$0")/common.sh"
 
+MODE="${1:-}"
+
+if [[ "$MODE" == "--simulation_nogui" ]]; then
+  start_simulation sleep infinity
+  exit 0
+fi
+
 initialize_environment
 source "$(dirname "$0")/setup.sh"
 

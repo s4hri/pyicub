@@ -5,46 +5,47 @@ x-pyicub-common: &pyicub-common
   network_mode: host
   privileged: true
 
-  
+x-pyicub-build: &pyicub-build
+  context: ..
+  dockerfile: docker/Dockerfile.pyicub
+  args:
+    DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
+    PYICUB_VERSION: ${PYICUB_VERSION:-master}
+    PYICUB_APPS_VERSION: ${PYICUB_APPS_VERSION:-master}
+    WORKDIR: ${WORKDIR:-/usr/local/src/robot}
+
+x-pyicub-headless: &pyicub-headless
+  <<: *pyicub-common
+  build: *pyicub-build
+  env_file:
+    - pyicub.env
+  environment:
+    - DISPLAY=:99
+
 services:
 
   pyicub-yarpserver:
     <<: *pyicub-common
     container_name: pyicub-yarpserver
-
     command: ["/bin/bash", "-c", "yarpserver --write"]
-
     restart: unless-stopped
-
     healthcheck:
       test: ["CMD", "/bin/bash", "-c", "yarp detect"]
       interval: 10s
       timeout: 5s
       retries: 6
       start_period: 1s
-    
     profiles:
       - backend
       - frontend
 
   pyicub-backend:
     <<: *pyicub-common
-    container_name: pyicub-backend  
-
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.pyicub
-      args:
-        DOCKER_SRC: ${ROBOTOLOGY_IMAGE_NAME}
-        PYICUB_VERSION: ${PYICUB_VERSION:-master}
-        PYICUB_APPS_VERSION: ${PYICUB_APPS_VERSION:-master}
-        WORKDIR: ${WORKDIR:-/usr/local/src/robot}
-
+    container_name: pyicub-backend
+    build: *pyicub-build
     runtime: ${DOCKER_RUNTIME:-runc}
-
     env_file:
       - pyicub.env
-
     environment:
       - DISPLAY=${DISPLAY:-:0}
       - PULSE_SERVER=unix:${XDG_RUNTIME_DIR:?error}/pulse/native
@@ -56,23 +57,18 @@ services:
       - NVIDIA_VISIBLE_DEVICES=${GPU_DEVICES:-none}
       - NVIDIA_DRIVER_CAPABILITIES=all
       - SSH_AUTH_SOCK=/ssh-agent
-
     command: ["/bin/bash", "-c", "bash ${WORKDIR:?error}/pyicub/scripts/start.sh"]
-      
     profiles:
       - backend
-
     healthcheck:
       test: ["CMD", "/bin/bash", "-c", "yarp ping /${PYICUB_NODE:?error}"]
       interval: 1m30s
       timeout: 30s
       retries: 5
       start_period: 30s
-
     depends_on:
       pyicub-yarpserver:
         condition: service_healthy
-
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - ${HOME}/.config/pulse/cookie:/run/pulse/cookie
@@ -84,48 +80,50 @@ services:
   pyicub.frontend:
     image: ${PYICUB_FRONTEND_IMAGE_NAME:?error}
     container_name: pyicub-frontend
-
     build:
       context: .
       dockerfile: Dockerfile.pyicub-frontend
       args:
         - PYICUB_FRONTEND_VERSION=${PYICUB_FRONTEND_VERSION:?error}
-
     environment:
       - SSH_AUTH_SOCK=/ssh-agent
-
     network_mode: host
-
     volumes:
       - pyicub-frontend-workspace:${WORKDIR:?error}/pyicub-frontend
       - ${HOME}/.gitconfig:/root/.gitconfig:ro
       - ${HOME}/.ssh:/root/.ssh:ro
       - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
-
     profiles:
       - frontend
-
     depends_on:
       pyicub-yarpserver:
         condition: service_healthy
       pyicub-backend:
         condition: service_healthy
 
+  pyicub.simulation-nogui:
+    <<: *pyicub-headless
+    container_name: pyicub-simulation-nogui
+    command: ["/bin/bash", "-c", "bash ${WORKDIR:?error}/pyicub/scripts/start.sh --simulation_nogui"]
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "yarp exists /icubSim/head/rpc:i"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    profiles:
+      - simulation_nogui
+      - test
+
   pyicub.test:
-    <<: *pyicub-common
+    <<: *pyicub-headless
     container_name: pyicub-test
-
-    command: ["/bin/bash", "-c", "bash ${WORKDIR:?error}/pyicub/scripts/tests.sh"]
-
-    env_file:
-      - pyicub.env
-      
-    environment:
-      - DISPLAY=:99
-
+    command: ["/bin/bash", "-c", "bash ${WORKDIR:?error}/pyicub/scripts/run_tests.sh"]
     volumes:
       - ./shared:/shared
-
+    depends_on:
+      pyicub.simulation-nogui:
+        condition: service_healthy
     profiles:
       - test
 

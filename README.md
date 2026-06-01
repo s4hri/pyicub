@@ -39,9 +39,11 @@ bash run.sh
 How to test pyicub
 -------------
 
-To run the tests you can run this command from your host machine, levearing docker containers.
+To run the tests, use the dedicated script from your host machine. It will build the image, start a headless simulation container, wait for it to be healthy, run the test container, and tear everything down on completion.
 
-    ```
-    cd pyicub/docker
-    COMPOSE_PROFILES=test ./run.sh
-    ```
+```
+cd pyicub/docker
+bash run_tests.sh
+```
+
+The test results (HTML report) are written to `docker/shared/pytest/pytest_report.html`.
