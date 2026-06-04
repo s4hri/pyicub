@@ -26,7 +26,12 @@ else
 fi
 
 # Check PulseAudio socket
-if [[ ! -S ${XDG_RUNTIME_DIR}/pulse/native ]]; then
+PULSE_SOCKET_PATH="${XDG_RUNTIME_DIR}/pulse/native"
+if [[ -n "${PULSE_SERVER:-}" && "${PULSE_SERVER}" == unix:* ]]; then
+    PULSE_SOCKET_PATH="${PULSE_SERVER#unix:}"
+fi
+
+if [[ ! -S "${PULSE_SOCKET_PATH}" ]]; then
     echo "🟡 PulseAudio socket missing. Audio via Pulse may fail."
 else
     echo "🟢 PulseAudio socket is ready."
