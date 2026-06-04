@@ -15,4 +15,4 @@ jobs:
 
       - name: Run tests
         working-directory: docker
-        run: bash run_tests.sh
+        run: bash build.sh && bash run_tests.sh
