@@ -120,9 +120,12 @@ class iCub(metaclass=iCubSingleton):
 
     def __del__(self):
         print("Please Wait! Closing YARP connections...")
-        self.close()
-        yarp.Network().init()
-        yarp.Network().fini()
+        try:
+            # During interpreter shutdown, forcing yarp Network init/fini here can block.
+            # Keep destructor cleanup lightweight and best-effort.
+            self.close()
+        except Exception:
+            pass
 
     def __importActions__(self, path):
         json_files = [pos_json for pos_json in os.listdir(path) if pos_json.endswith('.json')]
