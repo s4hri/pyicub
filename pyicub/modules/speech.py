@@ -125,3 +125,35 @@ class iSpeakPyCtrl:
 
     def close(self):
         self.__port__.close()
+
+
+class FakeSpeech(iSpeakPyCtrl):
+
+    def __init__(self):
+        super().__init__()
+        self.__port__ = yarp.BufferedPortBottle()
+        self.__port__.open("/pyicub/speech:o")
+        yarp.Network.connect("/pyicub/speech:o", "/iSpeak")
+        self.__speaking__ = False
+        self.__speak_thread__ = None
+
+    def say_muted(self, playback_time: float, waitActionDone=True):
+        btl = self.__port__.prepare()
+        btl.clear()
+        btl.addFloat64(playback_time)
+        self.__port__.write()
+        if waitActionDone:
+            time.sleep(playback_time)
+
+    def speak_start(self):
+        self.__speaking__ = True
+        self.__speak_thread__ = threading.Thread(target=self.__speak_loop__)
+        self.__speak_thread__.start()
+    
+    def __speak_loop__(self):
+        while self.__speaking__:
+            self.say_muted(playback_time=0.1, waitActionDone=True)
+    
+    def speak_stop(self):
+        self.__speaking__ = False
+        self.__speak_thread__.join()
