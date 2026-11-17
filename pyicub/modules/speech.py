@@ -32,6 +32,8 @@ from pyicub.core.ports import BufferedWritePort
 from pyicub.core.rpc import RpcClient
 
 import os
+import time
+import threading
 import numpy as np
 
 
@@ -60,27 +62,40 @@ class speechPyCtrl:
 class iSpeakPyCtrl:
 
     def __init__(self):
-         self.__port__ = BufferedWritePort("/pyicub/speech:o", "/iSpeak")
-         self.__rpcPort__ = RpcClient("/iSpeak/rpc")
+        self.__port__ = BufferedWritePort("/pyicub/speech:o", "/iSpeak")
+        self.__portbottle__ = yarp.BufferedPortBottle()
+        self.__portbottle__.open("/pyicub/speech_bottle:o")
+        yarp.Network.connect("/pyicub/speech_bottle:o", "/iSpeak")
+        self.__rpcPort__ = RpcClient("/iSpeak/rpc")
 
     def isValid(self):
         return self.__rpcPort__.connection_result
 
-    def say(self, something, waitActionDone=True):
-        self.__port__.write("\"%s\"" % something)
+    def wait_speaking_is_done(self):
         btl = yarp.Bottle()
         btl.clear()
         btl.addString("stat")
         res = self.__rpcPort__.execute(btl)
-        if waitActionDone:
-            if res.toString() == "quiet":
-                while res.toString() != "speaking":
-                    res = self.__rpcPort__.execute(btl)
-                    yarp.delay(0.01)
-            while res.toString() == "speaking":
+        if res.toString() == "quiet":
+            while res.toString() != "speaking":
                 res = self.__rpcPort__.execute(btl)
                 yarp.delay(0.01)
-        return res.toString()
+        while res.toString() == "speaking":
+            res = self.__rpcPort__.execute(btl)
+            yarp.delay(0.01)
+        
+    def say(self, something, waitActionDone=True):
+        self.__port__.write("\"%s\"" % something)
+        if waitActionDone:
+            self.wait_speaking_is_done()
+
+    def say_muted(self, playback_time: float, waitActionDone=True):
+        btl = self.__portbottle__.prepare()
+        btl.clear()
+        btl.addFloat64(playback_time)
+        self.__portbottle__.write()
+        if waitActionDone:
+            self.wait_speaking_is_done()
 
     def say_from_file(self, abs_file_path, wait_action_done=True):
         text = None
@@ -126,34 +141,3 @@ class iSpeakPyCtrl:
     def close(self):
         self.__port__.close()
 
-
-class FakeSpeech(iSpeakPyCtrl):
-
-    def __init__(self):
-        super().__init__()
-        self.__port__ = yarp.BufferedPortBottle()
-        self.__port__.open("/pyicub/speech:o")
-        yarp.Network.connect("/pyicub/speech:o", "/iSpeak")
-        self.__speaking__ = False
-        self.__speak_thread__ = None
-
-    def say_muted(self, playback_time: float, waitActionDone=True):
-        btl = self.__port__.prepare()
-        btl.clear()
-        btl.addFloat64(playback_time)
-        self.__port__.write()
-        if waitActionDone:
-            time.sleep(playback_time)
-
-    def speak_start(self):
-        self.__speaking__ = True
-        self.__speak_thread__ = threading.Thread(target=self.__speak_loop__)
-        self.__speak_thread__.start()
-    
-    def __speak_loop__(self):
-        while self.__speaking__:
-            self.say_muted(playback_time=0.1, waitActionDone=True)
-    
-    def speak_stop(self):
-        self.__speaking__ = False
-        self.__speak_thread__.join()
